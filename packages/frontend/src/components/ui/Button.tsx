@@ -31,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-page disabled:opacity-50 disabled:pointer-events-none cursor-pointer",
         variantStyles[variant],
         sizeStyles[size],
-        className
+        className,
       )}
       disabled={disabled || loading}
       {...props}
@@ -44,7 +44,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       )}
       {children}
     </button>
-  )
+  ),
 );
 
 Button.displayName = "Button";

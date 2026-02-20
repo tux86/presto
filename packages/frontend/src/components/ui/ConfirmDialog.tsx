@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Button } from "./Button";
 import { useT } from "@/i18n";
+import { Button } from "./Button";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -52,7 +52,11 @@ export function ConfirmDialog({
         <div className="flex items-start gap-3 mb-4">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-500">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
             </svg>
           </div>
           <div>
@@ -61,8 +65,12 @@ export function ConfirmDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={onCancel}>{resolvedCancelLabel}</Button>
-          <Button variant={variant === "danger" ? "danger" : "primary"} size="sm" onClick={onConfirm}>{resolvedConfirmLabel}</Button>
+          <Button variant="ghost" size="sm" onClick={onCancel}>
+            {resolvedCancelLabel}
+          </Button>
+          <Button variant={variant === "danger" ? "danger" : "primary"} size="sm" onClick={onConfirm}>
+            {resolvedConfirmLabel}
+          </Button>
         </div>
       </div>
     </div>

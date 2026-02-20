@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useT } from "@/i18n";
 
@@ -20,23 +20,49 @@ export function CommandPalette() {
 
   const commands: CommandItem[] = useMemo(
     () => [
-      { id: "dashboard", label: t("dashboard.title"), section: t("common.navigation"), icon: "~", action: () => navigate("/") },
-      { id: "activities", label: t("nav.activities"), section: t("common.navigation"), icon: "#", action: () => navigate("/") },
-      { id: "clients", label: t("nav.clients"), section: t("common.navigation"), icon: "@", action: () => navigate("/clients") },
-      { id: "missions", label: t("nav.missions"), section: t("common.navigation"), icon: "!", action: () => navigate("/missions") },
-      { id: "reporting", label: t("nav.reporting"), section: t("common.navigation"), icon: "%", action: () => navigate("/reporting") },
+      {
+        id: "dashboard",
+        label: t("dashboard.title"),
+        section: t("common.navigation"),
+        icon: "~",
+        action: () => navigate("/"),
+      },
+      {
+        id: "activities",
+        label: t("nav.activities"),
+        section: t("common.navigation"),
+        icon: "#",
+        action: () => navigate("/"),
+      },
+      {
+        id: "clients",
+        label: t("nav.clients"),
+        section: t("common.navigation"),
+        icon: "@",
+        action: () => navigate("/clients"),
+      },
+      {
+        id: "missions",
+        label: t("nav.missions"),
+        section: t("common.navigation"),
+        icon: "!",
+        action: () => navigate("/missions"),
+      },
+      {
+        id: "reporting",
+        label: t("nav.reporting"),
+        section: t("common.navigation"),
+        icon: "%",
+        action: () => navigate("/reporting"),
+      },
     ],
-    [navigate, t]
+    [navigate, t],
   );
 
   const filtered = useMemo(() => {
     if (!query) return commands;
     const lower = query.toLowerCase();
-    return commands.filter(
-      (c) =>
-        c.label.toLowerCase().includes(lower) ||
-        c.section.toLowerCase().includes(lower)
-    );
+    return commands.filter((c) => c.label.toLowerCase().includes(lower) || c.section.toLowerCase().includes(lower));
   }, [query, commands]);
 
   useEffect(() => {
@@ -60,7 +86,7 @@ export function CommandPalette() {
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [query]);
+  }, []);
 
   if (!open) return null;
 
@@ -110,9 +136,7 @@ export function CommandPalette() {
               <button
                 key={cmd.id}
                 className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-left transition-colors cursor-pointer ${
-                  i === selectedIndex
-                    ? "bg-accent-subtle text-accent-text"
-                    : "text-body hover:bg-elevated"
+                  i === selectedIndex ? "bg-accent-subtle text-accent-text" : "text-body hover:bg-elevated"
                 }`}
                 onClick={() => {
                   cmd.action();

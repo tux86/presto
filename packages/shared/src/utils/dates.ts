@@ -1,4 +1,4 @@
-import { isWeekend, getHolidayName } from "../holidays/france.js";
+import { getHolidayName, isWeekend } from "../holidays/france.js";
 
 /**
  * Get number of days in a given month (1-indexed)

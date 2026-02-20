@@ -1,16 +1,16 @@
+import type { Mission } from "@presto/shared";
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Table } from "@/components/ui/Table";
-import { Badge } from "@/components/ui/Badge";
-import { useMissions, useCreateMission, useUpdateMission, useDeleteMission } from "@/hooks/use-missions";
 import { useClients } from "@/hooks/use-clients";
 import { useConfirm } from "@/hooks/use-confirm";
+import { useCreateMission, useDeleteMission, useMissions, useUpdateMission } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
 import { formatCurrency } from "@/lib/utils";
-import type { Mission } from "@presto/shared";
 
 export function Missions() {
   const [showModal, setShowModal] = useState(false);
@@ -99,14 +99,34 @@ export function Missions() {
           emptyMessage={t("missions.emptyMessage")}
           onRowClick={openEdit}
           columns={[
-            { key: "name", header: t("missions.title"), render: (m) => <span className="font-medium text-heading">{m.name}</span> },
-            { key: "client", header: t("missions.client"), render: (m) => <span className="text-muted">{m.client?.name ?? "-"}</span> },
-            { key: "tjm", header: t("missions.dailyRate"), render: (m) => <span className="text-muted font-mono">{m.dailyRate ? formatCurrency(m.dailyRate) : "-"}</span> },
+            {
+              key: "name",
+              header: t("missions.title"),
+              render: (m) => <span className="font-medium text-heading">{m.name}</span>,
+            },
+            {
+              key: "client",
+              header: t("missions.client"),
+              render: (m) => <span className="text-muted">{m.client?.name ?? "-"}</span>,
+            },
+            {
+              key: "tjm",
+              header: t("missions.dailyRate"),
+              render: (m) => (
+                <span className="text-muted font-mono">{m.dailyRate ? formatCurrency(m.dailyRate) : "-"}</span>
+              ),
+            },
             {
               key: "status",
               header: t("missions.status"),
               render: (m) => (
-                <button onClick={(e) => { e.stopPropagation(); handleToggleActive(m); }} className="cursor-pointer">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleActive(m);
+                  }}
+                  className="cursor-pointer"
+                >
                   <Badge variant={m.isActive ? "success" : "default"}>
                     {m.isActive ? t("missions.active") : t("missions.inactive")}
                   </Badge>
@@ -119,7 +139,10 @@ export function Missions() {
               className: "text-right",
               render: (m) => (
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(m.id); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(m.id);
+                  }}
                   className="text-xs text-faint hover:text-red-500 transition-colors cursor-pointer"
                 >
                   {t("common.delete")}
@@ -147,13 +170,23 @@ export function Missions() {
             >
               <option value="">{t("missions.selectClient")}</option>
               {clients?.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
               ))}
             </select>
           </div>
-          <Input label={t("missions.dailyRateOptional")} type="number" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} placeholder="550" />
+          <Input
+            label={t("missions.dailyRateOptional")}
+            type="number"
+            value={dailyRate}
+            onChange={(e) => setDailyRate(e.target.value)}
+            placeholder="550"
+          />
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>{t("common.cancel")}</Button>
+            <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>
+              {t("common.cancel")}
+            </Button>
             <Button type="submit" loading={createMission.isPending || updateMission.isPending}>
               {editing ? t("common.edit") : t("common.create")}
             </Button>

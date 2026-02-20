@@ -1,13 +1,7 @@
+import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
 import { prisma } from "../lib/prisma.js";
-import { getMonthDates } from "@presto/shared";
-import { isWeekend, getHolidayName } from "@presto/shared";
 
-export async function createReportWithEntries(
-  userId: string,
-  missionId: string,
-  month: number,
-  year: number
-) {
+export async function createReportWithEntries(userId: string, missionId: string, month: number, year: number) {
   const dates = getMonthDates(year, month);
 
   const report = await prisma.activityReport.create({

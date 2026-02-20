@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { prisma } from "../lib/prisma.js";
-import { createToken } from "../lib/jwt.js";
-import { authMiddleware } from "../middleware/auth.js";
 import { config } from "../lib/config.js";
+import { createToken } from "../lib/jwt.js";
+import { prisma } from "../lib/prisma.js";
 import type { AppEnv } from "../lib/types.js";
+import { authMiddleware } from "../middleware/auth.js";
 
 const auth = new Hono<AppEnv>();
 
@@ -43,18 +43,21 @@ auth.post("/register", async (c) => {
 
   const token = await createToken(user.id, user.email);
 
-  return c.json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      company: user.company,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
+  return c.json(
+    {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: user.company,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      },
     },
-  }, 201);
+    201,
+  );
 });
 
 auth.post("/login", async (c) => {

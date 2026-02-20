@@ -1,14 +1,14 @@
 import { Hono } from "hono";
 import { prisma } from "../lib/prisma.js";
-import { authMiddleware } from "../middleware/auth.js";
 import type { AppEnv } from "../lib/types.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { generateReportPdf } from "../services/pdf.service.js";
 import {
-  createReportWithEntries,
   autoFillReport,
   clearReport,
+  createReportWithEntries,
   recalculateTotalDays,
 } from "../services/report.service.js";
-import { generateReportPdf } from "../services/pdf.service.js";
 
 const activityReports = new Hono<AppEnv>();
 activityReports.use("*", authMiddleware);
@@ -21,8 +21,8 @@ activityReports.get("/", async (c) => {
   const missionId = c.req.query("missionId");
 
   const where: Record<string, unknown> = { userId };
-  if (year) where.year = parseInt(year);
-  if (month) where.month = parseInt(month);
+  if (year) where.year = parseInt(year, 10);
+  if (month) where.month = parseInt(month, 10);
   if (missionId) where.missionId = missionId;
 
   const list = await prisma.activityReport.findMany({

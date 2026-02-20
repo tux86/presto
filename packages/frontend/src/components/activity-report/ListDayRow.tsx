@@ -1,7 +1,7 @@
 import type { ReportEntry } from "@presto/shared";
 import { getDayNameFull } from "@presto/shared";
-import { cn } from "@/lib/utils";
 import { useT } from "@/i18n";
+import { cn } from "@/lib/utils";
 
 interface ListDayRowProps {
   entry: ReportEntry;
@@ -31,46 +31,26 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
     >
       {/* Date */}
       <div className="w-24 shrink-0">
-        <div
-          className={cn(
-            "text-base font-bold",
-            isSpecial && "text-faint",
-            !isSpecial && "text-heading"
-          )}
-        >
+        <div className={cn("text-base font-bold", isSpecial && "text-faint", !isSpecial && "text-heading")}>
           {String(date.getDate()).padStart(2, "0")}
         </div>
-        <div className={cn("text-xs", isSpecial ? "text-faint" : "text-muted")}>
-          {getDayNameFull(date, locale)}
-        </div>
+        <div className={cn("text-xs", isSpecial ? "text-faint" : "text-muted")}>{getDayNameFull(date, locale)}</div>
       </div>
 
       {/* Value toggle */}
       <button
         className={cn(
           "relative flex h-9 w-16 items-center justify-center rounded-lg text-sm font-bold transition-all overflow-hidden cursor-pointer",
-          entry.value === 0 &&
-            "bg-elevated text-muted hover:bg-inset border border-edge",
-          entry.value === 1 &&
-            "bg-indigo-600 text-white border border-indigo-500",
-          entry.value === 0.5 &&
-            "bg-elevated text-white border border-indigo-500"
+          entry.value === 0 && "bg-elevated text-muted hover:bg-inset border border-edge",
+          entry.value === 1 && "bg-indigo-600 text-white border border-indigo-500",
+          entry.value === 0.5 && "bg-elevated text-white border border-indigo-500",
         )}
         onClick={handleToggle}
       >
         {entry.value === 0.5 && (
-          <div
-            className="absolute inset-0 bg-indigo-600"
-            style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
-          />
+          <div className="absolute inset-0 bg-indigo-600" style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
         )}
-        <span className="relative z-10">
-          {entry.value === 0
-            ? "0"
-            : entry.value === 0.5
-            ? "\u00BD"
-            : "1"}
-        </span>
+        <span className="relative z-10">{entry.value === 0 ? "0" : entry.value === 0.5 ? "\u00BD" : "1"}</span>
       </button>
 
       {/* Task / Holiday label */}
@@ -78,9 +58,7 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
         {entry.isHoliday ? (
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{entry.holidayName}</span>
-            {entry.value > 0 && (
-              <span className="text-xs text-muted">({t("activity.worked")})</span>
-            )}
+            {entry.value > 0 && <span className="text-xs text-muted">({t("activity.worked")})</span>}
           </div>
         ) : (
           <input

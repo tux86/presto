@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { prisma } from "../lib/prisma.js";
-import { authMiddleware } from "../middleware/auth.js";
 import type { AppEnv } from "../lib/types.js";
+import { authMiddleware } from "../middleware/auth.js";
 
 const clients = new Hono<AppEnv>();
 clients.use("*", authMiddleware);

@@ -24,7 +24,10 @@ export const useConfigStore = create<ConfigState>()((set) => ({
       const config = await api.get<AppConfig>("/config");
       set({ config, loaded: true });
     } catch {
-      set({ config: { appName: "Presto", theme: "light", authEnabled: true, locale: "fr", currency: "EUR" }, loaded: true });
+      set({
+        config: { appName: "Presto", theme: "light", authEnabled: true, locale: "fr", currency: "EUR" },
+        loaded: true,
+      });
     }
   },
 }));

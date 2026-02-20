@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useAuthStore } from "@/stores/auth.store";
-import { useT } from "@/i18n";
-
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useT } from "@/i18n";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function Login() {
   const [isRegister, setIsRegister] = useState(false);
@@ -48,15 +47,23 @@ export function Login() {
           <h2 className="text-lg font-semibold text-heading mb-1">
             {isRegister ? t("auth.register") : t("auth.login")}
           </h2>
-          <p className="text-sm text-muted mb-6">
-            {isRegister ? t("auth.registerSubtitle") : t("auth.loginSubtitle")}
-          </p>
+          <p className="text-sm text-muted mb-6">{isRegister ? t("auth.registerSubtitle") : t("auth.loginSubtitle")}</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <div className="grid grid-cols-2 gap-3">
-                <Input label={t("auth.firstName")} value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                <Input label={t("auth.lastName")} value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+                <Input
+                  label={t("auth.firstName")}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+                <Input
+                  label={t("auth.lastName")}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
               </div>
             )}
 
@@ -87,9 +94,7 @@ export function Login() {
               />
             )}
 
-            {error && (
-              <p className="text-sm text-red-500 bg-red-500/10 rounded-lg px-3 py-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 bg-red-500/10 rounded-lg px-3 py-2">{error}</p>}
 
             <Button type="submit" className="w-full" loading={loading}>
               {isRegister ? t("auth.submitRegister") : t("auth.submitLogin")}
@@ -100,7 +105,10 @@ export function Login() {
         <p className="mt-4 text-center text-sm text-muted">
           {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
           <button
-            onClick={() => { setIsRegister(!isRegister); setError(""); }}
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setError("");
+            }}
             className="text-accent-text hover:underline font-medium cursor-pointer"
           >
             {isRegister ? t("auth.switchToLogin") : t("auth.switchToRegister")}

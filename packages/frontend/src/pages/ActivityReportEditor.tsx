@@ -1,18 +1,23 @@
-import { useState, useCallback, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
-import { Button } from "@/components/ui/Button";
+import type { ReportEntry } from "@presto/shared";
+import { getMonthName } from "@presto/shared";
+import { useCallback, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
 import { ListView } from "@/components/activity-report/ListView";
 import { ReportInfoPanel } from "@/components/activity-report/ReportInfoPanel";
+import { Header } from "@/components/layout/Header";
+import { Button } from "@/components/ui/Button";
 import {
-  useActivityReport, useUpdateEntries, useAutoFillReport, useClearReport,
-  useDownloadPdf, useUpdateActivityReport, useDeleteActivityReport,
+  useActivityReport,
+  useAutoFillReport,
+  useClearReport,
+  useDeleteActivityReport,
+  useDownloadPdf,
+  useUpdateActivityReport,
+  useUpdateEntries,
 } from "@/hooks/use-activity-reports";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useT } from "@/i18n";
-import { getMonthName } from "@presto/shared";
-import type { ReportEntry } from "@presto/shared";
 
 type ViewMode = "calendar" | "list";
 
@@ -51,7 +56,7 @@ export function ActivityReportEditor() {
       }
       updateEntries.mutate({ reportId: id, entries: [{ id: entryId, value: newValue }] });
     },
-    [id, updateEntries, confirm, t]
+    [id, updateEntries, confirm, t],
   );
 
   const handleTaskChange = useCallback(
@@ -62,7 +67,7 @@ export function ActivityReportEditor() {
         updateEntries.mutate({ reportId: id, entries: [{ id: entryId, task }] });
       }, 500);
     },
-    [id, updateEntries]
+    [id, updateEntries],
   );
 
   const handleToggleStatus = () => {
@@ -97,7 +102,9 @@ export function ActivityReportEditor() {
     return (
       <div className="text-center py-20">
         <p className="text-muted">{t("activity.notFound")}</p>
-        <Button variant="ghost" className="mt-4" onClick={() => navigate("/")}>{t("common.back")}</Button>
+        <Button variant="ghost" className="mt-4" onClick={() => navigate("/")}>
+          {t("common.back")}
+        </Button>
       </div>
     );
   }
@@ -109,8 +116,12 @@ export function ActivityReportEditor() {
         subtitle={`${report.mission?.client?.name} - ${report.mission?.name}`}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>&larr; {t("common.back")}</Button>
-            <Button variant="danger" size="sm" onClick={handleDelete}>{t("common.delete")}</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+              &larr; {t("common.back")}
+            </Button>
+            <Button variant="danger" size="sm" onClick={handleDelete}>
+              {t("common.delete")}
+            </Button>
           </div>
         }
       />

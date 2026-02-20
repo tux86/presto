@@ -11,12 +11,7 @@ export function ListView({ entries, onToggle, onTaskChange }: ListViewProps) {
   return (
     <div className="space-y-0.5">
       {entries.map((entry) => (
-        <ListDayRow
-          key={entry.id}
-          entry={entry}
-          onToggle={onToggle}
-          onTaskChange={onTaskChange}
-        />
+        <ListDayRow key={entry.id} entry={entry} onToggle={onToggle} onTaskChange={onTaskChange} />
       ))}
     </div>
   );

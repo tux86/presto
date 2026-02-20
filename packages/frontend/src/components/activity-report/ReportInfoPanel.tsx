@@ -1,9 +1,8 @@
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
-import { Button } from "../ui/Button";
-import { formatCurrency } from "@/lib/utils";
 import { useT } from "@/i18n";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import { Button } from "../ui/Button";
 
 interface ReportInfoPanelProps {
   report: ActivityReport;
@@ -47,9 +46,7 @@ export function ReportInfoPanel({
           onClick={isCompleted ? onToggleStatus : undefined}
           className={cn(
             "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
-            !isCompleted
-              ? "bg-panel text-heading shadow-sm"
-              : "text-faint hover:text-muted",
+            !isCompleted ? "bg-panel text-heading shadow-sm" : "text-faint hover:text-muted",
           )}
         >
           {t("activity.draft")}
@@ -58,9 +55,7 @@ export function ReportInfoPanel({
           onClick={!isCompleted ? onToggleStatus : undefined}
           className={cn(
             "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
-            isCompleted
-              ? "bg-emerald-500 text-white shadow-sm"
-              : "text-faint hover:text-muted",
+            isCompleted ? "bg-emerald-500 text-white shadow-sm" : "text-faint hover:text-muted",
           )}
         >
           {t("activity.validated")}
@@ -77,16 +72,12 @@ export function ReportInfoPanel({
           <>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted">{t("missions.dailyRate")}</span>
-              <span className="text-base font-semibold text-body">
-                {formatCurrency(report.mission.dailyRate)}
-              </span>
+              <span className="text-base font-semibold text-body">{formatCurrency(report.mission.dailyRate)}</span>
             </div>
             {revenue !== null && (
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted">{t("activity.amount")}</span>
-                <span className="text-lg font-bold text-accent-text">
-                  {formatCurrency(revenue)}
-                </span>
+                <span className="text-lg font-bold text-accent-text">{formatCurrency(revenue)}</span>
               </div>
             )}
           </>
@@ -105,7 +96,11 @@ export function ReportInfoPanel({
         </Button>
         <Button variant="secondary" size="md" className="w-full" onClick={onDownloadPdf} loading={downloading}>
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+            />
           </svg>
           {t("activity.exportPdf")}
         </Button>

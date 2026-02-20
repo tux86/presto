@@ -32,16 +32,14 @@ export const useThemeStore = create<ThemeState>()(
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.mode);
       },
-    }
-  )
+    },
+  ),
 );
 
 // Listen for system theme changes when mode is "auto"
 if (typeof window !== "undefined") {
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", () => {
-      const { mode } = useThemeStore.getState();
-      if (mode === "auto") applyTheme("auto");
-    });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    const { mode } = useThemeStore.getState();
+    if (mode === "auto") applyTheme("auto");
+  });
 }

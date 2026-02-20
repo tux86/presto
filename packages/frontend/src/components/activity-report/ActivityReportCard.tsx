@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
-import { Badge } from "../ui/Badge";
-import { cn, formatCurrency } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { useT } from "@/i18n";
+import { cn, formatCurrency } from "@/lib/utils";
+import { Badge } from "../ui/Badge";
 
 interface ActivityReportCardProps {
   report: ActivityReport;
@@ -45,20 +45,11 @@ export function ActivityReportCard({ report }: ActivityReportCardProps) {
               title={`${new Date(entry.date).getDate()} - ${entry.value}${entry.value > 1 ? t("activity.days") : t("activity.day")}`}
               className={cn(
                 "w-3 h-3 rounded-sm transition-colors overflow-hidden relative",
-                isOff
-                  ? "bg-elevated"
-                  : entry.value === 1
-                  ? "bg-indigo-500"
-                  : isHalf
-                  ? "bg-elevated"
-                  : "bg-inset"
+                isOff ? "bg-elevated" : entry.value === 1 ? "bg-indigo-500" : isHalf ? "bg-elevated" : "bg-inset",
               )}
             >
               {isHalf && (
-                <div
-                  className="absolute inset-0 bg-indigo-500"
-                  style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
-                />
+                <div className="absolute inset-0 bg-indigo-500" style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
               )}
             </div>
           );
@@ -67,7 +58,9 @@ export function ActivityReportCard({ report }: ActivityReportCardProps) {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-muted">
-        <span>{report.totalDays} {report.totalDays > 1 ? t("activity.days") : t("activity.day")}</span>
+        <span>
+          {report.totalDays} {report.totalDays > 1 ? t("activity.days") : t("activity.day")}
+        </span>
         {report.mission?.dailyRate && (
           <span className="text-accent-text font-medium">
             {formatCurrency(report.totalDays * report.mission.dailyRate)}

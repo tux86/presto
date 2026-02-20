@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import { Sidebar } from "./Sidebar";
 import { CommandPalette } from "../ui/CommandPalette";
+import { Sidebar } from "./Sidebar";
 
 export function AppLayout() {
   return (

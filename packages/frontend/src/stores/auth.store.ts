@@ -1,6 +1,6 @@
+import type { AuthResponse, User } from "@presto/shared";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User, AuthResponse } from "@presto/shared";
 import { api } from "../api/client";
 
 interface AuthState {
@@ -55,6 +55,6 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "presto-auth",
       partialize: (state) => ({ token: state.token }),
-    }
-  )
+    },
+  ),
 );

@@ -61,7 +61,7 @@ export function getHolidayName(date: Date, year?: number): string | null {
     (h) =>
       h.date.getFullYear() === date.getFullYear() &&
       h.date.getMonth() === date.getMonth() &&
-      h.date.getDate() === date.getDate()
+      h.date.getDate() === date.getDate(),
   );
   return found?.name ?? null;
 }

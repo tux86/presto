@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { verifyToken } from "../lib/jwt.js";
 import { config } from "../lib/config.js";
+import { verifyToken } from "../lib/jwt.js";
 import { prisma } from "../lib/prisma.js";
 
 type AuthEnv = {
@@ -15,9 +15,7 @@ async function getOrCreateDefaultUser(): Promise<{ id: string; email: string }> 
   const { email, password, firstName, lastName } = config.auth.defaultUser;
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    const hashedPassword = password
-      ? await Bun.password.hash(password, { algorithm: "bcrypt", cost: 10 })
-      : "";
+    const hashedPassword = password ? await Bun.password.hash(password, { algorithm: "bcrypt", cost: 10 }) : "";
     user = await prisma.user.create({
       data: { email, password: hashedPassword, firstName, lastName },
     });

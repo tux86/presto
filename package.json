@@ -1,14 +1,37 @@
 {
   "name": "presto",
+  "version": "0.1.0",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "bun run --filter '@presto/backend' dev & bun run --filter '@presto/frontend' dev",
     "dev:backend": "bun run --filter '@presto/backend' dev",
     "dev:frontend": "bun run --filter '@presto/frontend' dev",
     "build": "bun run --filter '@presto/shared' build && bun run --filter '@presto/backend' build && bun run --filter '@presto/frontend' build",
+    "typecheck": "bun run --filter '@presto/shared' typecheck && bun run --filter '@presto/backend' typecheck && bun run --filter '@presto/frontend' typecheck",
     "db:migrate": "bun run --filter '@presto/backend' db:migrate",
     "db:seed": "bun run --filter '@presto/backend' db:seed",
-    "db:generate": "bun run --filter '@presto/backend' db:generate"
+    "db:generate": "bun run --filter '@presto/backend' db:generate",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.3",
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "husky": "^9.1.7",
+    "semantic-release": "^24.2.1"
   }
 }

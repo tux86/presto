@@ -1,14 +1,8 @@
 // @ts-nocheck - React PDF uses JSX patterns that conflict with strict TS in Bun backend context
+
+import { getDayName, getMonthName } from "@presto/shared";
+import { Document, Page, renderToBuffer, StyleSheet, Text, View } from "@react-pdf/renderer";
 import React from "react";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  renderToBuffer,
-} from "@react-pdf/renderer";
-import { getMonthName, getDayName } from "@presto/shared";
 
 const styles = StyleSheet.create({
   page: { padding: 40, fontSize: 10, fontFamily: "Helvetica" },
@@ -30,9 +24,14 @@ const styles = StyleSheet.create({
   colValue: { width: "15%", textAlign: "center" },
   colTask: { width: "50%" },
   footer: {
-    position: "absolute", bottom: 40, left: 40, right: 40,
-    flexDirection: "row", justifyContent: "space-between",
-    borderTop: "1px solid #ddd", paddingTop: 10,
+    position: "absolute",
+    bottom: 40,
+    left: 40,
+    right: 40,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTop: "1px solid #ddd",
+    paddingTop: 10,
   },
   total: { fontSize: 14, fontWeight: "bold", color: "#1a1a2e" },
   note: { marginTop: 20, padding: 10, backgroundColor: "#f8f9fa", borderRadius: 4 },
@@ -121,21 +120,22 @@ function ReportDocument({ report, locale = "fr" }: { report: PdfReport; locale?:
             { style: styles.infoBlock },
             React.createElement(Text, { style: styles.infoLabel }, l.consultant),
             React.createElement(Text, { style: styles.infoValue }, `${report.user.firstName} ${report.user.lastName}`),
-            report.user.company && React.createElement(Text, { style: { fontSize: 9, color: "#666" } }, report.user.company)
+            report.user.company &&
+              React.createElement(Text, { style: { fontSize: 9, color: "#666" } }, report.user.company),
           ),
           React.createElement(
             View,
             { style: styles.infoBlock },
             React.createElement(Text, { style: styles.infoLabel }, l.client),
-            React.createElement(Text, { style: styles.infoValue }, report.mission.client.name)
+            React.createElement(Text, { style: styles.infoValue }, report.mission.client.name),
           ),
           React.createElement(
             View,
             { style: styles.infoBlock },
             React.createElement(Text, { style: styles.infoLabel }, l.mission),
-            React.createElement(Text, { style: styles.infoValue }, report.mission.name)
-          )
-        )
+            React.createElement(Text, { style: styles.infoValue }, report.mission.name),
+          ),
+        ),
       ),
       React.createElement(
         View,
@@ -146,7 +146,7 @@ function ReportDocument({ report, locale = "fr" }: { report: PdfReport; locale?:
           React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDate } }, l.date),
           React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDay } }, l.day),
           React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colValue } }, l.days),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colTask } }, l.description)
+          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colTask } }, l.description),
         ),
         ...report.entries.map((entry, i) => {
           const date = new Date(entry.date);
@@ -162,26 +162,38 @@ function ReportDocument({ report, locale = "fr" }: { report: PdfReport; locale?:
             { style: rowStyle, key: i },
             React.createElement(Text, { style: styles.colDate }, `${dayStr}/${monthStr}/${report.year}`),
             React.createElement(Text, { style: styles.colDay }, dayName),
-            React.createElement(Text, { style: styles.colValue }, entry.isWeekend || entry.isHoliday ? "-" : String(entry.value)),
-            React.createElement(Text, { style: styles.colTask }, label)
+            React.createElement(
+              Text,
+              { style: styles.colValue },
+              entry.isWeekend || entry.isHoliday ? "-" : String(entry.value),
+            ),
+            React.createElement(Text, { style: styles.colTask }, label),
           );
-        })
+        }),
       ),
       report.note &&
         React.createElement(
           View,
           { style: styles.note },
           React.createElement(Text, { style: styles.noteLabel }, l.note),
-          React.createElement(Text, null, report.note)
+          React.createElement(Text, null, report.note),
         ),
       React.createElement(
         View,
         { style: styles.footer },
-        React.createElement(Text, { style: styles.total }, `${l.total} : ${report.totalDays} ${l.dayUnit(report.totalDays)}`),
+        React.createElement(
+          Text,
+          { style: styles.total },
+          `${l.total} : ${report.totalDays} ${l.dayUnit(report.totalDays)}`,
+        ),
         report.mission.dailyRate &&
-          React.createElement(Text, { style: styles.total }, `${l.amount} : ${(report.totalDays * report.mission.dailyRate).toLocaleString(currencyLocale)} \u20ac`)
-      )
-    )
+          React.createElement(
+            Text,
+            { style: styles.total },
+            `${l.amount} : ${(report.totalDays * report.mission.dailyRate).toLocaleString(currencyLocale)} \u20ac`,
+          ),
+      ),
+    ),
   );
 }
 

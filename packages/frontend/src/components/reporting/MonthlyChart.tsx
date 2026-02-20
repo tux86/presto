@@ -1,13 +1,5 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
 import { getMonthName } from "@presto/shared";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useT } from "@/i18n";
 
 interface MonthlyData {
@@ -24,13 +16,7 @@ interface MonthlyChartProps {
   formatValue?: (value: number) => string;
 }
 
-export function MonthlyChart({
-  data,
-  dataKey,
-  label,
-  color = "#6366f1",
-  formatValue,
-}: MonthlyChartProps) {
+export function MonthlyChart({ data, dataKey, label, color = "#6366f1", formatValue }: MonthlyChartProps) {
   const { locale } = useT();
 
   const chartData = data.map((d) => ({
@@ -45,17 +31,8 @@ export function MonthlyChart({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--th-edge)" vertical={false} />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 11, fill: "var(--th-muted)" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 11, fill: "var(--th-muted)" }}
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--th-muted)" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: "var(--th-muted)" }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{
                 background: "var(--th-panel)",
@@ -64,10 +41,7 @@ export function MonthlyChart({
                 fontSize: 12,
                 color: "var(--th-body)",
               }}
-              formatter={(value: number) => [
-                formatValue ? formatValue(value) : value,
-                label,
-              ]}
+              formatter={(value: number) => [formatValue ? formatValue(value) : value, label]}
             />
             <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>

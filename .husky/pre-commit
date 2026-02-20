@@ -1,0 +1,2 @@
+bunx --bun biome check --no-errors-on-unmatched --staged --write --unsafe
+git update-index --again

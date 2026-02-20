@@ -44,7 +44,8 @@ export const fr = {
   "missions.active": "Active",
   "missions.inactive": "Inactive",
   "missions.deleteTitle": "Supprimer cette mission",
-  "missions.deleteMessage": "Cette mission et ses activit\u00e9s associ\u00e9es seront supprim\u00e9es. Cette action est irr\u00e9versible.",
+  "missions.deleteMessage":
+    "Cette mission et ses activit\u00e9s associ\u00e9es seront supprim\u00e9es. Cette action est irr\u00e9versible.",
 
   // Activity (timesheet)
   "activity.validated": "Valid\u00e9",

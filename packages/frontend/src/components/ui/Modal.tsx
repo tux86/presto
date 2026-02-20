@@ -34,12 +34,10 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       <div
         className={cn(
           "w-full max-w-md rounded-xl bg-panel border border-edge shadow-2xl p-6 max-h-[85vh] overflow-y-auto",
-          className
+          className,
         )}
       >
-        {title && (
-          <h2 className="text-lg font-semibold text-heading mb-4">{title}</h2>
-        )}
+        {title && <h2 className="text-lg font-semibold text-heading mb-4">{title}</h2>}
         {children}
       </div>
     </div>

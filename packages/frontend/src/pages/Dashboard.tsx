@@ -1,12 +1,12 @@
+import { getMonthName } from "@presto/shared";
 import { useState } from "react";
+import { ActivityReportCard } from "@/components/activity-report/ActivityReportCard";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { ActivityReportCard } from "@/components/activity-report/ActivityReportCard";
 import { useActivityReports, useCreateActivityReport } from "@/hooks/use-activity-reports";
 import { useMissions } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
-import { getMonthName } from "@presto/shared";
 
 export function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -25,7 +25,9 @@ export function Dashboard() {
     try {
       await createReport.mutateAsync({ month: newReportMonth, year: newReportYear, missionId: newReportMissionId });
       setShowCreateModal(false);
-    } catch { /* handled by mutation */ }
+    } catch {
+      /* handled by mutation */
+    }
   };
 
   return (
@@ -36,9 +38,19 @@ export function Dashboard() {
         actions={
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 rounded-lg border border-edge bg-panel">
-              <button className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer" onClick={() => setSelectedYear((y) => y - 1)}>&larr;</button>
+              <button
+                className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer"
+                onClick={() => setSelectedYear((y) => y - 1)}
+              >
+                &larr;
+              </button>
               <span className="px-2 text-sm text-body font-medium">{selectedYear}</span>
-              <button className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer" onClick={() => setSelectedYear((y) => y + 1)}>&rarr;</button>
+              <button
+                className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer"
+                onClick={() => setSelectedYear((y) => y + 1)}
+              >
+                &rarr;
+              </button>
             </div>
             <Button onClick={() => setShowCreateModal(true)}>{t("dashboard.newActivity")}</Button>
           </div>
@@ -90,7 +102,9 @@ export function Dashboard() {
                 className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
               >
                 {[selectedYear - 1, selectedYear, selectedYear + 1].map((y) => (
-                  <option key={y} value={y}>{y}</option>
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
@@ -104,19 +118,25 @@ export function Dashboard() {
               className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
             >
               <option value="">{t("dashboard.selectMission")}</option>
-              {missions?.filter((m) => m.isActive).map((m) => (
-                <option key={m.id} value={m.id}>{m.client?.name} - {m.name}</option>
-              ))}
+              {missions
+                ?.filter((m) => m.isActive)
+                .map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.client?.name} - {m.name}
+                  </option>
+                ))}
             </select>
           </div>
 
-          {createReport.error && (
-            <p className="text-sm text-red-500">{createReport.error.message}</p>
-          )}
+          {createReport.error && <p className="text-sm text-red-500">{createReport.error.message}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="ghost" onClick={() => setShowCreateModal(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleCreate} loading={createReport.isPending} disabled={!newReportMissionId}>{t("common.create")}</Button>
+            <Button variant="ghost" onClick={() => setShowCreateModal(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={handleCreate} loading={createReport.isPending} disabled={!newReportMissionId}>
+              {t("common.create")}
+            </Button>
           </div>
         </div>
       </Modal>

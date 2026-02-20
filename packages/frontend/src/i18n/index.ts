@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useConfigStore } from "@/stores/config.store";
-import { fr, type TranslationKey } from "./fr";
 import { en } from "./en";
+import { fr, type TranslationKey } from "./fr";
 
 const translations: Record<string, Record<TranslationKey, string>> = { fr, en };
 

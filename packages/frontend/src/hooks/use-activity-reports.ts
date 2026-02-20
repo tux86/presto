@@ -1,6 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type {
+  ActivityReport,
+  CreateActivityReportRequest,
+  UpdateActivityReportRequest,
+  UpdateEntriesRequest,
+} from "@presto/shared";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
-import type { ActivityReport, CreateActivityReportRequest, UpdateActivityReportRequest, UpdateEntriesRequest } from "@presto/shared";
 
 export function useActivityReports(filters?: { year?: number; month?: number; missionId?: string }) {
   const params = new URLSearchParams();
@@ -80,7 +85,11 @@ export function useUpdateEntries() {
           return { ...e, ...upd, value: newValue };
         });
         const totalDays = updatedEntries?.reduce((sum, e) => sum + e.value, 0) ?? previous.totalDays;
-        qc.setQueryData<ActivityReport>(["activity-report", reportId], { ...previous, entries: updatedEntries, totalDays });
+        qc.setQueryData<ActivityReport>(["activity-report", reportId], {
+          ...previous,
+          entries: updatedEntries,
+          totalDays,
+        });
       }
       return { previous, reportId };
     },

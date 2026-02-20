@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuthStore } from "./stores/auth.store";
-import { useConfigStore } from "./stores/config.store";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
-import { Login } from "./pages/Login";
-import { Dashboard } from "./pages/Dashboard";
 import { ActivityReportEditor } from "./pages/ActivityReportEditor";
 import { Clients } from "./pages/Clients";
+import { Dashboard } from "./pages/Dashboard";
+import { Login } from "./pages/Login";
 import { Missions } from "./pages/Missions";
 import { Reporting } from "./pages/Reporting";
+import { useAuthStore } from "./stores/auth.store";
+import { useConfigStore } from "./stores/config.store";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
@@ -49,10 +49,7 @@ export default function App() {
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={!authEnabled || token ? <Navigate to="/" replace /> : <Login />}
-      />
+      <Route path="/login" element={!authEnabled || token ? <Navigate to="/" replace /> : <Login />} />
       <Route
         element={
           <ProtectedRoute>

@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  company   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  clients   Client[]
+  missions  Mission[]
+  cras      Cra[]
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  siret     String?
+  email     String?
+  address   String?
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  missions  Mission[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Mission {
+  id        String    @id @default(cuid())
+  name      String
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  tjm       Float?
+  startDate DateTime?
+  endDate   DateTime?
+  isActive  Boolean   @default(true)
+  cras      Cra[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Cra {
+  id        String     @id @default(cuid())
+  month     Int
+  year      Int
+  status    CraStatus  @default(DRAFT)
+  totalDays Float      @default(0)
+  note      String?
+  missionId String
+  mission   Mission    @relation(fields: [missionId], references: [id])
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  entries   CraEntry[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([missionId, month, year])
+}
+
+enum CraStatus {
+  DRAFT
+  COMPLETED
+}
+
+model CraEntry {
+  id          String   @id @default(cuid())
+  date        DateTime
+  value       Float    @default(0)
+  task        String?
+  isWeekend   Boolean  @default(false)
+  isHoliday   Boolean  @default(false)
+  holidayName String?
+  craId       String
+  cra         Cra      @relation(fields: [craId], references: [id], onDelete: Cascade)
+
+  @@unique([craId, date])
+}

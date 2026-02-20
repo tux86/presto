@@ -1,0 +1,97 @@
+import type { CraEntry } from "@presto/shared";
+import { getDayNameFull } from "@presto/shared";
+import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
+
+interface ListDayRowProps {
+  entry: CraEntry;
+  onToggle: (entryId: string, newValue: number) => void;
+  onTaskChange: (entryId: string, task: string) => void;
+}
+
+export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
+  const date = new Date(entry.date);
+  const isSpecial = entry.isWeekend || entry.isHoliday;
+  const { t, locale } = useT();
+
+  const handleToggle = () => {
+    const next = entry.value === 0 ? 1 : entry.value === 1 ? 0.5 : 0;
+    onToggle(entry.id, next);
+  };
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-4 px-4 py-3 rounded-lg transition-colors hover:bg-elevated",
+        entry.isWeekend && entry.value === 0 && "opacity-40",
+        entry.isWeekend && entry.value > 0 && "opacity-70",
+        entry.isHoliday && entry.value === 0 && "bg-holiday opacity-50",
+        entry.isHoliday && entry.value > 0 && "bg-holiday opacity-70",
+      )}
+    >
+      {/* Date */}
+      <div className="w-24 shrink-0">
+        <div
+          className={cn(
+            "text-base font-bold",
+            isSpecial && "text-faint",
+            !isSpecial && "text-heading"
+          )}
+        >
+          {String(date.getDate()).padStart(2, "0")}
+        </div>
+        <div className={cn("text-xs", isSpecial ? "text-faint" : "text-muted")}>
+          {getDayNameFull(date, locale)}
+        </div>
+      </div>
+
+      {/* Value toggle */}
+      <button
+        className={cn(
+          "relative flex h-9 w-16 items-center justify-center rounded-lg text-sm font-bold transition-all overflow-hidden cursor-pointer",
+          entry.value === 0 &&
+            "bg-elevated text-muted hover:bg-inset border border-edge",
+          entry.value === 1 &&
+            "bg-indigo-600 text-white border border-indigo-500",
+          entry.value === 0.5 &&
+            "bg-elevated text-white border border-indigo-500"
+        )}
+        onClick={handleToggle}
+      >
+        {entry.value === 0.5 && (
+          <div
+            className="absolute inset-0 bg-indigo-600"
+            style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+          />
+        )}
+        <span className="relative z-10">
+          {entry.value === 0
+            ? "0"
+            : entry.value === 0.5
+            ? "\u00BD"
+            : "1"}
+        </span>
+      </button>
+
+      {/* Task / Holiday label */}
+      <div className="flex-1 min-w-0">
+        {entry.isHoliday ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{entry.holidayName}</span>
+            {entry.value > 0 && (
+              <span className="text-xs text-muted">({t("activity.worked")})</span>
+            )}
+          </div>
+        ) : (
+          <input
+            type="text"
+            value={entry.task || ""}
+            onChange={(e) => onTaskChange(entry.id, e.target.value)}
+            placeholder={entry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.taskPlaceholder")}
+            className="w-full bg-transparent text-sm text-body placeholder:text-placeholder outline-none"
+          />
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,172 @@
+import { useState, useCallback, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Header } from "@/components/layout/Header";
+import { Button } from "@/components/ui/Button";
+import { CalendarGrid } from "@/components/cra/CalendarGrid";
+import { ListView } from "@/components/cra/ListView";
+import { CraInfoPanel } from "@/components/cra/CraInfoPanel";
+import {
+  useCra, useUpdateEntries, useAutoFillCra, useClearCra,
+  useDownloadPdf, useUpdateCra, useDeleteCra,
+} from "@/hooks/use-cras";
+import { useConfirm } from "@/hooks/use-confirm";
+import { useT } from "@/i18n";
+import { getMonthName } from "@presto/shared";
+import type { CraEntry } from "@presto/shared";
+
+type ViewMode = "calendar" | "list";
+
+export function CraEditor() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState<ViewMode>("calendar");
+  const { data: cra, isLoading } = useCra(id);
+  const updateEntries = useUpdateEntries();
+  const autoFill = useAutoFillCra();
+  const clear = useClearCra();
+  const downloadPdf = useDownloadPdf();
+  const updateCra = useUpdateCra();
+  const deleteCra = useDeleteCra();
+  const { confirm, dialog } = useConfirm();
+  const { t, locale } = useT();
+
+  const taskTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const entries = cra?.entries ?? [];
+  const entriesRef = useRef<CraEntry[]>(entries);
+  entriesRef.current = entries;
+
+  const handleToggle = useCallback(
+    async (entryId: string, newValue: number) => {
+      if (!id) return;
+      const entry = entriesRef.current.find((e) => e.id === entryId);
+      if (entry?.isHoliday && entry.value === 0) {
+        const ok = await confirm({
+          title: t("activity.holidayTitle"),
+          message: t("activity.holidayMessage", { name: entry.holidayName ?? t("activity.holidayDefault") }),
+          confirmLabel: t("activity.holidayConfirm"),
+          cancelLabel: t("common.cancel"),
+        });
+        if (!ok) return;
+      }
+      updateEntries.mutate({ craId: id, entries: [{ id: entryId, value: newValue }] });
+    },
+    [id, updateEntries, confirm, t]
+  );
+
+  const handleTaskChange = useCallback(
+    (entryId: string, task: string) => {
+      if (!id) return;
+      if (taskTimerRef.current[entryId]) clearTimeout(taskTimerRef.current[entryId]);
+      taskTimerRef.current[entryId] = setTimeout(() => {
+        updateEntries.mutate({ craId: id, entries: [{ id: entryId, task }] });
+      }, 500);
+    },
+    [id, updateEntries]
+  );
+
+  const handleToggleStatus = () => {
+    if (!cra || !id) return;
+    updateCra.mutate({ id, status: cra.status === "COMPLETED" ? "DRAFT" : "COMPLETED" });
+  };
+
+  const handleDelete = async () => {
+    if (!id) return;
+    const ok = await confirm({
+      title: t("activity.deleteTitle"),
+      message: t("activity.deleteMessage"),
+      confirmLabel: t("common.delete"),
+      cancelLabel: t("common.cancel"),
+      variant: "danger",
+    });
+    if (!ok) return;
+    await deleteCra.mutateAsync(id);
+    navigate("/");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 w-48 bg-elevated rounded" />
+        <div className="h-96 bg-panel border border-edge rounded-xl" />
+      </div>
+    );
+  }
+
+  if (!cra) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-muted">{t("activity.notFound")}</p>
+        <Button variant="ghost" className="mt-4" onClick={() => navigate("/")}>{t("common.back")}</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Header
+        title={`${getMonthName(cra.month, locale)} ${cra.year}`}
+        subtitle={`${cra.mission?.client?.name} - ${cra.mission?.name}`}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>&larr; {t("common.back")}</Button>
+            <Button variant="danger" size="sm" onClick={handleDelete}>{t("common.delete")}</Button>
+          </div>
+        }
+      />
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Info panel */}
+        <div className="w-full lg:w-72 lg:shrink-0">
+          <div className="lg:sticky lg:top-8">
+            <CraInfoPanel
+              cra={cra}
+              onAutoFill={() => autoFill.mutate(id!)}
+              onClear={() => clear.mutate(id!)}
+              onDownloadPdf={() => downloadPdf.mutate(id!)}
+              onToggleStatus={handleToggleStatus}
+              filling={autoFill.isPending}
+              clearing={clear.isPending}
+              downloading={downloadPdf.isPending}
+            />
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          {/* View toggle */}
+          <div className="flex items-center gap-1 mb-5 rounded-lg border border-edge bg-panel p-1 w-fit">
+            <button
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                viewMode === "calendar" ? "bg-elevated text-heading" : "text-muted hover:text-body"
+              }`}
+              onClick={() => setViewMode("calendar")}
+            >
+              {t("activity.calendar")}
+            </button>
+            <button
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                viewMode === "list" ? "bg-elevated text-heading" : "text-muted hover:text-body"
+              }`}
+              onClick={() => setViewMode("list")}
+            >
+              {t("activity.list")}
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="rounded-xl border border-edge bg-panel p-6">
+            {viewMode === "calendar" ? (
+              <CalendarGrid entries={entries} onToggle={handleToggle} />
+            ) : (
+              <ListView entries={entries} onToggle={handleToggle} onTaskChange={handleTaskChange} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Confirm dialog */}
+      {dialog}
+    </div>
+  );
+}

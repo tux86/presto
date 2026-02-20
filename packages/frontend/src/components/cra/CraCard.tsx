@@ -1,0 +1,79 @@
+import { useNavigate } from "react-router-dom";
+import type { Cra } from "@presto/shared";
+import { getMonthName } from "@presto/shared";
+import { Badge } from "../ui/Badge";
+import { cn, formatCurrency } from "@/lib/utils";
+import { useT } from "@/i18n";
+
+interface CraCardProps {
+  cra: Cra;
+}
+
+export function CraCard({ cra }: CraCardProps) {
+  const navigate = useNavigate();
+  const { t, locale } = useT();
+  const entries = cra.entries ?? [];
+
+  return (
+    <div
+      className="group rounded-xl border border-edge bg-panel p-4 hover:border-edge-strong hover:bg-elevated/50 transition-all duration-150 cursor-pointer"
+      onClick={() => navigate(`/activity/${cra.id}`)}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <h3 className="text-sm font-medium text-heading">
+            {getMonthName(cra.month, locale)} {cra.year}
+          </h3>
+          <p className="text-xs text-muted mt-0.5">
+            {cra.mission?.client?.name} &middot; {cra.mission?.name}
+          </p>
+        </div>
+        <Badge variant={cra.status === "COMPLETED" ? "success" : "default"}>
+          {cra.status === "COMPLETED" ? t("activity.validated") : t("activity.draft")}
+        </Badge>
+      </div>
+
+      {/* Mini heatmap */}
+      <div className="flex flex-wrap gap-[3px] mb-3">
+        {entries.map((entry) => {
+          const isOff = entry.isWeekend || entry.isHoliday;
+          const isHalf = !isOff && entry.value === 0.5;
+          return (
+            <div
+              key={entry.id}
+              title={`${new Date(entry.date).getDate()} - ${entry.value}${entry.value > 1 ? t("activity.days") : t("activity.day")}`}
+              className={cn(
+                "w-3 h-3 rounded-sm transition-colors overflow-hidden relative",
+                isOff
+                  ? "bg-elevated"
+                  : entry.value === 1
+                  ? "bg-indigo-500"
+                  : isHalf
+                  ? "bg-elevated"
+                  : "bg-inset"
+              )}
+            >
+              {isHalf && (
+                <div
+                  className="absolute inset-0 bg-indigo-500"
+                  style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between text-xs text-muted">
+        <span>{cra.totalDays} {cra.totalDays > 1 ? t("activity.days") : t("activity.day")}</span>
+        {cra.mission?.tjm && (
+          <span className="text-accent-text font-medium">
+            {formatCurrency(cra.totalDays * cra.mission.tjm)}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}

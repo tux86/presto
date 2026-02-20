@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* ─── Semantic theme tokens (light / dark) ─── */
+
+:root {
+  --th-page: #f5f5f5;
+  --th-panel: #ffffff;
+  --th-elevated: #f0f0f0;
+  --th-inset: #e5e5e5;
+  --th-edge: #e0e0e0;
+  --th-edge-strong: #d0d0d0;
+  --th-heading: #0f0f0f;
+  --th-body: #333333;
+  --th-muted: #666666;
+  --th-faint: #999999;
+  --th-placeholder: #bbbbbb;
+  --th-accent: #4f46e5;
+  --th-accent-hover: #4338ca;
+  --th-accent-subtle: #eef2ff;
+  --th-accent-text: #4f46e5;
+  --th-weekend: #f0f0f0;
+  --th-holiday: #faf5e4;
+  --th-scrollbar: #d0d0d0;
+  --th-scrollbar-hover: #b0b0b0;
+  --th-overlay: rgba(0, 0, 0, 0.5);
+}
+
+.dark {
+  --th-page: #09090b;
+  --th-panel: #131316;
+  --th-elevated: #1e1e22;
+  --th-inset: #2a2a30;
+  --th-edge: #27272a;
+  --th-edge-strong: #3f3f46;
+  --th-heading: #fafafa;
+  --th-body: #d4d4d8;
+  --th-muted: #71717a;
+  --th-faint: #52525b;
+  --th-placeholder: #3f3f46;
+  --th-accent: #6366f1;
+  --th-accent-hover: #818cf8;
+  --th-accent-subtle: rgba(99, 102, 241, 0.1);
+  --th-accent-text: #a5b4fc;
+  --th-weekend: rgba(24, 24, 27, 0.5);
+  --th-holiday: rgba(39, 39, 42, 0.6);
+  --th-scrollbar: #27272a;
+  --th-scrollbar-hover: #3f3f46;
+  --th-overlay: rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Register tokens in Tailwind ─── */
+
+@theme {
+  --color-page: var(--th-page);
+  --color-panel: var(--th-panel);
+  --color-elevated: var(--th-elevated);
+  --color-inset: var(--th-inset);
+  --color-edge: var(--th-edge);
+  --color-edge-strong: var(--th-edge-strong);
+  --color-heading: var(--th-heading);
+  --color-body: var(--th-body);
+  --color-muted: var(--th-muted);
+  --color-faint: var(--th-faint);
+  --color-placeholder: var(--th-placeholder);
+  --color-accent: var(--th-accent);
+  --color-accent-hover: var(--th-accent-hover);
+  --color-accent-subtle: var(--th-accent-subtle);
+  --color-accent-text: var(--th-accent-text);
+  --color-weekend: var(--th-weekend);
+  --color-holiday: var(--th-holiday);
+  --color-overlay: var(--th-overlay);
+}
+
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--th-scrollbar);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--th-scrollbar-hover);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

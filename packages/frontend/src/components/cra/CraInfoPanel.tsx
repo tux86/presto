@@ -1,0 +1,121 @@
+import type { Cra } from "@presto/shared";
+import { getMonthName } from "@presto/shared";
+import { Button } from "../ui/Button";
+import { formatCurrency } from "@/lib/utils";
+import { useT } from "@/i18n";
+import { cn } from "@/lib/utils";
+
+interface CraInfoPanelProps {
+  cra: Cra;
+  onAutoFill: () => void;
+  onClear: () => void;
+  onDownloadPdf: () => void;
+  onToggleStatus: () => void;
+  filling?: boolean;
+  clearing?: boolean;
+  downloading?: boolean;
+}
+
+export function CraInfoPanel({
+  cra,
+  onAutoFill,
+  onClear,
+  onDownloadPdf,
+  onToggleStatus,
+  filling,
+  clearing,
+  downloading,
+}: CraInfoPanelProps) {
+  const { t, locale } = useT();
+  const revenue = cra.mission?.tjm ? cra.totalDays * cra.mission.tjm : null;
+  const isCompleted = cra.status === "COMPLETED";
+
+  return (
+    <div className="rounded-xl border border-edge bg-panel p-5 space-y-5">
+      {/* Mission info */}
+      <div>
+        <h2 className="text-xl font-bold text-heading tracking-tight">
+          {getMonthName(cra.month, locale)} {cra.year}
+        </h2>
+        <p className="text-sm text-muted mt-1.5">{cra.mission?.name}</p>
+        <p className="text-sm text-faint mt-0.5">{cra.mission?.client?.name}</p>
+      </div>
+
+      {/* Status toggle */}
+      <div className="flex rounded-lg border border-edge bg-elevated p-0.5">
+        <button
+          onClick={isCompleted ? onToggleStatus : undefined}
+          className={cn(
+            "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
+            !isCompleted
+              ? "bg-panel text-heading shadow-sm"
+              : "text-faint hover:text-muted",
+          )}
+        >
+          {t("activity.draft")}
+        </button>
+        <button
+          onClick={!isCompleted ? onToggleStatus : undefined}
+          className={cn(
+            "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
+            isCompleted
+              ? "bg-emerald-500 text-white shadow-sm"
+              : "text-faint hover:text-muted",
+          )}
+        >
+          {t("activity.validated")}
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="space-y-3 py-1">
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted">{t("activity.daysWorked")}</span>
+          <span className="text-lg font-bold text-heading">{cra.totalDays}</span>
+        </div>
+        {cra.mission?.tjm && (
+          <>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted">{t("missions.dailyRate")}</span>
+              <span className="text-base font-semibold text-body">
+                {formatCurrency(cra.mission.tjm)}
+              </span>
+            </div>
+            {revenue !== null && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted">{t("activity.amount")}</span>
+                <span className="text-lg font-bold text-accent-text">
+                  {formatCurrency(revenue)}
+                </span>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="border-t border-edge" />
+
+      {/* Actions */}
+      <div className="space-y-2">
+        <Button variant="primary" size="md" className="w-full" onClick={onAutoFill} loading={filling}>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          {t("activity.fillWorkdays")}
+        </Button>
+        <Button variant="secondary" size="md" className="w-full" onClick={onDownloadPdf} loading={downloading}>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          {t("activity.exportPdf")}
+        </Button>
+        <Button variant="ghost" size="md" className="w-full text-faint!" onClick={onClear} loading={clearing}>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          {t("activity.clearAll")}
+        </Button>
+      </div>
+    </div>
+  );
+}

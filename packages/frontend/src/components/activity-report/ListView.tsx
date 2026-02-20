@@ -1,8 +1,8 @@
-import type { CraEntry } from "@presto/shared";
+import type { ReportEntry } from "@presto/shared";
 import { ListDayRow } from "./ListDayRow";
 
 interface ListViewProps {
-  entries: CraEntry[];
+  entries: ReportEntry[];
   onToggle: (entryId: string, newValue: number) => void;
   onTaskChange: (entryId: string, task: string) => void;
 }

@@ -8,72 +8,75 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String
-  firstName String
-  lastName  String
-  company   String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  clients   Client[]
-  missions  Mission[]
-  cras      Cra[]
+  id              String           @id @default(cuid())
+  email           String           @unique
+  password        String
+  firstName       String
+  lastName        String
+  company         String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  clients         Client[]
+  missions        Mission[]
+  activityReports ActivityReport[]
 }
 
 model Client {
-  id        String    @id @default(cuid())
-  name      String
-  siret     String?
-  email     String?
-  address   String?
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  missions  Mission[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  name       String
+  businessId String?   @map("siret")
+  email      String?
+  address    String?
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  missions   Mission[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Mission {
-  id        String    @id @default(cuid())
-  name      String
-  clientId  String
-  client    Client    @relation(fields: [clientId], references: [id])
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  tjm       Float?
-  startDate DateTime?
-  endDate   DateTime?
-  isActive  Boolean   @default(true)
-  cras      Cra[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id              String           @id @default(cuid())
+  name            String
+  clientId        String
+  client          Client           @relation(fields: [clientId], references: [id])
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
+  dailyRate       Float?           @map("tjm")
+  startDate       DateTime?
+  endDate         DateTime?
+  isActive        Boolean          @default(true)
+  activityReports ActivityReport[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
-model Cra {
-  id        String     @id @default(cuid())
+model ActivityReport {
+  id        String       @id @default(cuid())
   month     Int
   year      Int
-  status    CraStatus  @default(DRAFT)
-  totalDays Float      @default(0)
+  status    ReportStatus @default(DRAFT)
+  totalDays Float        @default(0)
   note      String?
   missionId String
-  mission   Mission    @relation(fields: [missionId], references: [id])
+  mission   Mission      @relation(fields: [missionId], references: [id])
   userId    String
-  user      User       @relation(fields: [userId], references: [id])
-  entries   CraEntry[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  user      User         @relation(fields: [userId], references: [id])
+  entries   ReportEntry[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@unique([missionId, month, year])
+  @@map("Cra")
 }
 
-enum CraStatus {
+enum ReportStatus {
   DRAFT
   COMPLETED
+
+  @@map("CraStatus")
 }
 
-model CraEntry {
+model ReportEntry {
   id          String   @id @default(cuid())
   date        DateTime
   value       Float    @default(0)
@@ -81,8 +84,9 @@ model CraEntry {
   isWeekend   Boolean  @default(false)
   isHoliday   Boolean  @default(false)
   holidayName String?
-  craId       String
-  cra         Cra      @relation(fields: [craId], references: [id], onDelete: Cascade)
+  reportId    String   @map("craId")
+  report      ActivityReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
-  @@unique([craId, date])
+  @@unique([reportId, date])
+  @@map("CraEntry")
 }

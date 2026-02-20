@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma.js";
 import { getMonthDates } from "@presto/shared";
 import { isWeekend, getHolidayName } from "@presto/shared";
 
-export async function createCraWithEntries(
+export async function createReportWithEntries(
   userId: string,
   missionId: string,
   month: number,
@@ -10,7 +10,7 @@ export async function createCraWithEntries(
 ) {
   const dates = getMonthDates(year, month);
 
-  const cra = await prisma.cra.create({
+  const report = await prisma.activityReport.create({
     data: {
       month,
       year,
@@ -34,14 +34,14 @@ export async function createCraWithEntries(
     },
   });
 
-  return cra;
+  return report;
 }
 
-export async function autoFillCra(craId: string) {
+export async function autoFillReport(reportId: string) {
   // Set all working days (not weekend, not holiday) to 1
-  await prisma.craEntry.updateMany({
+  await prisma.reportEntry.updateMany({
     where: {
-      craId,
+      reportId,
       isWeekend: false,
       isHoliday: false,
     },
@@ -49,26 +49,26 @@ export async function autoFillCra(craId: string) {
   });
 
   // Recalculate total
-  await recalculateTotalDays(craId);
+  await recalculateTotalDays(reportId);
 }
 
-export async function clearCra(craId: string) {
-  await prisma.craEntry.updateMany({
-    where: { craId },
+export async function clearReport(reportId: string) {
+  await prisma.reportEntry.updateMany({
+    where: { reportId },
     data: { value: 0, task: null },
   });
 
-  await prisma.cra.update({
-    where: { id: craId },
+  await prisma.activityReport.update({
+    where: { id: reportId },
     data: { totalDays: 0 },
   });
 }
 
-export async function recalculateTotalDays(craId: string) {
-  const entries = await prisma.craEntry.findMany({ where: { craId } });
+export async function recalculateTotalDays(reportId: string) {
+  const entries = await prisma.reportEntry.findMany({ where: { reportId } });
   const total = entries.reduce((sum, entry) => sum + entry.value, 0);
-  await prisma.cra.update({
-    where: { id: craId },
+  await prisma.activityReport.update({
+    where: { id: reportId },
     data: { totalDays: total },
   });
   return total;

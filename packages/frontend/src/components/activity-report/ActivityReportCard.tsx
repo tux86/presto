@@ -1,36 +1,36 @@
 import { useNavigate } from "react-router-dom";
-import type { Cra } from "@presto/shared";
+import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { Badge } from "../ui/Badge";
 import { cn, formatCurrency } from "@/lib/utils";
 import { useT } from "@/i18n";
 
-interface CraCardProps {
-  cra: Cra;
+interface ActivityReportCardProps {
+  report: ActivityReport;
 }
 
-export function CraCard({ cra }: CraCardProps) {
+export function ActivityReportCard({ report }: ActivityReportCardProps) {
   const navigate = useNavigate();
   const { t, locale } = useT();
-  const entries = cra.entries ?? [];
+  const entries = report.entries ?? [];
 
   return (
     <div
       className="group rounded-xl border border-edge bg-panel p-4 hover:border-edge-strong hover:bg-elevated/50 transition-all duration-150 cursor-pointer"
-      onClick={() => navigate(`/activity/${cra.id}`)}
+      onClick={() => navigate(`/activity/${report.id}`)}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="text-sm font-medium text-heading">
-            {getMonthName(cra.month, locale)} {cra.year}
+            {getMonthName(report.month, locale)} {report.year}
           </h3>
           <p className="text-xs text-muted mt-0.5">
-            {cra.mission?.client?.name} &middot; {cra.mission?.name}
+            {report.mission?.client?.name} &middot; {report.mission?.name}
           </p>
         </div>
-        <Badge variant={cra.status === "COMPLETED" ? "success" : "default"}>
-          {cra.status === "COMPLETED" ? t("activity.validated") : t("activity.draft")}
+        <Badge variant={report.status === "COMPLETED" ? "success" : "default"}>
+          {report.status === "COMPLETED" ? t("activity.validated") : t("activity.draft")}
         </Badge>
       </div>
 
@@ -67,10 +67,10 @@ export function CraCard({ cra }: CraCardProps) {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-muted">
-        <span>{cra.totalDays} {cra.totalDays > 1 ? t("activity.days") : t("activity.day")}</span>
-        {cra.mission?.tjm && (
+        <span>{report.totalDays} {report.totalDays > 1 ? t("activity.days") : t("activity.day")}</span>
+        {report.mission?.dailyRate && (
           <span className="text-accent-text font-medium">
-            {formatCurrency(cra.totalDays * cra.mission.tjm)}
+            {formatCurrency(report.totalDays * report.mission.dailyRate)}
           </span>
         )}
       </div>

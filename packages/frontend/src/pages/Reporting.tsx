@@ -59,7 +59,7 @@ export function Reporting() {
             <KpiCard
               label={t("reporting.revenue")}
               value={formatCurrency(report.totalRevenue)}
-              subtitle={t("reporting.avgDailyRate", { value: formatCurrency(report.averageTjm) })}
+              subtitle={t("reporting.avgDailyRate", { value: formatCurrency(report.averageDailyRate) })}
             />
             <KpiCard
               label={t("reporting.activeClients")}

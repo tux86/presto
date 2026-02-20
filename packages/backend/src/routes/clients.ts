@@ -17,14 +17,14 @@ clients.get("/", async (c) => {
 
 clients.post("/", async (c) => {
   const userId = c.get("userId");
-  const { name, siret, email, address } = await c.req.json();
+  const { name, businessId, email, address } = await c.req.json();
 
   if (!name) {
     return c.json({ error: "Name is required" }, 400);
   }
 
   const client = await prisma.client.create({
-    data: { name, siret, email, address, userId },
+    data: { name, businessId, email, address, userId },
   });
   return c.json(client, 201);
 });
@@ -43,7 +43,7 @@ clients.put("/:id", async (c) => {
     where: { id },
     data: {
       name: data.name,
-      siret: data.siret,
+      businessId: data.businessId,
       email: data.email,
       address: data.address,
     },

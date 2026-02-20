@@ -17,7 +17,7 @@ export function Missions() {
   const [editing, setEditing] = useState<Mission | null>(null);
   const [name, setName] = useState("");
   const [clientId, setClientId] = useState("");
-  const [tjm, setTjm] = useState("");
+  const [dailyRate, setDailyRate] = useState("");
 
   const { data: missions, isLoading } = useMissions();
   const { data: clients } = useClients();
@@ -31,7 +31,7 @@ export function Missions() {
     setEditing(null);
     setName("");
     setClientId("");
-    setTjm("");
+    setDailyRate("");
     setShowModal(true);
   };
 
@@ -39,7 +39,7 @@ export function Missions() {
     setEditing(mission);
     setName(mission.name);
     setClientId(mission.clientId);
-    setTjm(mission.tjm?.toString() || "");
+    setDailyRate(mission.dailyRate?.toString() || "");
     setShowModal(true);
   };
 
@@ -50,7 +50,7 @@ export function Missions() {
     const data = {
       name,
       clientId,
-      tjm: tjm ? parseFloat(tjm) : undefined,
+      dailyRate: dailyRate ? parseFloat(dailyRate) : undefined,
     };
 
     if (editing) {
@@ -101,7 +101,7 @@ export function Missions() {
           columns={[
             { key: "name", header: t("missions.title"), render: (m) => <span className="font-medium text-heading">{m.name}</span> },
             { key: "client", header: t("missions.client"), render: (m) => <span className="text-muted">{m.client?.name ?? "-"}</span> },
-            { key: "tjm", header: t("missions.dailyRate"), render: (m) => <span className="text-muted font-mono">{m.tjm ? formatCurrency(m.tjm) : "-"}</span> },
+            { key: "tjm", header: t("missions.dailyRate"), render: (m) => <span className="text-muted font-mono">{m.dailyRate ? formatCurrency(m.dailyRate) : "-"}</span> },
             {
               key: "status",
               header: t("missions.status"),
@@ -151,7 +151,7 @@ export function Missions() {
               ))}
             </select>
           </div>
-          <Input label={t("missions.dailyRateOptional")} type="number" value={tjm} onChange={(e) => setTjm(e.target.value)} placeholder="550" />
+          <Input label={t("missions.dailyRateOptional")} type="number" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} placeholder="550" />
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>{t("common.cancel")}</Button>
             <Button type="submit" loading={createMission.isPending || updateMission.isPending}>

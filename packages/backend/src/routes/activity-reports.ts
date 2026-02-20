@@ -3,18 +3,18 @@ import { prisma } from "../lib/prisma.js";
 import { authMiddleware } from "../middleware/auth.js";
 import type { AppEnv } from "../lib/types.js";
 import {
-  createCraWithEntries,
-  autoFillCra,
-  clearCra,
+  createReportWithEntries,
+  autoFillReport,
+  clearReport,
   recalculateTotalDays,
-} from "../services/cra.service.js";
-import { generateCraPdf } from "../services/pdf.service.js";
+} from "../services/report.service.js";
+import { generateReportPdf } from "../services/pdf.service.js";
 
-const cras = new Hono<AppEnv>();
-cras.use("*", authMiddleware);
+const activityReports = new Hono<AppEnv>();
+activityReports.use("*", authMiddleware);
 
-// List CRAs with optional filters
-cras.get("/", async (c) => {
+// List activity reports with optional filters
+activityReports.get("/", async (c) => {
   const userId = c.get("userId");
   const year = c.req.query("year");
   const month = c.req.query("month");
@@ -25,7 +25,7 @@ cras.get("/", async (c) => {
   if (month) where.month = parseInt(month);
   if (missionId) where.missionId = missionId;
 
-  const list = await prisma.cra.findMany({
+  const list = await prisma.activityReport.findMany({
     where,
     include: {
       mission: {
@@ -38,8 +38,8 @@ cras.get("/", async (c) => {
   return c.json(list);
 });
 
-// Create CRA
-cras.post("/", async (c) => {
+// Create activity report
+activityReports.post("/", async (c) => {
   const userId = c.get("userId");
   const { month, year, missionId } = await c.req.json();
 
@@ -54,23 +54,23 @@ cras.post("/", async (c) => {
     return c.json({ error: "Mission not found" }, 404);
   }
 
-  const existing = await prisma.cra.findUnique({
+  const existing = await prisma.activityReport.findUnique({
     where: { missionId_month_year: { missionId, month, year } },
   });
   if (existing) {
     return c.json({ error: "Activity already exists for this mission/month/year" }, 409);
   }
 
-  const cra = await createCraWithEntries(userId, missionId, month, year);
-  return c.json(cra, 201);
+  const report = await createReportWithEntries(userId, missionId, month, year);
+  return c.json(report, 201);
 });
 
-// Get CRA detail
-cras.get("/:id", async (c) => {
+// Get activity report detail
+activityReports.get("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const cra = await prisma.cra.findFirst({
+  const report = await prisma.activityReport.findFirst({
     where: { id, userId },
     include: {
       entries: { orderBy: { date: "asc" } },
@@ -80,25 +80,25 @@ cras.get("/:id", async (c) => {
     },
   });
 
-  if (!cra) {
+  if (!report) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  return c.json(cra);
+  return c.json(report);
 });
 
-// Update CRA (status, note)
-cras.put("/:id", async (c) => {
+// Update activity report (status, note)
+activityReports.put("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const data = await c.req.json();
 
-  const existing = await prisma.cra.findFirst({ where: { id, userId } });
+  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
   if (!existing) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  const cra = await prisma.cra.update({
+  const report = await prisma.activityReport.update({
     where: { id },
     data: {
       status: data.status,
@@ -111,36 +111,36 @@ cras.put("/:id", async (c) => {
       },
     },
   });
-  return c.json(cra);
+  return c.json(report);
 });
 
-// Delete CRA
-cras.delete("/:id", async (c) => {
+// Delete activity report
+activityReports.delete("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.cra.findFirst({ where: { id, userId } });
+  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
   if (!existing) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  await prisma.cra.delete({ where: { id } });
+  await prisma.activityReport.delete({ where: { id } });
   return c.json({ success: true });
 });
 
 // Batch update entries
-cras.patch("/:id/entries", async (c) => {
+activityReports.patch("/:id/entries", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const { entries } = await c.req.json();
 
-  const existing = await prisma.cra.findFirst({ where: { id, userId } });
+  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
   if (!existing) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
   for (const entry of entries) {
-    await prisma.craEntry.update({
+    await prisma.reportEntry.update({
       where: { id: entry.id },
       data: {
         value: entry.value !== undefined ? entry.value : undefined,
@@ -151,7 +151,7 @@ cras.patch("/:id/entries", async (c) => {
 
   await recalculateTotalDays(id);
 
-  const cra = await prisma.cra.findFirst({
+  const report = await prisma.activityReport.findFirst({
     where: { id },
     include: {
       entries: { orderBy: { date: "asc" } },
@@ -161,22 +161,22 @@ cras.patch("/:id/entries", async (c) => {
     },
   });
 
-  return c.json(cra);
+  return c.json(report);
 });
 
 // Auto-fill working days
-cras.patch("/:id/fill", async (c) => {
+activityReports.patch("/:id/fill", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.cra.findFirst({ where: { id, userId } });
+  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
   if (!existing) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  await autoFillCra(id);
+  await autoFillReport(id);
 
-  const cra = await prisma.cra.findFirst({
+  const report = await prisma.activityReport.findFirst({
     where: { id },
     include: {
       entries: { orderBy: { date: "asc" } },
@@ -185,22 +185,22 @@ cras.patch("/:id/fill", async (c) => {
       },
     },
   });
-  return c.json(cra);
+  return c.json(report);
 });
 
-// Clear CRA
-cras.patch("/:id/clear", async (c) => {
+// Clear activity report
+activityReports.patch("/:id/clear", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.cra.findFirst({ where: { id, userId } });
+  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
   if (!existing) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  await clearCra(id);
+  await clearReport(id);
 
-  const cra = await prisma.cra.findFirst({
+  const report = await prisma.activityReport.findFirst({
     where: { id },
     include: {
       entries: { orderBy: { date: "asc" } },
@@ -209,15 +209,16 @@ cras.patch("/:id/clear", async (c) => {
       },
     },
   });
-  return c.json(cra);
+  return c.json(report);
 });
 
 // PDF export
-cras.get("/:id/pdf", async (c) => {
+activityReports.get("/:id/pdf", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
+  const locale = (c.req.query("locale") as "fr" | "en") || "fr";
 
-  const cra = await prisma.cra.findFirst({
+  const report = await prisma.activityReport.findFirst({
     where: { id, userId },
     include: {
       entries: { orderBy: { date: "asc" } },
@@ -230,18 +231,18 @@ cras.get("/:id/pdf", async (c) => {
     },
   });
 
-  if (!cra) {
+  if (!report) {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  const pdfBuffer = await generateCraPdf(cra);
+  const pdfBuffer = await generateReportPdf(report, locale);
 
   return new Response(new Uint8Array(pdfBuffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="Presto-${cra.year}-${String(cra.month).padStart(2, "0")}-${cra.mission.client.name}.pdf"`,
+      "Content-Disposition": `attachment; filename="Presto-${report.year}-${String(report.month).padStart(2, "0")}-${report.mission.client.name}.pdf"`,
     },
   });
 });
 
-export default cras;
+export default activityReports;

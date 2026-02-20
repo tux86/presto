@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
-import { CraCard } from "@/components/cra/CraCard";
-import { useCras, useCreateCra } from "@/hooks/use-cras";
+import { ActivityReportCard } from "@/components/activity-report/ActivityReportCard";
+import { useActivityReports, useCreateActivityReport } from "@/hooks/use-activity-reports";
 import { useMissions } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
 import { getMonthName } from "@presto/shared";
@@ -11,19 +11,19 @@ import { getMonthName } from "@presto/shared";
 export function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [newCraMonth, setNewCraMonth] = useState(new Date().getMonth() + 1);
-  const [newCraYear, setNewCraYear] = useState(new Date().getFullYear());
-  const [newCraMissionId, setNewCraMissionId] = useState("");
+  const [newReportMonth, setNewReportMonth] = useState(new Date().getMonth() + 1);
+  const [newReportYear, setNewReportYear] = useState(new Date().getFullYear());
+  const [newReportMissionId, setNewReportMissionId] = useState("");
 
-  const { data: cras, isLoading } = useCras({ year: selectedYear });
+  const { data: reports, isLoading } = useActivityReports({ year: selectedYear });
   const { data: missions } = useMissions();
-  const createCra = useCreateCra();
+  const createReport = useCreateActivityReport();
   const { t, locale } = useT();
 
   const handleCreate = async () => {
-    if (!newCraMissionId) return;
+    if (!newReportMissionId) return;
     try {
-      await createCra.mutateAsync({ month: newCraMonth, year: newCraYear, missionId: newCraMissionId });
+      await createReport.mutateAsync({ month: newReportMonth, year: newReportYear, missionId: newReportMissionId });
       setShowCreateModal(false);
     } catch { /* handled by mutation */ }
   };
@@ -51,10 +51,10 @@ export function Dashboard() {
             <div key={i} className="h-40 rounded-xl bg-panel border border-edge animate-pulse" />
           ))}
         </div>
-      ) : cras && cras.length > 0 ? (
+      ) : reports && reports.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {cras.map((cra) => (
-            <CraCard key={cra.id} cra={cra} />
+          {reports.map((report) => (
+            <ActivityReportCard key={report.id} report={report} />
           ))}
         </div>
       ) : (
@@ -71,8 +71,8 @@ export function Dashboard() {
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-muted">{t("dashboard.month")}</label>
               <select
-                value={newCraMonth}
-                onChange={(e) => setNewCraMonth(Number(e.target.value))}
+                value={newReportMonth}
+                onChange={(e) => setNewReportMonth(Number(e.target.value))}
                 className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
               >
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
@@ -85,8 +85,8 @@ export function Dashboard() {
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-muted">{t("dashboard.year")}</label>
               <select
-                value={newCraYear}
-                onChange={(e) => setNewCraYear(Number(e.target.value))}
+                value={newReportYear}
+                onChange={(e) => setNewReportYear(Number(e.target.value))}
                 className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
               >
                 {[selectedYear - 1, selectedYear, selectedYear + 1].map((y) => (
@@ -99,8 +99,8 @@ export function Dashboard() {
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-muted">{t("dashboard.mission")}</label>
             <select
-              value={newCraMissionId}
-              onChange={(e) => setNewCraMissionId(e.target.value)}
+              value={newReportMissionId}
+              onChange={(e) => setNewReportMissionId(e.target.value)}
               className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
             >
               <option value="">{t("dashboard.selectMission")}</option>
@@ -110,13 +110,13 @@ export function Dashboard() {
             </select>
           </div>
 
-          {createCra.error && (
-            <p className="text-sm text-red-500">{createCra.error.message}</p>
+          {createReport.error && (
+            <p className="text-sm text-red-500">{createReport.error.message}</p>
           )}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" onClick={() => setShowCreateModal(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleCreate} loading={createCra.isPending} disabled={!newCraMissionId}>{t("common.create")}</Button>
+            <Button onClick={handleCreate} loading={createReport.isPending} disabled={!newReportMissionId}>{t("common.create")}</Button>
           </div>
         </div>
       </Modal>

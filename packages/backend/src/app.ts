@@ -5,7 +5,7 @@ import { config, getPublicConfig } from "./lib/config.js";
 import auth from "./routes/auth.js";
 import clients from "./routes/clients.js";
 import missions from "./routes/missions.js";
-import cras from "./routes/cras.js";
+import activityReports from "./routes/activity-reports.js";
 import reporting from "./routes/reporting.js";
 
 const app = new Hono();
@@ -23,7 +23,7 @@ app.use(
 app.route("/api/auth", auth);
 app.route("/api/clients", clients);
 app.route("/api/missions", missions);
-app.route("/api/cras", cras);
+app.route("/api/activity-reports", activityReports);
 app.route("/api/reporting", reporting);
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));

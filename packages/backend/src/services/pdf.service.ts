@@ -39,7 +39,40 @@ const styles = StyleSheet.create({
   noteLabel: { fontSize: 8, color: "#888", marginBottom: 4 },
 });
 
-interface PdfCra {
+const labels = {
+  fr: {
+    title: "Relev\u00e9 d'Activit\u00e9",
+    consultant: "Consultant",
+    client: "Client",
+    mission: "Mission",
+    date: "Date",
+    day: "Jour",
+    days: "Jours",
+    description: "Description",
+    holiday: "F\u00e9ri\u00e9",
+    note: "Note",
+    total: "Total",
+    amount: "Montant",
+    dayUnit: (n: number) => `jour${n > 1 ? "s" : ""}`,
+  },
+  en: {
+    title: "Activity Report",
+    consultant: "Consultant",
+    client: "Client",
+    mission: "Mission",
+    date: "Date",
+    day: "Day",
+    days: "Days",
+    description: "Description",
+    holiday: "Holiday",
+    note: "Note",
+    total: "Total",
+    amount: "Amount",
+    dayUnit: (n: number) => `day${n > 1 ? "s" : ""}`,
+  },
+};
+
+interface PdfReport {
   month: number;
   year: number;
   totalDays: number;
@@ -54,7 +87,7 @@ interface PdfCra {
   }[];
   mission: {
     name: string;
-    tjm: number | null;
+    dailyRate: number | null;
     client: { name: string };
   };
   user: {
@@ -64,8 +97,10 @@ interface PdfCra {
   };
 }
 
-function CraDocument({ cra }: { cra: PdfCra }) {
-  const monthName = getMonthName(cra.month);
+function ReportDocument({ report, locale = "fr" }: { report: PdfReport; locale?: "fr" | "en" }) {
+  const l = labels[locale];
+  const monthName = getMonthName(report.month);
+  const currencyLocale = locale === "fr" ? "fr-FR" : "en-US";
 
   return React.createElement(
     Document,
@@ -76,29 +111,29 @@ function CraDocument({ cra }: { cra: PdfCra }) {
       React.createElement(
         View,
         { style: styles.header },
-        React.createElement(Text, { style: styles.title }, "Relevé d'Activité"),
-        React.createElement(Text, { style: styles.subtitle }, `${monthName} ${cra.year}`),
+        React.createElement(Text, { style: styles.title }, l.title),
+        React.createElement(Text, { style: styles.subtitle }, `${monthName} ${report.year}`),
         React.createElement(
           View,
           { style: styles.infoRow },
           React.createElement(
             View,
             { style: styles.infoBlock },
-            React.createElement(Text, { style: styles.infoLabel }, "Consultant"),
-            React.createElement(Text, { style: styles.infoValue }, `${cra.user.firstName} ${cra.user.lastName}`),
-            cra.user.company && React.createElement(Text, { style: { fontSize: 9, color: "#666" } }, cra.user.company)
+            React.createElement(Text, { style: styles.infoLabel }, l.consultant),
+            React.createElement(Text, { style: styles.infoValue }, `${report.user.firstName} ${report.user.lastName}`),
+            report.user.company && React.createElement(Text, { style: { fontSize: 9, color: "#666" } }, report.user.company)
           ),
           React.createElement(
             View,
             { style: styles.infoBlock },
-            React.createElement(Text, { style: styles.infoLabel }, "Client"),
-            React.createElement(Text, { style: styles.infoValue }, cra.mission.client.name)
+            React.createElement(Text, { style: styles.infoLabel }, l.client),
+            React.createElement(Text, { style: styles.infoValue }, report.mission.client.name)
           ),
           React.createElement(
             View,
             { style: styles.infoBlock },
-            React.createElement(Text, { style: styles.infoLabel }, "Mission"),
-            React.createElement(Text, { style: styles.infoValue }, cra.mission.name)
+            React.createElement(Text, { style: styles.infoLabel }, l.mission),
+            React.createElement(Text, { style: styles.infoValue }, report.mission.name)
           )
         )
       ),
@@ -108,50 +143,50 @@ function CraDocument({ cra }: { cra: PdfCra }) {
         React.createElement(
           View,
           { style: styles.tableHeader },
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDate } }, "Date"),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDay } }, "Jour"),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colValue } }, "Jours"),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colTask } }, "Description")
+          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDate } }, l.date),
+          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDay } }, l.day),
+          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colValue } }, l.days),
+          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colTask } }, l.description)
         ),
-        ...cra.entries.map((entry, i) => {
+        ...report.entries.map((entry, i) => {
           const date = new Date(entry.date);
           const dayStr = String(date.getDate()).padStart(2, "0");
           const monthStr = String(date.getMonth() + 1).padStart(2, "0");
           const dayName = getDayName(date);
           let rowStyle = i % 2 === 0 ? styles.tableRow : styles.tableRowAlt;
           if (entry.isWeekend || entry.isHoliday) rowStyle = styles.tableRowWeekend;
-          const label = entry.isHoliday ? entry.holidayName || "Férié" : entry.task || "";
+          const label = entry.isHoliday ? entry.holidayName || l.holiday : entry.task || "";
 
           return React.createElement(
             View,
             { style: rowStyle, key: i },
-            React.createElement(Text, { style: styles.colDate }, `${dayStr}/${monthStr}/${cra.year}`),
+            React.createElement(Text, { style: styles.colDate }, `${dayStr}/${monthStr}/${report.year}`),
             React.createElement(Text, { style: styles.colDay }, dayName),
             React.createElement(Text, { style: styles.colValue }, entry.isWeekend || entry.isHoliday ? "-" : String(entry.value)),
             React.createElement(Text, { style: styles.colTask }, label)
           );
         })
       ),
-      cra.note &&
+      report.note &&
         React.createElement(
           View,
           { style: styles.note },
-          React.createElement(Text, { style: styles.noteLabel }, "Note"),
-          React.createElement(Text, null, cra.note)
+          React.createElement(Text, { style: styles.noteLabel }, l.note),
+          React.createElement(Text, null, report.note)
         ),
       React.createElement(
         View,
         { style: styles.footer },
-        React.createElement(Text, { style: styles.total }, `Total : ${cra.totalDays} jour${cra.totalDays > 1 ? "s" : ""}`),
-        cra.mission.tjm &&
-          React.createElement(Text, { style: styles.total }, `Montant : ${(cra.totalDays * cra.mission.tjm).toLocaleString("fr-FR")} €`)
+        React.createElement(Text, { style: styles.total }, `${l.total} : ${report.totalDays} ${l.dayUnit(report.totalDays)}`),
+        report.mission.dailyRate &&
+          React.createElement(Text, { style: styles.total }, `${l.amount} : ${(report.totalDays * report.mission.dailyRate).toLocaleString(currencyLocale)} \u20ac`)
       )
     )
   );
 }
 
-export async function generateCraPdf(cra: PdfCra): Promise<Buffer> {
-  const doc = React.createElement(CraDocument, { cra });
+export async function generateReportPdf(report: PdfReport, locale: "fr" | "en" = "fr"): Promise<Buffer> {
+  const doc = React.createElement(ReportDocument, { report, locale });
   const buffer = await renderToBuffer(doc);
   return Buffer.from(buffer);
 }

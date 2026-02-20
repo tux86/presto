@@ -1,12 +1,12 @@
-import type { Cra } from "@presto/shared";
+import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { Button } from "../ui/Button";
 import { formatCurrency } from "@/lib/utils";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 
-interface CraInfoPanelProps {
-  cra: Cra;
+interface ReportInfoPanelProps {
+  report: ActivityReport;
   onAutoFill: () => void;
   onClear: () => void;
   onDownloadPdf: () => void;
@@ -16,8 +16,8 @@ interface CraInfoPanelProps {
   downloading?: boolean;
 }
 
-export function CraInfoPanel({
-  cra,
+export function ReportInfoPanel({
+  report,
   onAutoFill,
   onClear,
   onDownloadPdf,
@@ -25,20 +25,20 @@ export function CraInfoPanel({
   filling,
   clearing,
   downloading,
-}: CraInfoPanelProps) {
+}: ReportInfoPanelProps) {
   const { t, locale } = useT();
-  const revenue = cra.mission?.tjm ? cra.totalDays * cra.mission.tjm : null;
-  const isCompleted = cra.status === "COMPLETED";
+  const revenue = report.mission?.dailyRate ? report.totalDays * report.mission.dailyRate : null;
+  const isCompleted = report.status === "COMPLETED";
 
   return (
     <div className="rounded-xl border border-edge bg-panel p-5 space-y-5">
       {/* Mission info */}
       <div>
         <h2 className="text-xl font-bold text-heading tracking-tight">
-          {getMonthName(cra.month, locale)} {cra.year}
+          {getMonthName(report.month, locale)} {report.year}
         </h2>
-        <p className="text-sm text-muted mt-1.5">{cra.mission?.name}</p>
-        <p className="text-sm text-faint mt-0.5">{cra.mission?.client?.name}</p>
+        <p className="text-sm text-muted mt-1.5">{report.mission?.name}</p>
+        <p className="text-sm text-faint mt-0.5">{report.mission?.client?.name}</p>
       </div>
 
       {/* Status toggle */}
@@ -71,14 +71,14 @@ export function CraInfoPanel({
       <div className="space-y-3 py-1">
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted">{t("activity.daysWorked")}</span>
-          <span className="text-lg font-bold text-heading">{cra.totalDays}</span>
+          <span className="text-lg font-bold text-heading">{report.totalDays}</span>
         </div>
-        {cra.mission?.tjm && (
+        {report.mission?.dailyRate && (
           <>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted">{t("missions.dailyRate")}</span>
               <span className="text-base font-semibold text-body">
-                {formatCurrency(cra.mission.tjm)}
+                {formatCurrency(report.mission.dailyRate)}
               </span>
             </div>
             {revenue !== null && (

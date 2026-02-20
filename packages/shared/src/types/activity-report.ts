@@ -1,6 +1,6 @@
-export type CraStatus = "DRAFT" | "COMPLETED";
+export type ReportStatus = "DRAFT" | "COMPLETED";
 
-export interface CraEntry {
+export interface ReportEntry {
   id: string;
   date: string;
   value: number; // 0, 0.5, 1
@@ -8,25 +8,25 @@ export interface CraEntry {
   isWeekend: boolean;
   isHoliday: boolean;
   holidayName: string | null;
-  craId: string;
+  reportId: string;
 }
 
-export interface Cra {
+export interface ActivityReport {
   id: string;
   month: number;
   year: number;
-  status: CraStatus;
+  status: ReportStatus;
   totalDays: number;
   note: string | null;
   missionId: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
-  entries?: CraEntry[];
+  entries?: ReportEntry[];
   mission?: {
     id: string;
     name: string;
-    tjm: number | null;
+    dailyRate: number | null;
     client: {
       id: string;
       name: string;
@@ -34,14 +34,14 @@ export interface Cra {
   };
 }
 
-export interface CreateCraRequest {
+export interface CreateActivityReportRequest {
   month: number;
   year: number;
   missionId: string;
 }
 
-export interface UpdateCraRequest {
-  status?: CraStatus;
+export interface UpdateActivityReportRequest {
+  status?: ReportStatus;
   note?: string;
 }
 
@@ -57,7 +57,7 @@ export interface ReportingData {
   year: number;
   totalDays: number;
   totalRevenue: number;
-  averageTjm: number;
+  averageDailyRate: number;
   monthlyData: {
     month: number;
     days: number;

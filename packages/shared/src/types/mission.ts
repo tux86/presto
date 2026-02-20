@@ -3,7 +3,7 @@ export interface Mission {
   name: string;
   clientId: string;
   userId: string;
-  tjm: number | null;
+  dailyRate: number | null;
   startDate: string | null;
   endDate: string | null;
   isActive: boolean;
@@ -18,7 +18,7 @@ export interface Mission {
 export interface CreateMissionRequest {
   name: string;
   clientId: string;
-  tjm?: number;
+  dailyRate?: number;
   startDate?: string;
   endDate?: string;
 }
@@ -26,7 +26,7 @@ export interface CreateMissionRequest {
 export interface UpdateMissionRequest {
   name?: string;
   clientId?: string;
-  tjm?: number;
+  dailyRate?: number;
   startDate?: string;
   endDate?: string;
   isActive?: boolean;

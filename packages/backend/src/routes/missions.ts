@@ -18,7 +18,7 @@ missions.get("/", async (c) => {
 
 missions.post("/", async (c) => {
   const userId = c.get("userId");
-  const { name, clientId, tjm, startDate, endDate } = await c.req.json();
+  const { name, clientId, dailyRate, startDate, endDate } = await c.req.json();
 
   if (!name || !clientId) {
     return c.json({ error: "Name and clientId are required" }, 400);
@@ -34,7 +34,7 @@ missions.post("/", async (c) => {
       name,
       clientId,
       userId,
-      tjm: tjm ?? null,
+      dailyRate: dailyRate ?? null,
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
     },
@@ -58,7 +58,7 @@ missions.put("/:id", async (c) => {
     data: {
       name: data.name,
       clientId: data.clientId,
-      tjm: data.tjm,
+      dailyRate: data.dailyRate,
       startDate: data.startDate ? new Date(data.startDate) : undefined,
       endDate: data.endDate ? new Date(data.endDate) : undefined,
       isActive: data.isActive,

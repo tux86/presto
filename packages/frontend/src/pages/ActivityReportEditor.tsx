@@ -2,38 +2,38 @@ import { useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
-import { CalendarGrid } from "@/components/cra/CalendarGrid";
-import { ListView } from "@/components/cra/ListView";
-import { CraInfoPanel } from "@/components/cra/CraInfoPanel";
+import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
+import { ListView } from "@/components/activity-report/ListView";
+import { ReportInfoPanel } from "@/components/activity-report/ReportInfoPanel";
 import {
-  useCra, useUpdateEntries, useAutoFillCra, useClearCra,
-  useDownloadPdf, useUpdateCra, useDeleteCra,
-} from "@/hooks/use-cras";
+  useActivityReport, useUpdateEntries, useAutoFillReport, useClearReport,
+  useDownloadPdf, useUpdateActivityReport, useDeleteActivityReport,
+} from "@/hooks/use-activity-reports";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useT } from "@/i18n";
 import { getMonthName } from "@presto/shared";
-import type { CraEntry } from "@presto/shared";
+import type { ReportEntry } from "@presto/shared";
 
 type ViewMode = "calendar" | "list";
 
-export function CraEditor() {
+export function ActivityReportEditor() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>("calendar");
-  const { data: cra, isLoading } = useCra(id);
+  const { data: report, isLoading } = useActivityReport(id);
   const updateEntries = useUpdateEntries();
-  const autoFill = useAutoFillCra();
-  const clear = useClearCra();
+  const autoFill = useAutoFillReport();
+  const clear = useClearReport();
   const downloadPdf = useDownloadPdf();
-  const updateCra = useUpdateCra();
-  const deleteCra = useDeleteCra();
+  const updateReport = useUpdateActivityReport();
+  const deleteReport = useDeleteActivityReport();
   const { confirm, dialog } = useConfirm();
   const { t, locale } = useT();
 
   const taskTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  const entries = cra?.entries ?? [];
-  const entriesRef = useRef<CraEntry[]>(entries);
+  const entries = report?.entries ?? [];
+  const entriesRef = useRef<ReportEntry[]>(entries);
   entriesRef.current = entries;
 
   const handleToggle = useCallback(
@@ -49,7 +49,7 @@ export function CraEditor() {
         });
         if (!ok) return;
       }
-      updateEntries.mutate({ craId: id, entries: [{ id: entryId, value: newValue }] });
+      updateEntries.mutate({ reportId: id, entries: [{ id: entryId, value: newValue }] });
     },
     [id, updateEntries, confirm, t]
   );
@@ -59,15 +59,15 @@ export function CraEditor() {
       if (!id) return;
       if (taskTimerRef.current[entryId]) clearTimeout(taskTimerRef.current[entryId]);
       taskTimerRef.current[entryId] = setTimeout(() => {
-        updateEntries.mutate({ craId: id, entries: [{ id: entryId, task }] });
+        updateEntries.mutate({ reportId: id, entries: [{ id: entryId, task }] });
       }, 500);
     },
     [id, updateEntries]
   );
 
   const handleToggleStatus = () => {
-    if (!cra || !id) return;
-    updateCra.mutate({ id, status: cra.status === "COMPLETED" ? "DRAFT" : "COMPLETED" });
+    if (!report || !id) return;
+    updateReport.mutate({ id, status: report.status === "COMPLETED" ? "DRAFT" : "COMPLETED" });
   };
 
   const handleDelete = async () => {
@@ -80,7 +80,7 @@ export function CraEditor() {
       variant: "danger",
     });
     if (!ok) return;
-    await deleteCra.mutateAsync(id);
+    await deleteReport.mutateAsync(id);
     navigate("/");
   };
 
@@ -93,7 +93,7 @@ export function CraEditor() {
     );
   }
 
-  if (!cra) {
+  if (!report) {
     return (
       <div className="text-center py-20">
         <p className="text-muted">{t("activity.notFound")}</p>
@@ -105,8 +105,8 @@ export function CraEditor() {
   return (
     <div>
       <Header
-        title={`${getMonthName(cra.month, locale)} ${cra.year}`}
-        subtitle={`${cra.mission?.client?.name} - ${cra.mission?.name}`}
+        title={`${getMonthName(report.month, locale)} ${report.year}`}
+        subtitle={`${report.mission?.client?.name} - ${report.mission?.name}`}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>&larr; {t("common.back")}</Button>
@@ -119,8 +119,8 @@ export function CraEditor() {
         {/* Info panel */}
         <div className="w-full lg:w-72 lg:shrink-0">
           <div className="lg:sticky lg:top-8">
-            <CraInfoPanel
-              cra={cra}
+            <ReportInfoPanel
+              report={report}
               onAutoFill={() => autoFill.mutate(id!)}
               onClear={() => clear.mutate(id!)}
               onDownloadPdf={() => downloadPdf.mutate(id!)}

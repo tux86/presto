@@ -37,17 +37,17 @@ export function getFrenchHolidays(year: number): Holiday[] {
   const easter = getEasterDate(year);
 
   return [
-    { date: new Date(year, 0, 1), name: "Jour de l'an" },
-    { date: addDays(easter, 1), name: "Lundi de Pâques" },
-    { date: new Date(year, 4, 1), name: "Fête du Travail" },
-    { date: new Date(year, 4, 8), name: "Victoire 1945" },
-    { date: addDays(easter, 39), name: "Ascension" },
-    { date: addDays(easter, 50), name: "Lundi de Pentecôte" },
-    { date: new Date(year, 6, 14), name: "Fête Nationale" },
-    { date: new Date(year, 7, 15), name: "Assomption" },
-    { date: new Date(year, 10, 1), name: "Toussaint" },
-    { date: new Date(year, 10, 11), name: "Armistice" },
-    { date: new Date(year, 11, 25), name: "Noël" },
+    { date: new Date(year, 0, 1), name: "New Year's Day" },
+    { date: addDays(easter, 1), name: "Easter Monday" },
+    { date: new Date(year, 4, 1), name: "Labour Day" },
+    { date: new Date(year, 4, 8), name: "Victory in Europe Day" },
+    { date: addDays(easter, 39), name: "Ascension Day" },
+    { date: addDays(easter, 50), name: "Whit Monday" },
+    { date: new Date(year, 6, 14), name: "Bastille Day" },
+    { date: new Date(year, 7, 15), name: "Assumption Day" },
+    { date: new Date(year, 10, 1), name: "All Saints' Day" },
+    { date: new Date(year, 10, 11), name: "Armistice Day" },
+    { date: new Date(year, 11, 25), name: "Christmas Day" },
   ];
 }
 

@@ -5,7 +5,7 @@ export async function getYearlyReport(
   userId: string,
   year: number
 ): Promise<ReportingData> {
-  const cras = await prisma.cra.findMany({
+  const reports = await prisma.activityReport.findMany({
     where: { userId, year },
     include: {
       mission: {
@@ -16,8 +16,8 @@ export async function getYearlyReport(
 
   let totalDays = 0;
   let totalRevenue = 0;
-  let tjmSum = 0;
-  let tjmCount = 0;
+  let dailyRateSum = 0;
+  let dailyRateCount = 0;
 
   const monthlyMap = new Map<number, { days: number; revenue: number }>();
   const clientMap = new Map<
@@ -25,34 +25,34 @@ export async function getYearlyReport(
     { clientId: string; clientName: string; days: number; revenue: number }
   >();
 
-  for (const cra of cras) {
-    totalDays += cra.totalDays;
-    const revenue = cra.totalDays * (cra.mission.tjm ?? 0);
+  for (const report of reports) {
+    totalDays += report.totalDays;
+    const revenue = report.totalDays * (report.mission.dailyRate ?? 0);
     totalRevenue += revenue;
 
-    if (cra.mission.tjm) {
-      tjmSum += cra.mission.tjm;
-      tjmCount++;
+    if (report.mission.dailyRate) {
+      dailyRateSum += report.mission.dailyRate;
+      dailyRateCount++;
     }
 
     // Monthly
-    const existing = monthlyMap.get(cra.month) ?? { days: 0, revenue: 0 };
-    monthlyMap.set(cra.month, {
-      days: existing.days + cra.totalDays,
+    const existing = monthlyMap.get(report.month) ?? { days: 0, revenue: 0 };
+    monthlyMap.set(report.month, {
+      days: existing.days + report.totalDays,
       revenue: existing.revenue + revenue,
     });
 
     // Client
-    const clientKey = cra.mission.client.id;
+    const clientKey = report.mission.client.id;
     const clientExisting = clientMap.get(clientKey) ?? {
-      clientId: cra.mission.client.id,
-      clientName: cra.mission.client.name,
+      clientId: report.mission.client.id,
+      clientName: report.mission.client.name,
       days: 0,
       revenue: 0,
     };
     clientMap.set(clientKey, {
       ...clientExisting,
-      days: clientExisting.days + cra.totalDays,
+      days: clientExisting.days + report.totalDays,
       revenue: clientExisting.revenue + revenue,
     });
   }
@@ -72,7 +72,7 @@ export async function getYearlyReport(
     year,
     totalDays,
     totalRevenue,
-    averageTjm: tjmCount > 0 ? tjmSum / tjmCount : 0,
+    averageDailyRate: dailyRateCount > 0 ? dailyRateSum / dailyRateCount : 0,
     monthlyData,
     clientData: Array.from(clientMap.values()),
   };

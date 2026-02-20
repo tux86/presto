@@ -1,10 +1,10 @@
-import type { CraEntry } from "@presto/shared";
+import type { ReportEntry } from "@presto/shared";
 import { getDayNameFull } from "@presto/shared";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n";
 
 interface ListDayRowProps {
-  entry: CraEntry;
+  entry: ReportEntry;
   onToggle: (entryId: string, newValue: number) => void;
   onTaskChange: (entryId: string, task: string) => void;
 }

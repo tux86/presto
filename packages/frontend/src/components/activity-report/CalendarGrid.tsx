@@ -1,10 +1,10 @@
-import type { CraEntry } from "@presto/shared";
+import type { ReportEntry } from "@presto/shared";
 import { getDayName } from "@presto/shared";
 import { useT } from "@/i18n";
 import { CalendarDay } from "./CalendarDay";
 
 interface CalendarGridProps {
-  entries: CraEntry[];
+  entries: ReportEntry[];
   onToggle: (entryId: string, newValue: number) => void;
 }
 

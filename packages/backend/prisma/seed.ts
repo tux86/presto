@@ -33,7 +33,7 @@ async function main() {
     create: {
       id: "demo-client-1",
       name: "Acme Corp",
-      siret: "12345678901234",
+      businessId: "12345678901234",
       email: "contact@acme.com",
       address: "123 rue de Paris, 75001 Paris",
       userId: user.id,
@@ -46,10 +46,10 @@ async function main() {
     update: {},
     create: {
       id: "demo-mission-1",
-      name: "Développement plateforme web",
+      name: "Web Platform Development",
       clientId: client.id,
       userId: user.id,
-      tjm: 550,
+      dailyRate: 550,
       isActive: true,
     },
   });

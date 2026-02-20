@@ -1,7 +1,7 @@
 export interface Client {
   id: string;
   name: string;
-  siret: string | null;
+  businessId: string | null;
   email: string | null;
   address: string | null;
   userId: string;
@@ -11,14 +11,14 @@ export interface Client {
 
 export interface CreateClientRequest {
   name: string;
-  siret?: string;
+  businessId?: string;
   email?: string;
   address?: string;
 }
 
 export interface UpdateClientRequest {
   name?: string;
-  siret?: string;
+  businessId?: string;
   email?: string;
   address?: string;
 }

@@ -25,7 +25,7 @@ export const en: Record<TranslationKey, string> = {
   "clients.editClient": "Edit client",
   "clients.emptyMessage": "No clients yet. Create your first client.",
   "clients.name": "Name / Company name",
-  "clients.siret": "SIRET",
+  "clients.businessId": "Business ID",
   "clients.email": "Email",
   "clients.address": "Address",
   "clients.deleteTitle": "Delete this client",

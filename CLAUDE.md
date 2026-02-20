@@ -1,6 +1,6 @@
 # Presto
 
-CRA (Compte Rendu d'Activité) time-tracking app. Monorepo with 3 packages.
+Activity report time-tracking app. Monorepo with 3 packages.
 
 ## Tech Stack
 
@@ -40,7 +40,7 @@ docker-compose up -d       # Start PostgreSQL
 
 ## Backend API Routes
 
-All prefixed with `/api`: `auth`, `clients`, `missions`, `cras`, `reporting`, `health`, `config`
+All prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `health`, `config`
 
 ## Key Conventions
 

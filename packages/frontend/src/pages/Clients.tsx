@@ -13,7 +13,7 @@ export function Clients() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
   const [name, setName] = useState("");
-  const [siret, setSiret] = useState("");
+  const [businessId, setBusinessId] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
 
@@ -24,13 +24,13 @@ export function Clients() {
   const { confirm, dialog } = useConfirm();
   const { t } = useT();
 
-  const openCreate = () => { setEditing(null); setName(""); setSiret(""); setEmail(""); setAddress(""); setShowModal(true); };
-  const openEdit = (client: Client) => { setEditing(client); setName(client.name); setSiret(client.siret || ""); setEmail(client.email || ""); setAddress(client.address || ""); setShowModal(true); };
+  const openCreate = () => { setEditing(null); setName(""); setBusinessId(""); setEmail(""); setAddress(""); setShowModal(true); };
+  const openEdit = (client: Client) => { setEditing(client); setName(client.name); setBusinessId(client.businessId || ""); setEmail(client.email || ""); setAddress(client.address || ""); setShowModal(true); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
-    const data = { name, siret: siret || undefined, email: email || undefined, address: address || undefined };
+    const data = { name, businessId: businessId || undefined, email: email || undefined, address: address || undefined };
     if (editing) { await updateClient.mutateAsync({ id: editing.id, ...data }); }
     else { await createClient.mutateAsync(data); }
     setShowModal(false);
@@ -62,7 +62,7 @@ export function Clients() {
           onRowClick={openEdit}
           columns={[
             { key: "name", header: t("clients.name"), render: (c) => <span className="font-medium text-heading">{c.name}</span> },
-            { key: "siret", header: t("clients.siret"), render: (c) => <span className="text-muted font-mono text-xs">{c.siret || "-"}</span> },
+            { key: "businessId", header: t("clients.businessId"), render: (c) => <span className="text-muted font-mono text-xs">{c.businessId || "-"}</span> },
             { key: "email", header: t("clients.email"), render: (c) => <span className="text-muted">{c.email || "-"}</span> },
             {
               key: "actions", header: "", className: "text-right",
@@ -79,7 +79,7 @@ export function Clients() {
       <Modal open={showModal} onClose={() => setShowModal(false)} title={editing ? t("clients.editClient") : t("clients.newClient")}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label={t("clients.name")} value={name} onChange={(e) => setName(e.target.value)} required />
-          <Input label={t("clients.siret")} value={siret} onChange={(e) => setSiret(e.target.value)} placeholder="123 456 789 01234" />
+          <Input label={t("clients.businessId")} value={businessId} onChange={(e) => setBusinessId(e.target.value)} placeholder="123 456 789 01234" />
           <Input label={t("clients.email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <Input label={t("clients.address")} value={address} onChange={(e) => setAddress(e.target.value)} />
           <div className="flex justify-end gap-3 pt-2">

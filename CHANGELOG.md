@@ -1,3 +1,9 @@
+## [1.3.3](https://github.com/tux86/presto/compare/v1.3.2...v1.3.3) (2026-02-21)
+
+### Bug Fixes
+
+* **docker:** use ARG for dummy DATABASE_URL needed by prisma generate ([c78b23b](https://github.com/tux86/presto/commit/c78b23ba37cdd1e6e96570cf15a779c021ecd921))
+
 ## [1.3.2](https://github.com/tux86/presto/compare/v1.3.1...v1.3.2) (2026-02-21)
 
 ### Bug Fixes

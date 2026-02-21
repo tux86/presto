@@ -22,6 +22,13 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -33,14 +40,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
-      - name: Typecheck shared
-        run: bun run --filter '@presto/shared' typecheck
-
-      - name: Typecheck backend
-        run: bun run --filter '@presto/backend' typecheck
-
-      - name: Typecheck frontend
-        run: bun run --filter '@presto/frontend' typecheck
+      - name: Typecheck
+        run: bun run typecheck
 
       - name: Build
         run: bun run build

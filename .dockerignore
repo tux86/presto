@@ -9,3 +9,10 @@ dist
 .env.*
 .vscode
 .idea
+.github/
+.husky/
+scripts/
+.releaserc.json
+.commitlintrc.json
+biome.json
+docker-compose*.yml

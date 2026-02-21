@@ -26,6 +26,8 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:-presto_dev_password}@postgres:5432/${POSTGRES_DB:-presto}?schema=public
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
+      HOLIDAY_COUNTRY: ${HOLIDAY_COUNTRY:-FR}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
     ports:
       - "${PORT:-8080}:8080"
 

@@ -23,18 +23,17 @@ COPY packages/shared/ packages/shared/
 COPY packages/frontend/ packages/frontend/
 COPY packages/backend/ packages/backend/
 
-# Build frontend
-RUN cd packages/frontend && ./node_modules/.bin/vite build
+# Build frontend (tsc -b + vite build via package script)
+RUN cd packages/frontend && bun run build
 
 # Generate Prisma client and build backend
-RUN cd packages/backend && bunx prisma generate
-RUN cd packages/backend && bun build src/index.ts --outdir dist --target bun
+RUN cd packages/backend && bunx prisma generate && \
+    bun build src/index.ts --outdir dist --target bun
 
 # Move frontend dist into backend's public dir for static serving
 RUN mv packages/frontend/dist packages/backend/public
 
-COPY packages/backend/docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
+RUN chmod +x /app/packages/backend/docker-entrypoint.sh
 
 ENV PORT=8080
 
@@ -45,4 +44,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:8080/api/health || exit 1
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/packages/backend/docker-entrypoint.sh"]

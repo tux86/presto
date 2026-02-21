@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/tux86/presto/compare/v1.2.0...v1.3.0) (2026-02-21)
+
+### Features
+
+* **shared:** replace hardcoded French holidays with date-holidays library ([31d0e38](https://github.com/tux86/presto/commit/31d0e38fdd54d3235d2c4702a90f5ffe23cfa50a))
+
 ## [1.2.0](https://github.com/tux86/presto/compare/v1.1.0...v1.2.0) (2026-02-21)
 
 ### Features

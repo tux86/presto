@@ -69,7 +69,6 @@ CREATE TABLE "CraEntry" (
     "task" TEXT,
     "isWeekend" BOOLEAN NOT NULL DEFAULT false,
     "isHoliday" BOOLEAN NOT NULL DEFAULT false,
-    "holidayName" TEXT,
     "craId" TEXT NOT NULL,
 
     CONSTRAINT "CraEntry_pkey" PRIMARY KEY ("id")
@@ -77,6 +76,9 @@ CREATE TABLE "CraEntry" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE INDEX "Cra_userId_year_month_idx" ON "Cra"("userId", "year", "month");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Cra_missionId_month_year_key" ON "Cra"("missionId", "month", "year");

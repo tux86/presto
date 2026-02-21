@@ -1,5 +1,8 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { findOwned, REPORT_INCLUDE, REPORT_INCLUDE_PDF } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
+import { createReportSchema, updateEntriesSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { generateReportPdf } from "../services/pdf.service.js";
@@ -13,6 +16,15 @@ import {
 
 const activityReports = new Hono<AppEnv>();
 activityReports.use("*", authMiddleware);
+
+/** Fetch a report by id with standard includes and enrich it. */
+async function fetchEnrichedReport(id: string) {
+  const report = await prisma.activityReport.findFirst({
+    where: { id },
+    include: REPORT_INCLUDE,
+  });
+  return enrichReport(report);
+}
 
 // List activity reports with optional filters
 activityReports.get("/", async (c) => {
@@ -28,32 +40,18 @@ activityReports.get("/", async (c) => {
 
   const list = await prisma.activityReport.findMany({
     where,
-    include: {
-      mission: {
-        include: { client: { select: { id: true, name: true } } },
-      },
-      entries: { orderBy: { date: "asc" } },
-    },
+    include: REPORT_INCLUDE,
     orderBy: [{ year: "desc" }, { month: "desc" }],
   });
   return c.json(enrichReport(list));
 });
 
 // Create activity report
-activityReports.post("/", async (c) => {
+activityReports.post("/", zValidator("json", createReportSchema), async (c) => {
   const userId = c.get("userId");
-  const { month, year, missionId } = await c.req.json();
+  const { month, year, missionId } = c.req.valid("json");
 
-  if (!month || !year || !missionId) {
-    return c.json({ error: "month, year, and missionId are required" }, 400);
-  }
-
-  const mission = await prisma.mission.findFirst({
-    where: { id: missionId, userId },
-  });
-  if (!mission) {
-    return c.json({ error: "Mission not found" }, 404);
-  }
+  await findOwned("mission", missionId, userId);
 
   const existing = await prisma.activityReport.findUnique({
     where: { missionId_month_year: { missionId, month, year } },
@@ -71,20 +69,12 @@ activityReports.get("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
+  await findOwned("activityReport", id, userId);
+
   const report = await prisma.activityReport.findFirst({
-    where: { id, userId },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: { select: { id: true, name: true } } },
-      },
-    },
+    where: { id },
+    include: REPORT_INCLUDE,
   });
-
-  if (!report) {
-    return c.json({ error: "Activity not found" }, 404);
-  }
-
   return c.json(enrichReport(report));
 });
 
@@ -94,23 +84,12 @@ activityReports.put("/:id", async (c) => {
   const id = c.req.param("id");
   const data = await c.req.json();
 
-  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Activity not found" }, 404);
-  }
+  await findOwned("activityReport", id, userId);
 
   const report = await prisma.activityReport.update({
     where: { id },
-    data: {
-      status: data.status,
-      note: data.note,
-    },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: { select: { id: true, name: true } } },
-      },
-    },
+    data: { status: data.status, note: data.note },
+    include: REPORT_INCLUDE,
   });
   return c.json(enrichReport(report));
 });
@@ -120,49 +99,43 @@ activityReports.delete("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Activity not found" }, 404);
-  }
+  await findOwned("activityReport", id, userId);
 
   await prisma.activityReport.delete({ where: { id } });
   return c.json({ success: true });
 });
 
 // Batch update entries
-activityReports.patch("/:id/entries", async (c) => {
+activityReports.patch("/:id/entries", zValidator("json", updateEntriesSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
-  const { entries } = await c.req.json();
+  const { entries } = c.req.valid("json");
 
-  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Activity not found" }, 404);
+  await findOwned("activityReport", id, userId);
+
+  // Verify all entry IDs belong to this report
+  const entryIds = entries.map((e) => e.id);
+  const ownedCount = await prisma.reportEntry.count({
+    where: { id: { in: entryIds }, reportId: id },
+  });
+  if (ownedCount !== entryIds.length) {
+    return c.json({ error: "One or more entries do not belong to this report" }, 400);
   }
 
-  for (const entry of entries) {
-    await prisma.reportEntry.update({
-      where: { id: entry.id },
-      data: {
-        value: entry.value !== undefined ? entry.value : undefined,
-        task: entry.task !== undefined ? entry.task : undefined,
-      },
-    });
-  }
+  await prisma.$transaction(
+    entries.map((entry) =>
+      prisma.reportEntry.update({
+        where: { id: entry.id },
+        data: {
+          value: entry.value !== undefined ? entry.value : undefined,
+          task: entry.task !== undefined ? entry.task : undefined,
+        },
+      }),
+    ),
+  );
 
   await recalculateTotalDays(id);
-
-  const report = await prisma.activityReport.findFirst({
-    where: { id },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: { select: { id: true, name: true } } },
-      },
-    },
-  });
-
-  return c.json(enrichReport(report));
+  return c.json(await fetchEnrichedReport(id));
 });
 
 // Auto-fill working days
@@ -170,23 +143,9 @@ activityReports.patch("/:id/fill", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Activity not found" }, 404);
-  }
-
+  await findOwned("activityReport", id, userId);
   await autoFillReport(id);
-
-  const report = await prisma.activityReport.findFirst({
-    where: { id },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: { select: { id: true, name: true } } },
-      },
-    },
-  });
-  return c.json(enrichReport(report));
+  return c.json(await fetchEnrichedReport(id));
 });
 
 // Clear activity report
@@ -194,23 +153,9 @@ activityReports.patch("/:id/clear", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.activityReport.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Activity not found" }, 404);
-  }
-
+  await findOwned("activityReport", id, userId);
   await clearReport(id);
-
-  const report = await prisma.activityReport.findFirst({
-    where: { id },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: { select: { id: true, name: true } } },
-      },
-    },
-  });
-  return c.json(enrichReport(report));
+  return c.json(await fetchEnrichedReport(id));
 });
 
 // PDF export
@@ -221,17 +166,8 @@ activityReports.get("/:id/pdf", async (c) => {
 
   const report = await prisma.activityReport.findFirst({
     where: { id, userId },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: true },
-      },
-      user: {
-        select: { firstName: true, lastName: true, company: true },
-      },
-    },
+    include: REPORT_INCLUDE_PDF,
   });
-
   if (!report) {
     return c.json({ error: "Activity not found" }, 404);
   }

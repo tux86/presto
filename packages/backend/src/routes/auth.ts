@@ -1,7 +1,10 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { rateLimiter } from "hono-rate-limiter";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
 import { prisma } from "../lib/prisma.js";
+import { loginSchema, registerSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
@@ -14,12 +17,34 @@ auth.use("*", async (c, next) => {
   return next();
 });
 
-auth.post("/register", async (c) => {
-  const { email, password, firstName, lastName, company } = await c.req.json();
+const authLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 20,
+  keyGenerator: (c) => c.req.header("x-forwarded-for") ?? "unknown",
+});
 
-  if (!email || !password || !firstName || !lastName) {
-    return c.json({ error: "Missing required fields" }, 400);
-  }
+function serializeUser(user: {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  company: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}) {
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    company: user.company,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString(),
+  };
+}
+
+auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c) => {
+  const { email, password, firstName, lastName, company } = c.req.valid("json");
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -42,30 +67,11 @@ auth.post("/register", async (c) => {
   });
 
   const token = await createToken(user.id, user.email);
-
-  return c.json(
-    {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        company: user.company,
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt.toISOString(),
-      },
-    },
-    201,
-  );
+  return c.json({ token, user: serializeUser(user) }, 201);
 });
 
-auth.post("/login", async (c) => {
-  const { email, password } = await c.req.json();
-
-  if (!email || !password) {
-    return c.json({ error: "Email and password required" }, 400);
-  }
+auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
+  const { email, password } = c.req.valid("json");
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
@@ -78,19 +84,7 @@ auth.post("/login", async (c) => {
   }
 
   const token = await createToken(user.id, user.email);
-
-  return c.json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      company: user.company,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    },
-  });
+  return c.json({ token, user: serializeUser(user) });
 });
 
 auth.get("/me", authMiddleware, async (c) => {

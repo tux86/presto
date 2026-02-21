@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { findOwned } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -24,10 +25,7 @@ missions.post("/", async (c) => {
     return c.json({ error: "Name and clientId are required" }, 400);
   }
 
-  const client = await prisma.client.findFirst({ where: { id: clientId, userId } });
-  if (!client) {
-    return c.json({ error: "Client not found" }, 404);
-  }
+  await findOwned("client", clientId, userId);
 
   const mission = await prisma.mission.create({
     data: {
@@ -48,10 +46,7 @@ missions.put("/:id", async (c) => {
   const id = c.req.param("id");
   const data = await c.req.json();
 
-  const existing = await prisma.mission.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Mission not found" }, 404);
-  }
+  await findOwned("mission", id, userId);
 
   const mission = await prisma.mission.update({
     where: { id },
@@ -72,10 +67,7 @@ missions.delete("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.mission.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Mission not found" }, 404);
-  }
+  await findOwned("mission", id, userId);
 
   await prisma.mission.delete({ where: { id } });
   return c.json({ success: true });

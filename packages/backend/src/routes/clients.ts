@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { findOwned } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -34,10 +35,7 @@ clients.put("/:id", async (c) => {
   const id = c.req.param("id");
   const data = await c.req.json();
 
-  const existing = await prisma.client.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Client not found" }, 404);
-  }
+  await findOwned("client", id, userId);
 
   const client = await prisma.client.update({
     where: { id },
@@ -55,10 +53,7 @@ clients.delete("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const existing = await prisma.client.findFirst({ where: { id, userId } });
-  if (!existing) {
-    return c.json({ error: "Client not found" }, 404);
-  }
+  await findOwned("client", id, userId);
 
   await prisma.client.delete({ where: { id } });
   return c.json({ success: true });

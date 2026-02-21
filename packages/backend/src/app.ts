@@ -1,9 +1,12 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
+import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
 import { config, getPublicConfig } from "./lib/config.js";
 import activityReports from "./routes/activity-reports.js";
 import auth from "./routes/auth.js";
@@ -14,6 +17,8 @@ import reporting from "./routes/reporting.js";
 const app = new Hono();
 
 app.use("*", logger());
+app.use("*", secureHeaders());
+app.use("*", bodyLimit({ maxSize: 1024 * 1024 })); // 1 MB
 app.use(
   "*",
   cors({
@@ -22,6 +27,21 @@ app.use(
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   }),
 );
+
+// Global error handler
+app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return c.json({ error: err.message }, err.status);
+  }
+
+  // Prisma foreign key constraint violation
+  if (err && typeof err === "object" && "code" in err && err.code === "P2003") {
+    return c.json({ error: "Cannot delete: record has associated data" }, 409);
+  }
+
+  console.error("Unhandled error:", err);
+  return c.json({ error: "Internal server error" }, 500);
+});
 
 // API routes
 app.route("/api/auth", auth);

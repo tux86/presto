@@ -64,4 +64,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ steps.meta.outputs.dockerhub }}
           short-description: "Self-hosted time-tracking for freelancers. Monthly activity reports + PDF export."
-          readme-filepath: ./README.md
+          readme-filepath: ./docs/DOCKERHUB.md

@@ -6,14 +6,24 @@
   <p>A self-hosted time-tracking application for freelancers and consultants.<br/>
   Generate monthly activity reports and export them as PDF.</p>
 
+  [![CI](https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/tux86/presto/actions/workflows/ci.yml)
+  [![Release](https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=blue)](https://github.com/tux86/presto/releases)
+  [![Docker](https://img.shields.io/badge/ghcr.io-presto-blue?style=flat-square&logo=docker&logoColor=white)](https://github.com/tux86/presto/pkgs/container/presto)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
   [![Bun](https://img.shields.io/badge/Bun-runtime-black?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
   [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
   [![Hono](https://img.shields.io/badge/Hono-4-E36002?style=flat-square&logo=hono&logoColor=white)](https://hono.dev/)
   [![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat-square&logo=prisma&logoColor=white)](https://www.prisma.io/)
   [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 </div>
+
+<br/>
+
+<p align="center">
+  <img src="docs/images/demo.png" alt="Presto Dashboard and Reporting" width="100%" />
+</p>
 
 ---
 
@@ -236,6 +246,43 @@ Authentication uses JWT bearer tokens. When `AUTH_ENABLED=false`, all protected 
 Presto's Prisma schema uses only cross-database compatible field types. To use a different database engine, update the `provider` in `packages/backend/prisma/schema.prisma` and set `DATABASE_URL` to the appropriate connection string.
 
 Supported providers: `postgresql`, `mysql`, `sqlite`, `sqlserver`, `cockroachdb`.
+
+---
+
+## Architecture
+
+```mermaid
+graph LR
+    Browser["Browser (SPA)"] -->|HTTP /api/*| API["Hono API<br/>port 8080"]
+    API -->|Prisma ORM| DB[(PostgreSQL)]
+    API -->|"@react-pdf/renderer"| PDF["PDF Export"]
+    Browser -->|Static files| API
+```
+
+Presto ships as a single Docker image. The Hono backend serves both the API and the pre-built React frontend as static files.
+
+---
+
+## Comparison with Alternatives
+
+| Feature | Presto | Kimai | Traggo | Wakapi |
+|---|:---:|:---:|:---:|:---:|
+| Self-hosted | Yes | Yes | Yes | Yes |
+| Single Docker image | Yes | No | Yes | Yes |
+| Monthly activity reports | Yes | No | No | No |
+| PDF export | Yes | Yes | No | No |
+| Multi-database support | Yes | No | No | Yes |
+| Optional auth (single-user) | Yes | No | No | No |
+| i18n (FR + EN) | Yes | Yes | No | No |
+| Lightweight (Bun runtime) | Yes | No | No | Yes |
+| Client/mission tracking | Yes | Yes | No | No |
+| Revenue dashboards | Yes | Yes | No | No |
+
+---
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 

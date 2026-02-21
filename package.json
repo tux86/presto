@@ -1,6 +1,26 @@
 {
   "name": "presto",
   "version": "1.3.3",
+  "description": "Self-hosted time-tracking app for freelancers and consultants. Generate monthly activity reports and export them as PDF.",
+  "keywords": [
+    "time-tracking",
+    "self-hosted",
+    "activity-report",
+    "freelancer",
+    "pdf-export",
+    "react",
+    "hono",
+    "prisma",
+    "docker",
+    "typescript"
+  ],
+  "homepage": "https://github.com/tux86/presto",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tux86/presto.git"
+  },
+  "author": "tux86",
+  "license": "MIT",
   "private": true,
   "workspaces": [
     "packages/*"

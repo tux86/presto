@@ -2,16 +2,126 @@
 
 Thanks for your interest in contributing! Here's how to get started.
 
+## Prerequisites
+
+- [Bun](https://bun.sh/) (latest)
+- [Docker](https://www.docker.com/) (for PostgreSQL)
+
 ## Development Setup
 
-1. Fork and clone the repository
-2. Install dependencies: `bun install`
-3. Copy environment config: `cp .env.example .env`
-4. Start PostgreSQL: `docker compose up -d postgres`
-5. Run migrations and seed: `bun run db:migrate && bun run db:seed`
-6. Start dev servers: `bun run dev`
+```bash
+git clone https://github.com/tux86/presto.git
+cd presto
+bun install
+cp .env.example .env
+docker compose up -d postgres
+bun run db:migrate
+bun run db:seed
+bun run dev
+```
 
-See the [README](README.md) for full setup details.
+This starts the backend (hot reload) on `http://localhost:3001` and the frontend (Vite HMR) on `http://localhost:5173`. The frontend proxies `/api` requests to the backend.
+
+### Commands
+
+```bash
+bun run dev              # Start backend + frontend
+bun run dev:backend      # Backend only
+bun run dev:frontend     # Frontend only
+bun run build            # Production build (all packages)
+bun run typecheck        # Type-check all packages
+bun run lint             # Lint + format check (Biome)
+bun run lint:fix         # Auto-fix lint + format
+bun run db:generate      # Regenerate Prisma client after schema changes
+bun run db:migrate       # Apply pending migrations
+bun run db:seed          # Seed sample data
+```
+
+## Project Structure
+
+Presto is a Bun monorepo with three packages.
+
+```
+packages/
+├── backend/                  # @presto/backend — Hono API server
+│   ├── src/
+│   │   ├── app.ts            # Hono app, route registration
+│   │   ├── index.ts          # Server entry point
+│   │   ├── lib/config.ts     # Environment variable configuration
+│   │   └── routes/           # auth, clients, missions, activity-reports, reporting
+│   └── prisma/
+│       └── schema.prisma     # Database schema
+├── frontend/                 # @presto/frontend — React SPA
+│   └── src/
+│       ├── App.tsx           # Route definitions
+│       ├── pages/            # Dashboard, ActivityReportEditor, Clients, Missions, Reporting, Login
+│       ├── components/       # Shared UI components
+│       ├── stores/           # Zustand state stores
+│       ├── hooks/            # Custom hooks (useIsMobile, etc.)
+│       └── i18n/             # French and English translation files
+└── shared/                   # @presto/shared — Shared types and utilities
+    └── src/
+        └── index.ts
+```
+
+## Environment Variables
+
+Copy `.env.example` to `.env`. All defaults work for local development.
+
+### Database
+
+| Variable | Default | Description |
+|---|---|---|
+| `POSTGRES_USER` | `presto` | PostgreSQL username |
+| `POSTGRES_PASSWORD` | `presto_dev_password` | PostgreSQL password |
+| `POSTGRES_DB` | `presto` | PostgreSQL database name |
+| `POSTGRES_PORT` | `5432` | Host port mapped to PostgreSQL |
+| `DATABASE_URL` | _(constructed)_ | Full Prisma connection string |
+
+### Backend
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `3001` | Backend HTTP port |
+| `JWT_SECRET` | `change-me-in-production` | Secret for signing JWT tokens |
+| `AUTH_ENABLED` | `true` | Enable/disable authentication |
+| `CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins (comma-separated) |
+| `HOLIDAY_COUNTRY` | `FR` | Country code for public holidays |
+| `APP_NAME` | `Presto` | Application name in public config API |
+| `APP_THEME` | `light` | Default theme (`light` or `dark`) |
+| `APP_LOCALE` | `fr` | Default locale (`fr` or `en`) |
+| `APP_CURRENCY` | `EUR` | Currency used in reports |
+| `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |
+| `DEFAULT_USER_PASSWORD` | _(empty)_ | Default admin password |
+
+### Docker Compose
+
+| Variable | Default | Description |
+|---|---|---|
+| `BACKEND_PORT` | `3001` | Host port for backend container |
+| `FRONTEND_PORT` | `8080` | Host port for frontend container |
+
+## API Routes
+
+All routes are prefixed with `/api`.
+
+| Route | Description |
+|---|---|
+| `GET /api/health` | Health check — returns `{ status: "ok" }` |
+| `GET /api/config` | Public configuration (app name, theme, locale, auth status) |
+| `/api/auth/*` | Login, logout, and current user (`/me`) |
+| `/api/clients/*` | CRUD for clients |
+| `/api/missions/*` | CRUD for missions (linked to clients) |
+| `/api/activity-reports/*` | CRUD for monthly activity reports, PDF export |
+| `/api/reporting/*` | Aggregated reporting and analytics data |
+
+Authentication uses JWT bearer tokens. When `AUTH_ENABLED=false`, all protected endpoints are accessible without a token.
+
+## Switching Databases
+
+Presto's Prisma schema uses only cross-database compatible field types. To use a different engine, update the `provider` in `packages/backend/prisma/schema.prisma` and set `DATABASE_URL` accordingly.
+
+Supported: `postgresql`, `mysql`, `sqlite`, `sqlserver`, `cockroachdb`.
 
 ## Branch Strategy
 
@@ -30,7 +140,7 @@ docs: improve API reference section
 refactor: extract shared date utilities
 ```
 
-A pre-commit hook runs Biome to auto-format staged files. A commit-msg hook validates the commit message format.
+A pre-commit hook runs Biome to auto-format staged files. A commit-msg hook validates the message format.
 
 ## Code Style
 

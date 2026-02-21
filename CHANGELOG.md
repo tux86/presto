@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/tux86/presto/compare/v1.1.0...v1.2.0) (2026-02-21)
+
+### Features
+
+* **frontend:** replace PNG logos with theme-aware SVGs ([86ebc1e](https://github.com/tux86/presto/commit/86ebc1e4755e0001ee97af2e97e5f7afe23c2e21))
+
 ## [1.1.0](https://github.com/tux86/presto/compare/v1.0.0...v1.1.0) (2026-02-21)
 
 ### Features

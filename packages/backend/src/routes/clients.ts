@@ -1,6 +1,8 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { findOwned } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
+import { createClientSchema, updateClientSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
@@ -16,13 +18,9 @@ clients.get("/", async (c) => {
   return c.json(list);
 });
 
-clients.post("/", async (c) => {
+clients.post("/", zValidator("json", createClientSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, businessId, email, address } = await c.req.json();
-
-  if (!name) {
-    return c.json({ error: "Name is required" }, 400);
-  }
+  const { name, businessId, email, address } = c.req.valid("json");
 
   const client = await prisma.client.create({
     data: { name, businessId, email, address, userId },
@@ -30,10 +28,10 @@ clients.post("/", async (c) => {
   return c.json(client, 201);
 });
 
-clients.put("/:id", async (c) => {
+clients.put("/:id", zValidator("json", updateClientSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
-  const data = await c.req.json();
+  const data = c.req.valid("json");
 
   await findOwned("client", id, userId);
 

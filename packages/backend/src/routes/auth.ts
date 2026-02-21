@@ -20,7 +20,8 @@ auth.use("*", async (c, next) => {
 const authLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 20,
-  keyGenerator: (c) => c.req.header("x-forwarded-for") ?? "unknown",
+  keyGenerator: (c) =>
+    c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? c.req.header("x-real-ip") ?? "127.0.0.1",
 });
 
 function serializeUser(user: {

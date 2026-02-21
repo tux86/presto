@@ -35,7 +35,7 @@ bun run format             # Format all files
 bun run db:generate        # Generate Prisma client
 bun run db:migrate         # Run database migrations
 bun run db:seed            # Seed sample data
-docker compose up -d       # Start PostgreSQL + Presto (Docker)
+docker compose up -d       # Start PostgreSQL (dev)
 ```
 
 ## Path Aliases
@@ -57,7 +57,7 @@ All prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `re
 
 - **CI** (`.github/workflows/ci.yml`): lint → typecheck → build on PR/push to `main`
 - **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
-- **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR + Docker Hub on release
+- **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR on release
 
 ## Key Conventions
 

@@ -1,6 +1,8 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { findOwned } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
+import { createMissionSchema, updateMissionSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
@@ -17,13 +19,9 @@ missions.get("/", async (c) => {
   return c.json(list);
 });
 
-missions.post("/", async (c) => {
+missions.post("/", zValidator("json", createMissionSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, clientId, dailyRate, startDate, endDate } = await c.req.json();
-
-  if (!name || !clientId) {
-    return c.json({ error: "Name and clientId are required" }, 400);
-  }
+  const { name, clientId, dailyRate, startDate, endDate } = c.req.valid("json");
 
   await findOwned("client", clientId, userId);
 
@@ -41,10 +39,10 @@ missions.post("/", async (c) => {
   return c.json(mission, 201);
 });
 
-missions.put("/:id", async (c) => {
+missions.put("/:id", zValidator("json", updateMissionSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
-  const data = await c.req.json();
+  const data = c.req.valid("json");
 
   await findOwned("mission", id, userId);
 

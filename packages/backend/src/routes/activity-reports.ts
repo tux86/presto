@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { findOwned, REPORT_INCLUDE, REPORT_INCLUDE_PDF } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
-import { createReportSchema, updateEntriesSchema } from "../lib/schemas.js";
+import { createReportSchema, updateEntriesSchema, updateReportSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { generateReportPdf } from "../services/pdf.service.js";
@@ -69,20 +69,21 @@ activityReports.get("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  await findOwned("activityReport", id, userId);
-
   const report = await prisma.activityReport.findFirst({
-    where: { id },
+    where: { id, userId },
     include: REPORT_INCLUDE,
   });
+  if (!report) {
+    return c.json({ error: "Activity not found" }, 404);
+  }
   return c.json(enrichReport(report));
 });
 
 // Update activity report (status, note)
-activityReports.put("/:id", async (c) => {
+activityReports.put("/:id", zValidator("json", updateReportSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
-  const data = await c.req.json();
+  const data = c.req.valid("json");
 
   await findOwned("activityReport", id, userId);
 

@@ -82,7 +82,7 @@ interface PdfReport {
     task: string | null;
     isWeekend: boolean;
     isHoliday: boolean;
-    holidayName: string | null;
+    holidayName?: string | null;
   }[];
   mission: {
     name: string;

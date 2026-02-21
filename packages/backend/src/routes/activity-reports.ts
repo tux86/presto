@@ -7,6 +7,7 @@ import {
   autoFillReport,
   clearReport,
   createReportWithEntries,
+  enrichReport,
   recalculateTotalDays,
 } from "../services/report.service.js";
 
@@ -35,7 +36,7 @@ activityReports.get("/", async (c) => {
     },
     orderBy: [{ year: "desc" }, { month: "desc" }],
   });
-  return c.json(list);
+  return c.json(enrichReport(list));
 });
 
 // Create activity report
@@ -84,7 +85,7 @@ activityReports.get("/:id", async (c) => {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  return c.json(report);
+  return c.json(enrichReport(report));
 });
 
 // Update activity report (status, note)
@@ -111,7 +112,7 @@ activityReports.put("/:id", async (c) => {
       },
     },
   });
-  return c.json(report);
+  return c.json(enrichReport(report));
 });
 
 // Delete activity report
@@ -161,7 +162,7 @@ activityReports.patch("/:id/entries", async (c) => {
     },
   });
 
-  return c.json(report);
+  return c.json(enrichReport(report));
 });
 
 // Auto-fill working days
@@ -185,7 +186,7 @@ activityReports.patch("/:id/fill", async (c) => {
       },
     },
   });
-  return c.json(report);
+  return c.json(enrichReport(report));
 });
 
 // Clear activity report
@@ -209,7 +210,7 @@ activityReports.patch("/:id/clear", async (c) => {
       },
     },
   });
-  return c.json(report);
+  return c.json(enrichReport(report));
 });
 
 // PDF export
@@ -235,7 +236,7 @@ activityReports.get("/:id/pdf", async (c) => {
     return c.json({ error: "Activity not found" }, 404);
   }
 
-  const pdfBuffer = await generateReportPdf(report, locale);
+  const pdfBuffer = await generateReportPdf(enrichReport(report), locale);
 
   return new Response(new Uint8Array(pdfBuffer), {
     headers: {

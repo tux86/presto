@@ -83,7 +83,6 @@ model ReportEntry {
   task        String?
   isWeekend   Boolean  @default(false)
   isHoliday   Boolean  @default(false)
-  holidayName String?
   reportId    String   @map("craId")
   report      ActivityReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
 

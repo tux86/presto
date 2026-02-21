@@ -1,5 +1,29 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
+import { config } from "../lib/config.js";
 import { prisma } from "../lib/prisma.js";
+
+const { holidayCountry, locale } = config.app;
+
+/**
+ * Enrich report entries with computed holidayName based on date and configured locale.
+ * Handles single reports, arrays of reports, or null.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: Prisma types are complex
+export function enrichReport(report: any): any {
+  if (!report) return report;
+  if (Array.isArray(report)) return report.map(enrichReport);
+  if (report.entries) {
+    return {
+      ...report,
+      // biome-ignore lint/suspicious/noExplicitAny: Prisma entry type
+      entries: report.entries.map((entry: any) => ({
+        ...entry,
+        holidayName: entry.isHoliday ? getHolidayName(new Date(entry.date), holidayCountry, locale) : null,
+      })),
+    };
+  }
+  return report;
+}
 
 export async function createReportWithEntries(userId: string, missionId: string, month: number, year: number) {
   const dates = getMonthDates(year, month);
@@ -15,8 +39,7 @@ export async function createReportWithEntries(userId: string, missionId: string,
           date,
           value: 0,
           isWeekend: isWeekend(date),
-          isHoliday: !!getHolidayName(date),
-          holidayName: getHolidayName(date),
+          isHoliday: !!getHolidayName(date, holidayCountry),
         })),
       },
     },
@@ -28,7 +51,7 @@ export async function createReportWithEntries(userId: string, missionId: string,
     },
   });
 
-  return report;
+  return enrichReport(report);
 }
 
 export async function autoFillReport(reportId: string) {

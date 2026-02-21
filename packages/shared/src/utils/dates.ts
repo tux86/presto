@@ -1,5 +1,3 @@
-import { getHolidayName, isWeekend } from "../holidays/france.js";
-
 /**
  * Get number of days in a given month (1-indexed)
  */
@@ -71,12 +69,4 @@ export function getDayName(date: Date, locale?: string): string {
 export function getDayNameFull(date: Date, locale?: string): string {
   const name = new Intl.DateTimeFormat(resolveLocale(locale), { weekday: "long" }).format(date);
   return name.charAt(0).toUpperCase() + name.slice(1);
-}
-
-/**
- * Count working days in a month (excluding weekends and holidays)
- */
-export function getWorkingDaysCount(year: number, month: number): number {
-  const dates = getMonthDates(year, month);
-  return dates.filter((d) => !isWeekend(d) && !getHolidayName(d)).length;
 }

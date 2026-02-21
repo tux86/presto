@@ -47,8 +47,8 @@ export function ActivityReportEditor() {
       const entry = entriesRef.current.find((e) => e.id === entryId);
       if (entry?.isHoliday && entry.value === 0) {
         const ok = await confirm({
-          title: t("activity.holidayTitle"),
-          message: t("activity.holidayMessage", { name: entry.holidayName ?? t("activity.holidayDefault") }),
+          title: t("activity.holidayTitle", { name: entry.holidayName ?? t("activity.holidayDefault") }),
+          message: t("activity.holidayMessage"),
           confirmLabel: t("activity.holidayConfirm"),
           cancelLabel: t("common.cancel"),
         });

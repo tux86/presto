@@ -57,7 +57,9 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
       <div className="flex-1 min-w-0">
         {entry.isHoliday ? (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{entry.holidayName}</span>
+            <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
+              {entry.holidayName ?? t("activity.holiday")}
+            </span>
             {entry.value > 0 && <span className="text-xs text-muted">({t("activity.worked")})</span>}
           </div>
         ) : (

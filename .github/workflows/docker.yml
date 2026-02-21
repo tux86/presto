@@ -53,3 +53,12 @@ jobs:
             ${{ steps.meta.outputs.dockerhub }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ steps.meta.outputs.dockerhub }}
+          short-description: "Self-hosted time-tracking for freelancers. Monthly activity reports + PDF export."
+          readme-filepath: ./README.md

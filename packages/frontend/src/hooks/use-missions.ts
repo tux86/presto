@@ -1,34 +1,11 @@
 import type { CreateMissionRequest, Mission, UpdateMissionRequest } from "@presto/shared";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../api/client";
+import { createCrudHooks } from "./use-crud";
 
-export function useMissions() {
-  return useQuery({
-    queryKey: ["missions"],
-    queryFn: () => api.get<Mission[]>("/missions"),
-  });
-}
+const {
+  useList: useMissions,
+  useCreate: useCreateMission,
+  useUpdate: useUpdateMission,
+  useDelete: useDeleteMission,
+} = createCrudHooks<Mission, CreateMissionRequest, UpdateMissionRequest>("/missions");
 
-export function useCreateMission() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (data: CreateMissionRequest) => api.post<Mission>("/missions", data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["missions"] }),
-  });
-}
-
-export function useUpdateMission() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, ...data }: UpdateMissionRequest & { id: string }) => api.put<Mission>(`/missions/${id}`, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["missions"] }),
-  });
-}
-
-export function useDeleteMission() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api.delete(`/missions/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["missions"] }),
-  });
-}
+export { useMissions, useCreateMission, useUpdateMission, useDeleteMission };

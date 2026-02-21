@@ -9,10 +9,49 @@ interface CalendarDayProps {
   onToggle: (entryId: string, newValue: number) => void;
 }
 
+type DayKind = "holiday" | "weekend" | "normal";
+type DayValue = 0 | 0.5 | 1;
+
+function getDayKind(entry: ReportEntry): DayKind {
+  if (entry.isHoliday) return "holiday";
+  if (entry.isWeekend) return "weekend";
+  return "normal";
+}
+
+const containerStyles: Record<DayKind, Record<DayValue, string>> = {
+  holiday: {
+    0: "bg-holiday border border-edge opacity-50 hover:opacity-70",
+    0.5: "border border-indigo-500/60 opacity-70 hover:opacity-90",
+    1: "bg-indigo-600/70 border border-indigo-500/60 opacity-70 hover:opacity-90",
+  },
+  weekend: {
+    0: "bg-weekend border border-transparent opacity-40 hover:opacity-60",
+    0.5: "border border-indigo-500/60 opacity-70 hover:opacity-90",
+    1: "bg-indigo-600/70 border border-indigo-500/60 opacity-70 hover:opacity-90",
+  },
+  normal: {
+    0: "bg-elevated border border-edge hover:bg-inset hover:border-edge-strong",
+    0.5: "border border-indigo-500 hover:border-indigo-400",
+    1: "bg-indigo-600 border border-indigo-500 hover:bg-indigo-500",
+  },
+};
+
+const dayNumberStyles: Record<DayKind, Record<DayValue, string>> = {
+  holiday: { 0: "text-faint", 0.5: "text-white", 1: "text-white" },
+  weekend: { 0: "text-faint", 0.5: "text-white", 1: "text-white" },
+  normal: { 0: "text-body", 0.5: "text-white", 1: "text-white" },
+};
+
+const dayNameStyles: Record<DayKind, Record<DayValue, string>> = {
+  holiday: { 0: "text-faint", 0.5: "text-faint", 1: "text-faint" },
+  weekend: { 0: "text-faint", 0.5: "text-faint", 1: "text-faint" },
+  normal: { 0: "text-muted", 0.5: "text-muted", 1: "text-indigo-200" },
+};
+
 export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDayProps) {
   const { t } = useT();
-  const hasValue = entry.value > 0;
-  const isSpecial = entry.isWeekend || entry.isHoliday;
+  const kind = getDayKind(entry);
+  const value = entry.value as DayValue;
 
   const handleClick = () => {
     const next = entry.value === 0 ? 1 : entry.value === 1 ? 0.5 : 0;
@@ -23,33 +62,7 @@ export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDay
     <div
       className={cn(
         "relative flex flex-col items-center justify-center rounded-lg h-12 sm:h-16 transition-all duration-100 select-none overflow-hidden cursor-pointer active:scale-[0.97]",
-        // Holiday empty
-        entry.isHoliday && entry.value === 0 && "bg-holiday border border-edge opacity-50 hover:opacity-70",
-        // Holiday filled
-        entry.isHoliday &&
-          entry.value === 1 &&
-          "bg-indigo-600/70 border border-indigo-500/60 opacity-70 hover:opacity-90",
-        entry.isHoliday && entry.value === 0.5 && "border border-indigo-500/60 opacity-70 hover:opacity-90",
-        // Weekend empty
-        entry.isWeekend &&
-          !entry.isHoliday &&
-          entry.value === 0 &&
-          "bg-weekend border border-transparent opacity-40 hover:opacity-60",
-        // Weekend filled
-        entry.isWeekend &&
-          !entry.isHoliday &&
-          entry.value === 1 &&
-          "bg-indigo-600/70 border border-indigo-500/60 opacity-70 hover:opacity-90",
-        entry.isWeekend &&
-          !entry.isHoliday &&
-          entry.value === 0.5 &&
-          "border border-indigo-500/60 opacity-70 hover:opacity-90",
-        // Working day empty
-        !isSpecial && entry.value === 0 && "bg-elevated border border-edge hover:bg-inset hover:border-edge-strong",
-        // Working day full
-        !isSpecial && entry.value === 1 && "bg-indigo-600 border border-indigo-500 hover:bg-indigo-500",
-        // Working day half
-        !isSpecial && entry.value === 0.5 && "border border-indigo-500 hover:border-indigo-400",
+        containerStyles[kind][value],
       )}
       onClick={handleClick}
       title={entry.isHoliday ? (entry.holidayName ?? t("activity.holiday")) : undefined}
@@ -63,28 +76,12 @@ export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDay
       )}
 
       {/* Day number */}
-      <span
-        className={cn(
-          "relative z-10 text-xs sm:text-base font-bold leading-tight",
-          isSpecial && !hasValue && "text-faint",
-          isSpecial && hasValue && "text-white",
-          !isSpecial && entry.value === 0 && "text-body",
-          !isSpecial && hasValue && "text-white",
-        )}
-      >
+      <span className={cn("relative z-10 text-xs sm:text-base font-bold leading-tight", dayNumberStyles[kind][value])}>
         {dayNumber}
       </span>
 
       {/* Day name */}
-      <span
-        className={cn(
-          "relative z-10 text-[9px] sm:text-[11px] leading-tight mt-0.5",
-          isSpecial && "text-faint",
-          !isSpecial && entry.value === 0 && "text-muted",
-          !isSpecial && entry.value === 1 && "text-indigo-200",
-          !isSpecial && entry.value === 0.5 && "text-muted",
-        )}
-      >
+      <span className={cn("relative z-10 text-[9px] sm:text-[11px] leading-tight mt-0.5", dayNameStyles[kind][value])}>
         {dayName}
       </span>
 

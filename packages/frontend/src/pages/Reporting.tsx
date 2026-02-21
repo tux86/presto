@@ -5,6 +5,8 @@ import { api } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { KpiCard } from "@/components/reporting/KpiCard";
 import { MonthlyChart } from "@/components/reporting/MonthlyChart";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useT } from "@/i18n";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 
@@ -22,31 +24,11 @@ export function Reporting() {
       <Header
         title={t("reporting.title")}
         subtitle={t("reporting.subtitle", { year })}
-        actions={
-          <div className="flex items-center gap-1 rounded-lg border border-edge bg-panel">
-            <button
-              className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer"
-              onClick={() => setYear((y) => y - 1)}
-            >
-              &larr;
-            </button>
-            <span className="px-2 text-sm text-body font-medium">{year}</span>
-            <button
-              className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer"
-              onClick={() => setYear((y) => y + 1)}
-            >
-              &rarr;
-            </button>
-          </div>
-        }
+        actions={<YearNavigator year={year} onChange={setYear} />}
       />
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-28 bg-panel border border-edge rounded-xl animate-pulse" />
-          ))}
-        </div>
+        <Skeleton count={3} height="h-28" grid="grid grid-cols-1 md:grid-cols-3 gap-4" />
       ) : report ? (
         <div className="space-y-6">
           {/* KPIs */}

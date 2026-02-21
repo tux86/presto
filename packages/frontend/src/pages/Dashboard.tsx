@@ -4,6 +4,9 @@ import { ActivityReportCard } from "@/components/activity-report/ActivityReportC
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { Select } from "@/components/ui/Select";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useActivityReports, useCreateActivityReport } from "@/hooks/use-activity-reports";
 import { useMissions } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
@@ -37,32 +40,14 @@ export function Dashboard() {
         subtitle={t("dashboard.subtitle", { year: selectedYear })}
         actions={
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 rounded-lg border border-edge bg-panel">
-              <button
-                className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer"
-                onClick={() => setSelectedYear((y) => y - 1)}
-              >
-                &larr;
-              </button>
-              <span className="px-2 text-sm text-body font-medium">{selectedYear}</span>
-              <button
-                className="px-2.5 py-1.5 text-xs text-muted hover:text-heading cursor-pointer"
-                onClick={() => setSelectedYear((y) => y + 1)}
-              >
-                &rarr;
-              </button>
-            </div>
+            <YearNavigator year={selectedYear} onChange={setSelectedYear} />
             <Button onClick={() => setShowCreateModal(true)}>{t("dashboard.newActivity")}</Button>
           </div>
         }
       />
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-40 rounded-xl bg-panel border border-edge animate-pulse" />
-          ))}
-        </div>
+        <Skeleton count={6} height="h-40" grid="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" />
       ) : reports && reports.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {reports.map((report) => (
@@ -80,53 +65,44 @@ export function Dashboard() {
       <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)} title={t("dashboard.newActivity")}>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-muted">{t("dashboard.month")}</label>
-              <select
-                value={newReportMonth}
-                onChange={(e) => setNewReportMonth(Number(e.target.value))}
-                className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
-              >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                  <option key={m} value={m}>
-                    {getMonthName(m, locale)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-muted">{t("dashboard.year")}</label>
-              <select
-                value={newReportYear}
-                onChange={(e) => setNewReportYear(Number(e.target.value))}
-                className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
-              >
-                {[selectedYear - 1, selectedYear, selectedYear + 1].map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label={t("dashboard.month")}
+              value={newReportMonth}
+              onChange={(e) => setNewReportMonth(Number(e.target.value))}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>
+                  {getMonthName(m, locale)}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label={t("dashboard.year")}
+              value={newReportYear}
+              onChange={(e) => setNewReportYear(Number(e.target.value))}
+            >
+              {[selectedYear - 1, selectedYear, selectedYear + 1].map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-muted">{t("dashboard.mission")}</label>
-            <select
-              value={newReportMissionId}
-              onChange={(e) => setNewReportMissionId(e.target.value)}
-              className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
-            >
-              <option value="">{t("dashboard.selectMission")}</option>
-              {missions
-                ?.filter((m) => m.isActive)
-                .map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.client?.name} - {m.name}
-                  </option>
-                ))}
-            </select>
-          </div>
+          <Select
+            label={t("dashboard.mission")}
+            value={newReportMissionId}
+            onChange={(e) => setNewReportMissionId(e.target.value)}
+          >
+            <option value="">{t("dashboard.selectMission")}</option>
+            {missions
+              ?.filter((m) => m.isActive)
+              .map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.client?.name} - {m.name}
+                </option>
+              ))}
+          </Select>
 
           {createReport.error && <p className="text-sm text-red-500">{createReport.error.message}</p>}
 

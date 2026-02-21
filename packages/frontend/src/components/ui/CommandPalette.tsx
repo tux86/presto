@@ -84,10 +84,6 @@ export function CommandPalette() {
     }
   }, [open]);
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, []);
-
   if (!open) return null;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

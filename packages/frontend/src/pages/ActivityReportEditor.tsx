@@ -7,6 +7,7 @@ import { ListView } from "@/components/activity-report/ListView";
 import { ReportInfoPanel } from "@/components/activity-report/ReportInfoPanel";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 import {
   useActivityReport,
   useAutoFillReport,
@@ -91,9 +92,9 @@ export function ActivityReportEditor() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 w-48 bg-elevated rounded" />
-        <div className="h-96 bg-panel border border-edge rounded-xl" />
+      <div className="space-y-4">
+        <Skeleton count={1} height="h-8" className="w-48 bg-elevated rounded" />
+        <Skeleton count={1} height="h-96" />
       </div>
     );
   }

@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { Select } from "@/components/ui/Select";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients } from "@/hooks/use-clients";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -88,11 +90,7 @@ export function Missions() {
       />
 
       {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-14 bg-panel rounded-lg animate-pulse" />
-          ))}
-        </div>
+        <Skeleton count={3} height="h-14" className="rounded-lg" />
       ) : (
         <Table
           data={missions ?? []}
@@ -160,22 +158,14 @@ export function Missions() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label={t("missions.missionName")} value={name} onChange={(e) => setName(e.target.value)} required />
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-muted">{t("missions.client")}</label>
-            <select
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              className="w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none"
-              required
-            >
-              <option value="">{t("missions.selectClient")}</option>
-              {clients?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select label={t("missions.client")} value={clientId} onChange={(e) => setClientId(e.target.value)} required>
+            <option value="">{t("missions.selectClient")}</option>
+            {clients?.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </Select>
           <Input
             label={t("missions.dailyRateOptional")}
             type="number"

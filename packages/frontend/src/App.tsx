@@ -14,15 +14,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
   const authEnabled = useConfigStore((s) => s.config?.authEnabled);
 
-  if (!authEnabled) {
-    return <>{children}</>;
-  }
-
-  if (!token) {
+  if (authEnabled && !token) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return children;
 }
 
 export default function App() {

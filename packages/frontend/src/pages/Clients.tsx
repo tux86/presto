@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "@/hooks/use-clients";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -78,11 +79,7 @@ export function Clients() {
       />
 
       {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-14 bg-panel rounded-lg animate-pulse" />
-          ))}
-        </div>
+        <Skeleton count={3} height="h-14" className="rounded-lg" />
       ) : (
         <Table
           data={clients ?? []}

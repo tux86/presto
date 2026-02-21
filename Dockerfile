@@ -28,8 +28,8 @@ RUN cd packages/frontend && bun run build
 
 # Generate Prisma client and build backend
 # DATABASE_URL is required by prisma.config.ts at load time, even for generate
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
-    cd packages/backend && bunx prisma generate && \
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+RUN cd packages/backend && bunx prisma generate && \
     bun build src/index.ts --outdir dist --target bun
 
 # Move frontend dist into backend's public dir for static serving

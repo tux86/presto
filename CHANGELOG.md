@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/tux86/presto/compare/v1.3.1...v1.3.2) (2026-02-21)
+
+### Bug Fixes
+
+* **docker:** provide dummy DATABASE_URL for prisma generate in Docker build ([aa33128](https://github.com/tux86/presto/commit/aa33128f00233424b117ac69da8b955e9184857e))
+
 ## [1.3.1](https://github.com/tux86/presto/compare/v1.3.0...v1.3.1) (2026-02-21)
 
 ### Bug Fixes

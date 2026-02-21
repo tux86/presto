@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-push:
-    name: Build and Push Images
+    name: Build and Push Image
     runs-on: ubuntu-latest
 
     permissions:
@@ -28,29 +28,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push backend
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: packages/backend/Dockerfile
+          file: Dockerfile
           push: true
           tags: |
-            ghcr.io/tux86/presto-backend:${{ steps.version.outputs.semver }}
-            ghcr.io/tux86/presto-backend:latest
-          cache-from: type=gha,scope=backend
-          cache-to: type=gha,mode=max,scope=backend
-
-      - name: Build and push frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: packages/frontend/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/tux86/presto-frontend:${{ steps.version.outputs.semver }}
-            ghcr.io/tux86/presto-frontend:latest
-          cache-from: type=gha,scope=frontend
-          cache-to: type=gha,mode=max,scope=frontend
+            ghcr.io/tux86/presto:${{ steps.version.outputs.semver }}
+            ghcr.io/tux86/presto:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/presto:${{ steps.version.outputs.semver }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/presto:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

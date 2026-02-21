@@ -17,11 +17,11 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+  presto:
     build:
       context: .
-      dockerfile: packages/backend/Dockerfile
-    container_name: presto-backend
+      dockerfile: Dockerfile
+    container_name: presto
     restart: unless-stopped
     depends_on:
       postgres:
@@ -29,22 +29,9 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:-presto_dev_password}@postgres:5432/${POSTGRES_DB:-presto}?schema=public
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
     ports:
-      - "${BACKEND_PORT:-3001}:3001"
-
-  frontend:
-    build:
-      context: .
-      dockerfile: packages/frontend/Dockerfile
-    container_name: presto-frontend
-    restart: unless-stopped
-    depends_on:
-      backend:
-        condition: service_healthy
-    ports:
-      - "${FRONTEND_PORT:-8080}:80"
+      - "${PORT:-8080}:8080"
 
 volumes:
   pgdata:

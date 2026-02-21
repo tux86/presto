@@ -6,7 +6,7 @@ Activity report time-tracking app. Monorepo with 3 packages.
 
 - **Runtime:** Bun
 - **Frontend:** React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts
-- **Backend:** Hono 4, Prisma 6, @react-pdf/renderer
+- **Backend:** Hono 4, Prisma 7, @react-pdf/renderer
 - **Database:** PostgreSQL 16 (supports MySQL, SQLite, SQL Server, CockroachDB via Prisma provider swap)
 - **Shared:** TypeScript types + utilities (dates, French holidays)
 - **Language:** TypeScript 5.7, strict mode
@@ -15,8 +15,8 @@ Activity report time-tracking app. Monorepo with 3 packages.
 
 ```
 packages/
-  backend/     # Hono API server (port 3001)
-  frontend/    # React SPA (port 5173, proxies /api → backend)
+  backend/     # Hono API server (port 3001 dev, 8080 Docker)
+  frontend/    # React SPA (port 5173 dev, proxies /api → backend)
   shared/      # Shared types and utils (@presto/shared)
 ```
 
@@ -35,7 +35,7 @@ bun run format             # Format all files
 bun run db:generate        # Generate Prisma client
 bun run db:migrate         # Run database migrations
 bun run db:seed            # Seed sample data
-docker-compose up -d       # Start PostgreSQL
+docker compose up -d       # Start PostgreSQL + Presto (Docker)
 ```
 
 ## Path Aliases
@@ -57,7 +57,7 @@ All prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `re
 
 - **CI** (`.github/workflows/ci.yml`): lint → typecheck → build on PR/push to `main`
 - **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
-- **Docker** (`.github/workflows/docker.yml`): builds + pushes `ghcr.io/tux86/presto-backend` and `ghcr.io/tux86/presto-frontend` on release
+- **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR + Docker Hub on release
 
 ## Key Conventions
 

@@ -1,9 +1,8 @@
-# Single-stage build: bun workspace + Prisma's hoisting behavior makes
+# Single-stage build: Bun workspace + Prisma's hoisting behavior makes
 # multi-stage artifact collection unreliable across bun versions.
 # Since the runtime is also bun, single-stage is the pragmatic choice.
-FROM oven/bun:1
+FROM oven/bun:1-debian
 
-# Create non-root user early
 RUN groupadd --system --gid 1001 presto && \
     useradd --system --uid 1001 --gid presto --no-create-home presto
 
@@ -19,23 +18,31 @@ COPY packages/frontend/package.json packages/frontend/package.json
 
 RUN bun install --frozen-lockfile
 
-# Copy source code (changes here don't invalidate the install layer above)
+# Copy source code
 COPY packages/shared/ packages/shared/
+COPY packages/frontend/ packages/frontend/
 COPY packages/backend/ packages/backend/
 
-# Generate Prisma client and build
+# Build frontend
+RUN cd packages/frontend && ./node_modules/.bin/vite build
+
+# Generate Prisma client and build backend
 RUN cd packages/backend && bunx prisma generate
 RUN cd packages/backend && bun build src/index.ts --outdir dist --target bun
 
-COPY packages/backend/docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+# Move frontend dist into backend's public dir for static serving
+RUN mv packages/frontend/dist packages/backend/public
 
-# Switch to non-root user (files are root-owned but world-readable)
+COPY packages/backend/docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
+ENV PORT=8080
+
 USER presto
 
-EXPOSE 3001
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -f http://localhost:3001/api/health || exit 1
+  CMD curl -f http://localhost:8080/api/health || exit 1
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

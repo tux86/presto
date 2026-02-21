@@ -1,4 +1,7 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { config, getPublicConfig } from "./lib/config.js";
@@ -20,6 +23,7 @@ app.use(
   }),
 );
 
+// API routes
 app.route("/api/auth", auth);
 app.route("/api/clients", clients);
 app.route("/api/missions", missions);
@@ -28,5 +32,23 @@ app.route("/api/reporting", reporting);
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
 app.get("/api/config", (c) => c.json(getPublicConfig()));
+
+// Serve frontend static files (Docker / production)
+const publicDir = join(import.meta.dir, "../public");
+if (existsSync(publicDir)) {
+  // Cache Vite hashed assets for 1 year
+  app.use("/assets/*", async (c, next) => {
+    await next();
+    if (c.res.status === 200) {
+      c.res.headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    }
+  });
+
+  // Serve static files
+  app.use("*", serveStatic({ root: "./public" }));
+
+  // SPA fallback — serve index.html for non-API, non-file routes
+  app.get("*", serveStatic({ root: "./public", path: "index.html" }));
+}
 
 export default app;

@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/tux86/presto/compare/v1.0.0...v1.1.0) (2026-02-21)
+
+### Features
+
+* **docker:** unify frontend and backend into single Docker image ([4fabbf8](https://github.com/tux86/presto/commit/4fabbf8fc8422f33b739d88baaa967dc0caa3512))
+
 ## 1.0.0 (2026-02-20)
 
 ### Bug Fixes

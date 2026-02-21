@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -74,7 +75,7 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 bottom-0 w-56 flex flex-col bg-panel border-r border-edge">
       {/* Logo */}
       <div className="px-5 py-5">
-        <img src="/logo-horizontal.png" alt="Presto" className="h-8" />
+        <LogoHorizontal className="h-8" />
       </div>
 
       {/* Nav */}

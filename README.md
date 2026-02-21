@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.png" alt="Presto" width="180" />
+  <img src="packages/frontend/public/favicon.svg" alt="Presto" width="64" />
 
   <h1>Presto</h1>
 

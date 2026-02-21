@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useT } from "@/i18n";
@@ -40,7 +41,7 @@ export function Login() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <img src="/logo-horizontal.png" alt="Presto" className="h-16" />
+          <LogoHorizontal className="h-16" />
         </div>
 
         <div className="rounded-xl border border-edge bg-panel p-6">

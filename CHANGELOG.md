@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/tux86/presto/compare/v1.3.3...v1.4.0) (2026-02-21)
+
+### Features
+
+* **ci:** publish Docker image to both GHCR and Docker Hub ([c0d0729](https://github.com/tux86/presto/commit/c0d072952900affdf01743aa9227da365a6f03f0))
+
 ## [1.3.3](https://github.com/tux86/presto/compare/v1.3.2...v1.3.3) (2026-02-21)
 
 ### Bug Fixes

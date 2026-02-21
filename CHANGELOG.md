@@ -1,3 +1,14 @@
+## [1.3.1](https://github.com/tux86/presto/compare/v1.3.0...v1.3.1) (2026-02-21)
+
+### Bug Fixes
+
+* **ci:** use RELEASE_TOKEN PAT in release workflow to trigger Docker build ([4702afa](https://github.com/tux86/presto/commit/4702afadb9cc9b624b51a267f04d1f174adedb30))
+
+### Refactoring
+
+* **backend:** audit and harden API routes ([a5c4fab](https://github.com/tux86/presto/commit/a5c4fab1cdcc43fb4b5336a36295213d88ba693f))
+* **frontend:** extract shared components and reduce duplication ([5f01852](https://github.com/tux86/presto/commit/5f018525add3ca02bc296751620d0cbf32d1742f))
+
 ## [1.3.0](https://github.com/tux86/presto/compare/v1.2.0...v1.3.0) (2026-02-21)
 
 ### Features

@@ -1,3 +1,13 @@
+## [1.5.1](https://github.com/tux86/presto/compare/v1.5.0...v1.5.1) (2026-02-22)
+
+### Bug Fixes
+
+* use server-provided filename for PDF downloads ([377aff3](https://github.com/tux86/presto/commit/377aff3c623191d825d0796f16158f5428e874b5))
+
+### Refactoring
+
+* code review fixes, REST improvements, and squashed migrations ([942268e](https://github.com/tux86/presto/commit/942268ee0419def6ad002a862747f7d830cb1cf0))
+
 ## [1.5.0](https://github.com/tux86/presto/compare/v1.4.0...v1.5.0) (2026-02-22)
 
 ### Features

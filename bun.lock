@@ -25,16 +25,18 @@
     },
     "packages/backend": {
       "name": "@presto/backend",
-      "version": "1.6.0",
+      "version": "1.7.1",
       "dependencies": {
         "@hono/zod-validator": "^0.7.6",
         "@presto/shared": "workspace:*",
         "@prisma/adapter-pg": "^7.4.1",
         "@prisma/client": "^7.4.1",
         "@react-pdf/renderer": "^4.3.0",
+        "dotenv": "^17.3.1",
         "hono": "^4.7.0",
         "hono-rate-limiter": "^0.5.3",
         "pg": "^8.18.0",
+        "prisma": "^7.4.1",
         "react": "^19.0.0",
         "zod": "^4.3.6",
       },
@@ -42,14 +44,12 @@
         "@types/bun": "latest",
         "@types/pg": "^8.16.0",
         "@types/react": "^19.0.0",
-        "dotenv": "^17.3.1",
-        "prisma": "^7.4.1",
         "typescript": "^5.7.0",
       },
     },
     "packages/frontend": {
       "name": "@presto/frontend",
-      "version": "1.6.0",
+      "version": "1.7.1",
       "dependencies": {
         "@presto/shared": "workspace:*",
         "@tanstack/react-query": "^5.66.0",
@@ -71,7 +71,7 @@
     },
     "packages/shared": {
       "name": "@presto/shared",
-      "version": "1.6.0",
+      "version": "1.7.1",
       "dependencies": {
         "date-holidays": "^3.26.8",
       },

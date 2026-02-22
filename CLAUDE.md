@@ -32,6 +32,7 @@ bun run typecheck          # Type-check all packages
 bun run lint               # Lint + format check (Biome)
 bun run lint:fix           # Auto-fix lint + format issues
 bun run db:generate        # Generate Prisma client
+bun run db:push            # Push schema changes to dev DB (no migration file)
 bun run db:migrate         # Apply committed migrations (migrate deploy)
 bun run db:migrate:dev     # Create new migration from schema changes (migrate dev)
 bun run db:seed            # Seed sample data

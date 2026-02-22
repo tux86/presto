@@ -35,6 +35,7 @@ bun run typecheck        # Type-check all packages
 bun run lint             # Lint + format check (Biome)
 bun run lint:fix         # Auto-fix lint + format
 bun run db:generate      # Regenerate Prisma client after schema changes
+bun run db:push          # Push schema changes to dev DB (no migration file)
 bun run db:migrate       # Apply pending migrations (uses migrate deploy)
 bun run db:migrate:dev   # Create new migration from schema changes (uses migrate dev)
 bun run db:seed          # Seed sample data

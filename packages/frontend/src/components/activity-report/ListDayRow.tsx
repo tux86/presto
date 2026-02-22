@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 interface ListDayRowProps {
   entry: ReportEntry;
   onToggle?: (entryId: string, newValue: number) => void;
-  onTaskChange?: (entryId: string, task: string) => void;
+  onTaskChange?: (entryId: string, note: string) => void;
 }
 
 export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
@@ -57,23 +57,22 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
 
       {/* Task / Holiday label */}
       <div className="flex-1 min-w-0">
-        {entry.isHoliday ? (
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
+        {entry.isHoliday && (
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
               {entry.holidayName ?? t("activity.holiday")}
             </span>
             {entry.value > 0 && <span className="text-xs text-muted">({t("activity.worked")})</span>}
           </div>
-        ) : (
-          <input
-            type="text"
-            defaultValue={entry.task || ""}
-            onChange={(e) => onTaskChange?.(entry.id, e.target.value)}
-            placeholder={entry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.taskPlaceholder")}
-            className="w-full bg-transparent text-sm text-body placeholder:text-placeholder outline-none"
-            readOnly={!onTaskChange}
-          />
         )}
+        <input
+          type="text"
+          defaultValue={entry.note || ""}
+          onChange={(e) => onTaskChange?.(entry.id, e.target.value)}
+          placeholder={entry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.notePlaceholder")}
+          className="w-full bg-transparent text-sm text-body placeholder:text-placeholder outline-none"
+          readOnly={!onTaskChange}
+        />
       </div>
     </div>
   );

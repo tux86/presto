@@ -72,7 +72,7 @@ export const updateEntriesSchema = z.object({
     z.object({
       id: z.string().min(1),
       value: z.number().min(0).max(1).optional(),
-      task: z.string().max(1000).optional(),
+      note: z.string().max(1000).optional(),
     }),
   ),
 });

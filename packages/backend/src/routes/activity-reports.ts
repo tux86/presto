@@ -133,7 +133,7 @@ activityReports.patch("/:id/entries", zValidator("json", updateEntriesSchema), a
         where: { id: entry.id },
         data: {
           value: entry.value !== undefined ? entry.value : undefined,
-          task: entry.task !== undefined ? entry.task : undefined,
+          note: entry.note !== undefined ? entry.note : undefined,
         },
       }),
     ),

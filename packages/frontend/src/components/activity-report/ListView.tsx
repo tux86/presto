@@ -4,7 +4,7 @@ import { ListDayRow } from "./ListDayRow";
 interface ListViewProps {
   entries: ReportEntry[];
   onToggle: (entryId: string, newValue: number) => void;
-  onTaskChange: (entryId: string, task: string) => void;
+  onTaskChange: (entryId: string, note: string) => void;
   readOnly?: boolean;
 }
 

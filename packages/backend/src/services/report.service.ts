@@ -79,7 +79,7 @@ export async function clearReport(reportId: string) {
   await prisma.$transaction([
     prisma.reportEntry.updateMany({
       where: { reportId },
-      data: { value: 0, task: null },
+      data: { value: 0, note: null },
     }),
     prisma.activityReport.update({
       where: { id: reportId },

@@ -77,7 +77,7 @@ export const en: Record<TranslationKey, string> = {
   "activity.days": "days",
   "activity.worked": "worked",
   "activity.weekendPlaceholder": "Weekend - Description...",
-  "activity.taskPlaceholder": "Description...",
+  "activity.notePlaceholder": "Description...",
 
   // Reporting
   "reporting.title": "Reporting",

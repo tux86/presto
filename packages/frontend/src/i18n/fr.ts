@@ -76,7 +76,7 @@ export const fr = {
   "activity.days": "jours",
   "activity.worked": "travaill\u00e9",
   "activity.weekendPlaceholder": "Weekend - Description...",
-  "activity.taskPlaceholder": "Description...",
+  "activity.notePlaceholder": "Description...",
 
   // Reporting
   "reporting.title": "Reporting",

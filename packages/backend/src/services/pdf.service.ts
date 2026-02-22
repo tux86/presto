@@ -4,43 +4,106 @@ import { getDayName, getMonthName } from "@presto/shared";
 import { Document, Page, renderToBuffer, StyleSheet, Text, View } from "@react-pdf/renderer";
 import React from "react";
 
+const h = React.createElement;
+
+const colors = {
+  accent: "#4f46e5",
+  text: "#1f2937",
+  muted: "#6b7280",
+  lightBg: "#f9fafb",
+  lighterBg: "#f3f4f6",
+  white: "#ffffff",
+  border: "#e5e7eb",
+};
+
 const styles = StyleSheet.create({
-  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica" },
-  header: { marginBottom: 20, borderBottom: "2px solid #1a1a2e", paddingBottom: 15 },
-  title: { fontSize: 20, fontWeight: "bold", color: "#1a1a2e", marginBottom: 4 },
-  subtitle: { fontSize: 12, color: "#555" },
-  infoRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 15 },
-  infoBlock: { flex: 1 },
-  infoLabel: { fontSize: 8, color: "#888", textTransform: "uppercase", marginBottom: 2 },
-  infoValue: { fontSize: 11, color: "#1a1a2e" },
-  table: { marginTop: 20 },
-  tableHeader: { flexDirection: "row", backgroundColor: "#1a1a2e", padding: 6 },
-  tableHeaderText: { color: "#fff", fontWeight: "bold", fontSize: 9 },
-  tableRow: { flexDirection: "row", borderBottom: "1px solid #eee", padding: 5 },
-  tableRowAlt: { flexDirection: "row", borderBottom: "1px solid #eee", padding: 5, backgroundColor: "#f8f9fa" },
-  tableRowWeekend: { flexDirection: "row", borderBottom: "1px solid #eee", padding: 5, backgroundColor: "#e9ecef" },
-  colDate: { width: "20%" },
-  colDay: { width: "15%" },
-  colValue: { width: "15%", textAlign: "center" },
-  colTask: { width: "50%" },
+  page: { padding: 36, fontSize: 10, fontFamily: "Helvetica", color: colors.text },
+
+  // Header
+  header: { marginBottom: 14 },
+  titleRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 2 },
+  titleBar: { width: 3, height: 22, backgroundColor: colors.accent, marginRight: 8, borderRadius: 1 },
+  titleText: { fontSize: 18, fontFamily: "Helvetica-Bold", color: colors.text },
+  subtitle: { fontSize: 11, color: colors.muted, textTransform: "uppercase", letterSpacing: 1, marginLeft: 11 },
+
+  // Info cards
+  infoRow: { flexDirection: "row", gap: 8, marginTop: 10 },
+  infoCard: { flex: 1, backgroundColor: colors.lighterBg, borderRadius: 4, padding: 8 },
+  infoLabel: {
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    color: colors.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  infoValue: { fontSize: 11, fontFamily: "Helvetica-Bold", color: colors.text },
+  infoSub: { fontSize: 10, color: colors.muted, marginTop: 1 },
+
+  // Table
+  table: { marginTop: 12 },
+  tableHeader: { flexDirection: "row", backgroundColor: colors.accent, paddingVertical: 5, paddingHorizontal: 6 },
+  thText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 10 },
+  row: {
+    flexDirection: "row",
+    paddingVertical: 3.5,
+    paddingHorizontal: 6,
+    borderBottom: `0.5px solid ${colors.border}`,
+  },
+  cell: { fontSize: 10 },
+  cellMuted: { fontSize: 10, color: colors.muted },
+  colDate: { width: "14%" },
+  colDay: { width: "10%" },
+  colValue: { width: "10%", textAlign: "center" },
+  colDesc: { width: "66%" },
+
+  // Note
+  note: { marginTop: 12, padding: 8, backgroundColor: colors.lightBg, borderRadius: 4 },
+  noteLabel: { fontSize: 9, fontFamily: "Helvetica-Bold", color: colors.muted, marginBottom: 3 },
+
+  // Footer
   footer: {
     position: "absolute",
-    bottom: 40,
-    left: 40,
-    right: 40,
+    bottom: 36,
+    left: 36,
+    right: 36,
     flexDirection: "row",
     justifyContent: "space-between",
-    borderTop: "1px solid #ddd",
-    paddingTop: 10,
+    alignItems: "center",
+    borderTop: `1px solid ${colors.border}`,
+    paddingTop: 8,
   },
-  total: { fontSize: 14, fontWeight: "bold", color: "#1a1a2e" },
-  note: { marginTop: 20, padding: 10, backgroundColor: "#f8f9fa", borderRadius: 4 },
-  noteLabel: { fontSize: 8, color: "#888", marginBottom: 4 },
+  total: { fontSize: 12, fontFamily: "Helvetica-Bold", color: colors.accent },
+  pageNum: { fontSize: 9, color: colors.muted },
 });
+
+// Pre-computed merged column styles to avoid repeated spreads
+const thDate = { ...styles.thText, ...styles.colDate };
+const thDay = { ...styles.thText, ...styles.colDay };
+const thValue = { ...styles.thText, ...styles.colValue };
+const thDesc = { ...styles.thText, ...styles.colDesc };
+const colStyles = {
+  date: [
+    { ...styles.cell, ...styles.colDate },
+    { ...styles.cellMuted, ...styles.colDate },
+  ],
+  day: [
+    { ...styles.cell, ...styles.colDay },
+    { ...styles.cellMuted, ...styles.colDay },
+  ],
+  value: [
+    { ...styles.cell, ...styles.colValue },
+    { ...styles.cellMuted, ...styles.colValue },
+  ],
+  desc: [
+    { ...styles.cell, ...styles.colDesc },
+    { ...styles.cellMuted, ...styles.colDesc },
+  ],
+} as const;
 
 const labels = {
   fr: {
-    title: "Relev\u00e9 d'Activit\u00e9",
+    title: "Compte-Rendu d'Activit\u00e9",
     consultant: "Consultant",
     client: "Client",
     mission: "Mission",
@@ -51,8 +114,8 @@ const labels = {
     holiday: "F\u00e9ri\u00e9",
     note: "Note",
     total: "Total",
-    amount: "Montant",
     dayUnit: (n: number) => `jour${n > 1 ? "s" : ""}`,
+    page: "Page",
   },
   en: {
     title: "Activity Report",
@@ -66,8 +129,8 @@ const labels = {
     holiday: "Holiday",
     note: "Note",
     total: "Total",
-    amount: "Amount",
     dayUnit: (n: number) => `day${n > 1 ? "s" : ""}`,
+    page: "Page",
   },
 };
 
@@ -79,7 +142,7 @@ interface PdfReport {
   entries: {
     date: Date | string;
     value: number;
-    task: string | null;
+    note: string | null;
     isWeekend: boolean;
     isHoliday: boolean;
     holidayName?: string | null;
@@ -96,117 +159,125 @@ interface PdfReport {
   };
 }
 
+function formatDayValue(value: number, isNonWorked: boolean): string {
+  if (isNonWorked && value === 0) return "\u2014";
+  if (value === 0.5) return "\u00bd";
+  return String(value);
+}
+
+function rowBg(i: number, isNonWorked: boolean): string | undefined {
+  if (isNonWorked) return colors.lighterBg;
+  return i % 2 !== 0 ? colors.lightBg : undefined;
+}
+
 function ReportDocument({ report, locale = "en" }: { report: PdfReport; locale?: "fr" | "en" }) {
   const l = labels[locale];
-  const monthName = getMonthName(report.month);
-  const currencyLocale = locale === "fr" ? "fr-FR" : "en-US";
-  const currency = report.mission.client.currency || "EUR";
-  const formatAmount = (amount: number) =>
-    new Intl.NumberFormat(currencyLocale, {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+  const monthName = getMonthName(report.month, locale);
 
-  return React.createElement(
+  return h(
     Document,
     null,
-    React.createElement(
+    h(
       Page,
       { size: "A4", style: styles.page },
-      React.createElement(
+
+      // Header
+      h(
         View,
         { style: styles.header },
-        React.createElement(Text, { style: styles.title }, l.title),
-        React.createElement(Text, { style: styles.subtitle }, `${monthName} ${report.year}`),
-        React.createElement(
+        h(
+          View,
+          { style: styles.titleRow },
+          h(View, { style: styles.titleBar }),
+          h(Text, { style: styles.titleText }, l.title),
+        ),
+        h(Text, { style: styles.subtitle }, `${monthName} ${report.year}`),
+        h(
           View,
           { style: styles.infoRow },
-          React.createElement(
+          h(
             View,
-            { style: styles.infoBlock },
-            React.createElement(Text, { style: styles.infoLabel }, l.consultant),
-            React.createElement(Text, { style: styles.infoValue }, `${report.user.firstName} ${report.user.lastName}`),
-            report.user.company &&
-              React.createElement(Text, { style: { fontSize: 9, color: "#666" } }, report.user.company),
+            { style: styles.infoCard },
+            h(Text, { style: styles.infoLabel }, l.consultant),
+            h(Text, { style: styles.infoValue }, `${report.user.firstName} ${report.user.lastName}`),
+            report.user.company && h(Text, { style: styles.infoSub }, report.user.company),
           ),
-          React.createElement(
+          h(
             View,
-            { style: styles.infoBlock },
-            React.createElement(Text, { style: styles.infoLabel }, l.client),
-            React.createElement(Text, { style: styles.infoValue }, report.mission.client.name),
+            { style: styles.infoCard },
+            h(Text, { style: styles.infoLabel }, l.client),
+            h(Text, { style: styles.infoValue }, report.mission.client.name),
           ),
-          React.createElement(
+          h(
             View,
-            { style: styles.infoBlock },
-            React.createElement(Text, { style: styles.infoLabel }, l.mission),
-            React.createElement(Text, { style: styles.infoValue }, report.mission.name),
+            { style: styles.infoCard },
+            h(Text, { style: styles.infoLabel }, l.mission),
+            h(Text, { style: styles.infoValue }, report.mission.name),
           ),
         ),
       ),
-      React.createElement(
+
+      // Table
+      h(
         View,
         { style: styles.table },
-        React.createElement(
+        h(
           View,
           { style: styles.tableHeader },
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDate } }, l.date),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colDay } }, l.day),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colValue } }, l.days),
-          React.createElement(Text, { style: { ...styles.tableHeaderText, ...styles.colTask } }, l.description),
+          h(Text, { style: thDate }, l.date),
+          h(Text, { style: thDay }, l.day),
+          h(Text, { style: thValue }, l.days),
+          h(Text, { style: thDesc }, l.description),
         ),
         ...report.entries.map((entry, i) => {
           const date = new Date(entry.date);
           const dayStr = String(date.getDate()).padStart(2, "0");
           const monthStr = String(date.getMonth() + 1).padStart(2, "0");
-          const dayName = getDayName(date);
-          let rowStyle = i % 2 === 0 ? styles.tableRow : styles.tableRowAlt;
-          if (entry.isWeekend || entry.isHoliday) rowStyle = styles.tableRowWeekend;
-          const label = entry.isHoliday ? entry.holidayName || l.holiday : entry.task || "";
+          const isNonWorked = entry.isWeekend || entry.isHoliday;
+          const m = isNonWorked ? 1 : 0; // muted index
+          const bg = rowBg(i, isNonWorked);
+          const rowStyle = bg ? { ...styles.row, backgroundColor: bg } : styles.row;
 
-          return React.createElement(
+          const holidayLabel = entry.isHoliday ? entry.holidayName || l.holiday : "";
+          const noteLabel = entry.note || "";
+          const desc = [holidayLabel, noteLabel].filter(Boolean).join(" \u2014 ");
+
+          return h(
             View,
             { style: rowStyle, key: i },
-            React.createElement(Text, { style: styles.colDate }, `${dayStr}/${monthStr}/${report.year}`),
-            React.createElement(Text, { style: styles.colDay }, dayName),
-            React.createElement(
-              Text,
-              { style: styles.colValue },
-              entry.isWeekend || entry.isHoliday ? "-" : String(entry.value),
-            ),
-            React.createElement(Text, { style: styles.colTask }, label),
+            h(Text, { style: colStyles.date[m] }, `${dayStr}/${monthStr}/${report.year}`),
+            h(Text, { style: colStyles.day[m] }, getDayName(date, locale)),
+            h(Text, { style: colStyles.value[m] }, formatDayValue(entry.value, isNonWorked)),
+            h(Text, { style: colStyles.desc[m] }, desc),
           );
         }),
       ),
+
+      // Note
       report.note &&
-        React.createElement(
+        h(
           View,
           { style: styles.note },
-          React.createElement(Text, { style: styles.noteLabel }, l.note),
-          React.createElement(Text, null, report.note),
+          h(Text, { style: styles.noteLabel }, l.note),
+          h(Text, { style: styles.cell }, report.note),
         ),
-      React.createElement(
+
+      // Footer
+      h(
         View,
-        { style: styles.footer },
-        React.createElement(
-          Text,
-          { style: styles.total },
-          `${l.total} : ${report.totalDays} ${l.dayUnit(report.totalDays)}`,
-        ),
-        report.mission.dailyRate &&
-          React.createElement(
-            Text,
-            { style: styles.total },
-            `${l.amount} : ${formatAmount(report.totalDays * report.mission.dailyRate)}`,
-          ),
+        { style: styles.footer, fixed: true },
+        h(Text, { style: styles.total }, `${l.total} : ${report.totalDays} ${l.dayUnit(report.totalDays)}`),
+        h(Text, {
+          style: styles.pageNum,
+          render: ({ pageNumber, totalPages }) => `${l.page} ${pageNumber} / ${totalPages}`,
+        }),
       ),
     ),
   );
 }
 
 export async function generateReportPdf(report: PdfReport, locale: "fr" | "en" = "en"): Promise<Buffer> {
-  const doc = React.createElement(ReportDocument, { report, locale });
+  const doc = h(ReportDocument, { report, locale });
   const buffer = await renderToBuffer(doc);
   return Buffer.from(buffer);
 }

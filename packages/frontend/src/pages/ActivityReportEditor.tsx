@@ -70,11 +70,11 @@ export function ActivityReportEditor() {
   );
 
   const handleTaskChange = useCallback(
-    (entryId: string, task: string) => {
+    (entryId: string, note: string) => {
       if (!id) return;
       if (taskTimerRef.current[entryId]) clearTimeout(taskTimerRef.current[entryId]);
       taskTimerRef.current[entryId] = setTimeout(() => {
-        updateEntries.mutate({ reportId: id, entries: [{ id: entryId, task }] });
+        updateEntries.mutate({ reportId: id, entries: [{ id: entryId, note }] });
       }, 500);
     },
     [id, updateEntries],

@@ -98,7 +98,7 @@ export function CalendarDay({ entry, dayNumber, dayName, selected, onToggle, onS
       )}
 
       {/* Task indicator */}
-      {entry.task && !entry.isHoliday && (
+      {entry.note && (
         <div
           className={cn(
             "absolute top-1 left-1/2 -translate-x-1/2 z-10 h-1 w-3 rounded-full",

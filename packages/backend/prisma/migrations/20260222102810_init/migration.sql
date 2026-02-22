@@ -68,7 +68,7 @@ CREATE TABLE "ReportEntry" (
     "id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "value" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "task" TEXT,
+    "note" TEXT,
     "isWeekend" BOOLEAN NOT NULL DEFAULT false,
     "isHoliday" BOOLEAN NOT NULL DEFAULT false,
     "reportId" TEXT NOT NULL,

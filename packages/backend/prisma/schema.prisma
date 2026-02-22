@@ -85,7 +85,7 @@ model ReportEntry {
   id          String   @id @default(cuid())
   date        DateTime
   value       Float    @default(0)
-  task        String?
+  note        String?
   isWeekend   Boolean  @default(false)
   isHoliday   Boolean  @default(false)
   reportId    String

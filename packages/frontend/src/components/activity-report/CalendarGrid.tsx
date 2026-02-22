@@ -7,7 +7,7 @@ import { CalendarDay } from "./CalendarDay";
 interface CalendarGridProps {
   entries: ReportEntry[];
   onToggle: (entryId: string, newValue: number) => void;
-  onTaskChange?: (entryId: string, task: string) => void;
+  onTaskChange?: (entryId: string, note: string) => void;
   readOnly?: boolean;
 }
 
@@ -73,19 +73,24 @@ export function CalendarGrid({ entries, onToggle, onTaskChange, readOnly }: Cale
       </div>
 
       {/* Task editor for selected day */}
-      {selectedEntry && !readOnly && !selectedEntry.isHoliday && (
+      {selectedEntry && !readOnly && (
         <div className="mt-4 flex items-center gap-3 rounded-lg border border-edge bg-elevated px-4 py-3">
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-1.5">
             <span className="text-sm font-bold text-heading">{new Date(selectedEntry.date).getDate()}</span>
-            <span className="ml-1.5 text-xs text-muted">{getDayNameFull(new Date(selectedEntry.date), locale)}</span>
+            <span className="text-xs text-muted">{getDayNameFull(new Date(selectedEntry.date), locale)}</span>
+            {selectedEntry.isHoliday && (
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                — {selectedEntry.holidayName ?? t("activity.holiday")}
+              </span>
+            )}
           </div>
           <input
             ref={taskInputRef}
             type="text"
-            defaultValue={selectedEntry.task || ""}
+            defaultValue={selectedEntry.note || ""}
             key={selectedEntry.id}
             onChange={(e) => onTaskChange?.(selectedEntry.id, e.target.value)}
-            placeholder={selectedEntry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.taskPlaceholder")}
+            placeholder={selectedEntry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.notePlaceholder")}
             className="flex-1 bg-transparent text-sm text-body placeholder:text-placeholder outline-none"
           />
         </div>

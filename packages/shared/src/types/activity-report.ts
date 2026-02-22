@@ -5,7 +5,7 @@ export interface ReportEntry {
   id: string;
   date: string;
   value: number; // 0, 0.5, 1
-  task: string | null;
+  note: string | null;
   isWeekend: boolean;
   isHoliday: boolean;
   holidayName: string | null;
@@ -53,7 +53,7 @@ export interface UpdateEntriesRequest {
   entries: {
     id: string;
     value?: number;
-    task?: string;
+    note?: string;
   }[];
 }
 

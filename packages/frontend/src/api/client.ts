@@ -3,6 +3,31 @@ import { useConfigStore } from "../stores/config.store";
 
 const API_BASE = "/api";
 
+function extractZodMessages(issues: { message?: string }[]): string {
+  return issues.map((i) => i.message || "Validation error").join(". ");
+}
+
+function extractErrorMessage(body: Record<string, unknown>, status: number): string {
+  if (typeof body.error === "string") return body.error;
+
+  const err = body.error as Record<string, unknown> | undefined;
+
+  // Zod validation: issues as direct array property
+  if (Array.isArray(err?.issues)) {
+    return extractZodMessages(err.issues as { message?: string }[]);
+  }
+
+  // Zod 4: issues serialized as JSON string inside message
+  const message = (err?.message as string) || (body.message as string);
+  if (message?.startsWith("[")) {
+    try {
+      return extractZodMessages(JSON.parse(message));
+    } catch {}
+  }
+
+  return message || `Request failed: ${status}`;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = useAuthStore.getState().token;
   const headers: Record<string, string> = {
@@ -27,7 +52,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `Request failed: ${res.status}`);
+    throw new Error(extractErrorMessage(body, res.status));
   }
 
   if (res.status === 204) return undefined as T;
@@ -48,7 +73,7 @@ async function requestBlob(path: string, options: RequestInit = {}): Promise<Res
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `Request failed: ${res.status}`);
+    throw new Error(extractErrorMessage(body, res.status));
   }
 
   return res;

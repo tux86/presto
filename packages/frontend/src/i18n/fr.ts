@@ -110,6 +110,8 @@ export const fr = {
   "auth.switchToLogin": "Se connecter",
   "auth.switchToRegister": "S'inscrire",
   "auth.genericError": "Une erreur est survenue",
+  "auth.tagline": "Suivez votre temps.\nSimplifiez vos comptes-rendus.",
+  "auth.brandingDescription": "Suivi du temps et comptes-rendus d'activit\u00e9, simplifi\u00e9s.",
 
   // Common
   "common.create": "Cr\u00e9er",

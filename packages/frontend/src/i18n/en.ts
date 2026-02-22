@@ -111,6 +111,8 @@ export const en: Record<TranslationKey, string> = {
   "auth.switchToLogin": "Sign in",
   "auth.switchToRegister": "Sign up",
   "auth.genericError": "An error occurred",
+  "auth.tagline": "Track your time.\nSimplify your reports.",
+  "auth.brandingDescription": "Time tracking and activity reports, simplified.",
 
   // Common
   "common.create": "Create",

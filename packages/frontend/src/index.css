@@ -97,3 +97,36 @@ body {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ─── Login page floating orb animations ─── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(-20px) translateX(10px); }
+  66% { transform: translateY(10px) translateX(-15px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(15px) translateX(-10px); }
+  66% { transform: translateY(-10px) translateX(20px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-15px) translateX(-20px); }
+  50% { transform: translateY(10px) translateX(10px); }
+  75% { transform: translateY(-5px) translateX(-10px); }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 10s ease-in-out 2s infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 12s ease-in-out 4s infinite;
+}

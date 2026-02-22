@@ -129,8 +129,8 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-56 flex flex-col bg-panel border-r border-edge">
       {/* Logo */}
-      <div className="px-5 py-5">
-        <LogoHorizontal className="h-8" />
+      <div className="px-4 pt-4 pb-3">
+        <LogoHorizontal className="h-9" />
       </div>
 
       {/* Search trigger */}

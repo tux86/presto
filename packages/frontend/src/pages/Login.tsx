@@ -2,6 +2,7 @@ import { useState } from "react";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useT } from "@/i18n";
 import { useAuthStore } from "@/stores/auth.store";
 
@@ -17,6 +18,7 @@ export function Login() {
 
   const { login, register } = useAuthStore();
   const { t } = useT();
+  const isMobile = useIsMobile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,20 +39,50 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-page p-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <LogoHorizontal className="h-16" />
-        </div>
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Left branding panel — desktop only */}
+      {!isMobile && (
+        <div className="relative w-1/2 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-500">
+          {/* Grid overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.08]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
 
-        <div className="rounded-xl border border-edge bg-panel p-6">
+          {/* Floating orbs */}
+          <div className="animate-float absolute top-[15%] left-[20%] h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+          <div className="animate-float-delayed absolute bottom-[20%] right-[15%] h-48 w-48 rounded-full bg-violet-400/20 blur-3xl" />
+          <div className="animate-float-slow absolute top-[55%] left-[55%] h-56 w-56 rounded-full bg-indigo-300/15 blur-3xl" />
+
+          {/* Branding content */}
+          <div className="relative z-10 flex flex-col items-center text-center px-12">
+            <img src="/logo-horizontal-light.svg" alt="Presto" className="h-12 mb-8 brightness-0 invert" />
+            <p className="text-2xl font-semibold text-white leading-snug whitespace-pre-line">{t("auth.tagline")}</p>
+            <p className="mt-4 text-indigo-100/80 text-sm">{t("auth.brandingDescription")}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Right form panel */}
+      <div className="flex flex-1 flex-col items-center justify-center bg-page p-4">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          {isMobile && (
+            <div className="flex justify-center mb-8">
+              <LogoHorizontal className="h-12" />
+            </div>
+          )}
+
           <h2 className="text-lg font-semibold text-heading mb-1">
             {isRegister ? t("auth.register") : t("auth.login")}
           </h2>
           <p className="text-sm text-muted mb-6">{isRegister ? t("auth.registerSubtitle") : t("auth.loginSubtitle")}</p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {isRegister && (
               <div className="grid grid-cols-2 gap-3">
                 <Input
@@ -98,24 +130,24 @@ export function Login() {
 
             {error && <p className="text-sm text-red-500 bg-red-500/10 rounded-lg px-3 py-2">{error}</p>}
 
-            <Button type="submit" className="w-full" loading={loading}>
+            <Button type="submit" size="lg" className="w-full" loading={loading}>
               {isRegister ? t("auth.submitRegister") : t("auth.submitLogin")}
             </Button>
           </form>
-        </div>
 
-        <p className="mt-4 text-center text-sm text-muted">
-          {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
-          <button
-            onClick={() => {
-              setIsRegister(!isRegister);
-              setError("");
-            }}
-            className="text-accent-text hover:underline font-medium cursor-pointer"
-          >
-            {isRegister ? t("auth.switchToLogin") : t("auth.switchToRegister")}
-          </button>
-        </p>
+          <p className="mt-4 text-center text-sm text-muted">
+            {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
+            <button
+              onClick={() => {
+                setIsRegister(!isRegister);
+                setError("");
+              }}
+              className="text-accent-text hover:underline font-medium cursor-pointer"
+            >
+              {isRegister ? t("auth.switchToLogin") : t("auth.switchToRegister")}
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

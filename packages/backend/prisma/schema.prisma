@@ -42,7 +42,7 @@ model Mission {
   id              String           @id @default(cuid())
   name            String
   clientId        String
-  client          Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client          Client           @relation(fields: [clientId], references: [id], onDelete: Restrict)
   userId          String
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   dailyRate       Float?
@@ -65,7 +65,7 @@ model ActivityReport {
   totalDays Float        @default(0)
   note      String?
   missionId String
-  mission   Mission      @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  mission   Mission      @relation(fields: [missionId], references: [id], onDelete: Restrict)
   userId    String
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   entries   ReportEntry[]

@@ -36,30 +36,40 @@ export const createClientSchema = z.object({
 
 export const updateClientSchema = z.object({
   name: z.string().min(1).max(200).optional(),
-  email: z.string().email().max(254).optional(),
-  phone: z.string().max(50).optional(),
-  address: z.string().max(500).optional(),
-  businessId: z.string().max(100).optional(),
+  email: z.string().email().max(254).nullable().optional(),
+  phone: z.string().max(50).nullable().optional(),
+  address: z.string().max(500).nullable().optional(),
+  businessId: z.string().max(100).nullable().optional(),
   currency: currencySchema.optional(),
 });
 
 // Missions
-export const createMissionSchema = z.object({
-  name: z.string().min(1).max(200),
-  clientId: z.string().min(1),
-  dailyRate: z.number().min(0).optional(),
-  startDate: dateString.optional(),
-  endDate: dateString.optional(),
-});
+export const createMissionSchema = z
+  .object({
+    name: z.string().min(1).max(200),
+    clientId: z.string().min(1),
+    dailyRate: z.number().min(0).optional(),
+    startDate: dateString.optional(),
+    endDate: dateString.optional(),
+  })
+  .refine((d) => !d.startDate || !d.endDate || d.endDate >= d.startDate, {
+    message: "End date must be on or after start date",
+    path: ["endDate"],
+  });
 
-export const updateMissionSchema = z.object({
-  name: z.string().min(1).max(200).optional(),
-  clientId: z.string().min(1).optional(),
-  dailyRate: z.number().min(0).optional(),
-  startDate: dateString.optional(),
-  endDate: dateString.optional(),
-  isActive: z.boolean().optional(),
-});
+export const updateMissionSchema = z
+  .object({
+    name: z.string().min(1).max(200).optional(),
+    clientId: z.string().min(1).optional(),
+    dailyRate: z.number().min(0).nullable().optional(),
+    startDate: dateString.nullable().optional(),
+    endDate: dateString.nullable().optional(),
+    isActive: z.boolean().optional(),
+  })
+  .refine((d) => !d.startDate || !d.endDate || d.endDate >= d.startDate, {
+    message: "End date must be on or after start date",
+    path: ["endDate"],
+  });
 
 // Activity Reports
 export const createReportSchema = z.object({

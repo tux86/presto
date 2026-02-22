@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/tux86/presto/compare/v1.7.0...v1.7.1) (2026-02-22)
+
+### Bug Fixes
+
+* **frontend:** reduce sidebar logo text size and overall logo height ([8577a19](https://github.com/tux86/presto/commit/8577a19d563a044be63975da83cc69ea30c0b9d7))
+* **security:** harden authentication, authorization, and production defaults ([5bd2986](https://github.com/tux86/presto/commit/5bd2986cdf258cb4f724f7948dd71840fb80e7fa))
+
 ## [1.7.0](https://github.com/tux86/presto/compare/v1.6.0...v1.7.0) (2026-02-22)
 
 ### Features

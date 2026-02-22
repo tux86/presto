@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/Input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useT } from "@/i18n";
 import { useAuthStore } from "@/stores/auth.store";
+import { useConfigStore } from "@/stores/config.store";
 
 export function Login() {
   const [isRegister, setIsRegister] = useState(false);
@@ -19,6 +20,7 @@ export function Login() {
   const { login, register } = useAuthStore();
   const { t } = useT();
   const isMobile = useIsMobile();
+  const registrationEnabled = useConfigStore((s) => s.config?.registrationEnabled ?? true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,19 +137,21 @@ export function Login() {
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-muted">
-            {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegister(!isRegister);
-                setError("");
-              }}
-              className="text-accent-text hover:underline font-medium cursor-pointer"
-            >
-              {isRegister ? t("auth.switchToLogin") : t("auth.switchToRegister")}
-            </button>
-          </p>
+          {registrationEnabled && (
+            <p className="mt-4 text-center text-sm text-muted">
+              {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegister(!isRegister);
+                  setError("");
+                }}
+                className="text-accent-text hover:underline font-medium cursor-pointer"
+              >
+                {isRegister ? t("auth.switchToLogin") : t("auth.switchToRegister")}
+              </button>
+            </p>
+          )}
         </div>
       </div>
     </div>

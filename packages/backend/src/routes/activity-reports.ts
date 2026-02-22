@@ -19,9 +19,9 @@ const activityReports = new Hono<AppEnv>();
 activityReports.use("*", authMiddleware);
 
 /** Fetch a report by id with standard includes and enrich it. */
-async function fetchEnrichedReport(id: string) {
+async function fetchEnrichedReport(id: string, userId: string) {
   const report = await prisma.activityReport.findFirst({
-    where: { id },
+    where: { id, userId },
     include: REPORT_INCLUDE,
   });
   return enrichReport(report);
@@ -35,8 +35,16 @@ activityReports.get("/", async (c) => {
   const missionId = c.req.query("missionId");
 
   const where: Record<string, unknown> = { userId };
-  if (year) where.year = parseInt(year, 10);
-  if (month) where.month = parseInt(month, 10);
+  if (year) {
+    const parsed = parseInt(year, 10);
+    if (Number.isNaN(parsed)) throw new HTTPException(400, { message: "Invalid year parameter" });
+    where.year = parsed;
+  }
+  if (month) {
+    const parsed = parseInt(month, 10);
+    if (Number.isNaN(parsed)) throw new HTTPException(400, { message: "Invalid month parameter" });
+    where.month = parsed;
+  }
   if (missionId) where.missionId = missionId;
 
   const list = await prisma.activityReport.findMany({
@@ -87,7 +95,15 @@ activityReports.patch("/:id", zValidator("json", updateReportSchema), async (c) 
   const id = c.req.param("id");
   const data = c.req.valid("json");
 
-  await findOwned("activityReport", id, userId);
+  const existing = await findOwned("activityReport", id, userId);
+
+  // Allow setting status to COMPLETED, but block other mutations on completed reports
+  if (existing.status === "COMPLETED" && data.status !== "COMPLETED") {
+    throw new HTTPException(400, { message: "Cannot modify a completed report" });
+  }
+  if (existing.status === "COMPLETED" && data.note !== undefined) {
+    throw new HTTPException(400, { message: "Cannot modify a completed report" });
+  }
 
   const report = await prisma.activityReport.update({
     where: { id },
@@ -140,7 +156,7 @@ activityReports.patch("/:id/entries", zValidator("json", updateEntriesSchema), a
   );
 
   await recalculateTotalDays(id);
-  return c.json(await fetchEnrichedReport(id));
+  return c.json(await fetchEnrichedReport(id, userId));
 });
 
 // Auto-fill working days
@@ -151,7 +167,7 @@ activityReports.patch("/:id/fill", async (c) => {
   const report = await findOwned("activityReport", id, userId);
   ensureDraft(report);
   await autoFillReport(id);
-  return c.json(await fetchEnrichedReport(id));
+  return c.json(await fetchEnrichedReport(id, userId));
 });
 
 // Clear activity report
@@ -162,7 +178,7 @@ activityReports.patch("/:id/clear", async (c) => {
   const report = await findOwned("activityReport", id, userId);
   ensureDraft(report);
   await clearReport(id);
-  return c.json(await fetchEnrichedReport(id));
+  return c.json(await fetchEnrichedReport(id, userId));
 });
 
 // PDF export

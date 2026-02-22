@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-presto}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-presto_dev_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       POSTGRES_DB: ${POSTGRES_DB:-presto}
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -25,9 +25,10 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:-presto_dev_password}@postgres:5432/${POSTGRES_DB:-presto}?schema=public
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-presto}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-true}
       HOLIDAY_COUNTRY: ${HOLIDAY_COUNTRY:-FR}
       CORS_ORIGINS: ${CORS_ORIGINS:-}
     ports:

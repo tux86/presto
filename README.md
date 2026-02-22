@@ -47,6 +47,11 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 
 ```bash
 curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.production.yml
+
+# Required: set secrets before starting
+export POSTGRES_PASSWORD="$(openssl rand -base64 32)"
+export JWT_SECRET="$(openssl rand -base64 48)"
+
 docker compose -f docker-compose.production.yml up -d
 ```
 

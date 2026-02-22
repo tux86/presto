@@ -1,5 +1,5 @@
 function env(key: string, fallback: string): string {
-  return process.env[key] || fallback;
+  return process.env[key] ?? fallback;
 }
 
 function envRequired(key: string): string {
@@ -31,6 +31,7 @@ export const config = {
   },
   auth: {
     enabled: envBool("AUTH_ENABLED", true),
+    registrationEnabled: envBool("REGISTRATION_ENABLED", true),
     bcryptCost: envInt("BCRYPT_COST", 10),
     defaultUser: {
       email: env("DEFAULT_USER_EMAIL", "admin@localhost"),
@@ -43,12 +44,20 @@ export const config = {
     url: envRequired("DATABASE_URL"),
   },
   jwt: {
-    secret: envRequired("JWT_SECRET"),
+    secret: (() => {
+      const s = envRequired("JWT_SECRET");
+      const WEAK = ["change-me-in-production", "dev-secret-change-in-production"];
+      if (WEAK.includes(s) || s.length < 32) {
+        throw new Error("JWT_SECRET must be at least 32 characters and not a known default");
+      }
+      return s;
+    })(),
   },
   cors: {
     origins: env("CORS_ORIGINS", "http://localhost:5173")
       .split(",")
-      .map((s) => s.trim()),
+      .map((s) => s.trim())
+      .filter(Boolean),
   },
 } as const;
 
@@ -58,6 +67,7 @@ export function getPublicConfig() {
     appName: config.app.name,
     theme: config.app.theme,
     authEnabled: config.auth.enabled,
+    registrationEnabled: config.auth.registrationEnabled,
     locale: config.app.locale,
     holidayCountry: config.app.holidayCountry,
   };

@@ -14,6 +14,7 @@ git clone https://github.com/tux86/presto.git
 cd presto
 bun install
 cp .env.example .env
+# Edit .env: set POSTGRES_PASSWORD and JWT_SECRET (min 32 chars)
 docker compose up -d
 bun run db:migrate
 bun run db:generate
@@ -68,14 +69,14 @@ packages/
 
 ## Environment Variables
 
-Copy `.env.example` to `.env`. All defaults work for local development.
+Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must be at least 32 characters, `POSTGRES_PASSWORD` must be set).
 
 ### Database
 
 | Variable | Default | Description |
 |---|---|---|
 | `POSTGRES_USER` | `presto` | PostgreSQL username |
-| `POSTGRES_PASSWORD` | `presto_dev_password` | PostgreSQL password |
+| `POSTGRES_PASSWORD` | **required** | PostgreSQL password |
 | `POSTGRES_DB` | `presto` | PostgreSQL database name |
 | `POSTGRES_PORT` | `5432` | Host port mapped to PostgreSQL |
 | `DATABASE_URL` | _(constructed)_ | Full Prisma connection string |
@@ -85,8 +86,9 @@ Copy `.env.example` to `.env`. All defaults work for local development.
 | Variable | Default | Description |
 |---|---|---|
 | `PORT` | `3001` | Backend HTTP port |
-| `JWT_SECRET` | `change-me-in-production` | Secret for signing JWT tokens |
+| `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
+| `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins (comma-separated) |
 | `HOLIDAY_COUNTRY` | `FR` | Country code for public holidays |
 | `APP_NAME` | `Presto` | Application name in public config API |
@@ -100,6 +102,8 @@ Copy `.env.example` to `.env`. All defaults work for local development.
 | Variable | Default | Description |
 |---|---|---|
 | `PORT` | `8080` | Host port for the Presto container |
+| `POSTGRES_PASSWORD` | **required** | PostgreSQL password (no default in production) |
+| `JWT_SECRET` | **required** | JWT signing secret (no default in production) |
 
 ## API Routes
 
@@ -109,7 +113,7 @@ All routes are prefixed with `/api`.
 |---|---|
 | `GET /api/health` | Health check — returns `{ status: "ok" }` |
 | `GET /api/config` | Public configuration (app name, theme, locale, auth status) |
-| `/api/auth/*` | Login, logout, and current user (`/me`) |
+| `/api/auth/*` | Login, register, and current user (`/me`) |
 | `/api/clients/*` | CRUD for clients |
 | `/api/missions/*` | CRUD for missions (linked to clients) |
 | `/api/activity-reports/*` | CRUD for monthly activity reports, PDF export |

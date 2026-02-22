@@ -86,7 +86,7 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 - **Scope:** theme (light/dark/auto), locale (en/fr)
 - **Defaults:** server env var `APP_LOCALE` applied on first visit via `initFromServerDefaults()`
 - **Currency:** per-client field (EUR/USD/GBP), defaults to EUR
-- **Config store** (`config.store.ts`) remains read-only server config (appName, authEnabled, holidayCountry)
+- **Config store** (`config.store.ts`) remains read-only server config (appName, authEnabled, registrationEnabled, holidayCountry)
 - **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls
 
 ## Key Conventions
@@ -94,5 +94,8 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 - No test framework — no tests exist yet
 - i18n: English (default) + French
 - Auth is optional, controlled by `AUTH_ENABLED` env var
+- Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
+- `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup
+- Registration password requires min 8 chars + uppercase + lowercase + digit
 - Prisma schema uses only cross-DB compatible types (String, Float, Boolean, DateTime, Int, enum, cuid)
 - Completed reports are read-only — no entry editing, auto-fill, or clear. Only PDF export is allowed.

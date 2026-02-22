@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "cra",
+      "dependencies": {
+        "hono": "^4.12.1",
+      },
       "devDependencies": {
         "@biomejs/biome": "^2.4.3",
         "@commitlint/cli": "^19.6.1",
@@ -22,7 +25,7 @@
     },
     "packages/backend": {
       "name": "@presto/backend",
-      "version": "1.2.0",
+      "version": "1.6.0",
       "dependencies": {
         "@hono/zod-validator": "^0.7.6",
         "@presto/shared": "workspace:*",
@@ -46,7 +49,7 @@
     },
     "packages/frontend": {
       "name": "@presto/frontend",
-      "version": "1.2.0",
+      "version": "1.6.0",
       "dependencies": {
         "@presto/shared": "workspace:*",
         "@tanstack/react-query": "^5.66.0",
@@ -68,7 +71,7 @@
     },
     "packages/shared": {
       "name": "@presto/shared",
-      "version": "1.2.0",
+      "version": "1.6.0",
       "dependencies": {
         "date-holidays": "^3.26.8",
       },
@@ -782,7 +785,7 @@
 
     "highlight.js": ["highlight.js@10.7.3", "", {}, "sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A=="],
 
-    "hono": ["hono@4.11.10", "", {}, "sha512-kyWP5PAiMooEvGrA9jcD3IXF7ATu8+o7B3KCbPXid5se52NPqnOpM/r9qeW2heMnOekF4kqR1fXJqCYeCLKrZg=="],
+    "hono": ["hono@4.12.1", "", {}, "sha512-hi9afu8g0lfJVLolxElAZGANCTTl6bewIdsRNhaywfP9K8BPf++F2z6OLrYGIinUwpRKzbZHMhPwvc0ZEpAwGw=="],
 
     "hono-rate-limiter": ["hono-rate-limiter@0.5.3", "", { "peerDependencies": { "hono": "^4.10.8", "unstorage": "^1.17.3" }, "optionalPeers": ["unstorage"] }, "sha512-M0DxbVMpPELEzLi0AJg1XyBHLGJXz7GySjsPoK+gc5YeeBsdGDGe+2RvVuCAv8ydINiwlbxqYMNxUEyYfRji/A=="],
 

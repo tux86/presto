@@ -46,6 +46,9 @@ missions.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
   const data = c.req.valid("json");
 
   await findOwned("mission", id, userId);
+  if (data.clientId) {
+    await findOwned("client", data.clientId, userId);
+  }
 
   const mission = await prisma.mission.update({
     where: { id },

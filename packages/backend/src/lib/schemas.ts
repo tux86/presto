@@ -7,7 +7,13 @@ const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 // Auth
 export const registerSchema = z.object({
   email: z.string().email().max(254),
-  password: z.string().min(8).max(128),
+  password: z
+    .string()
+    .min(8)
+    .max(128)
+    .regex(/[a-z]/, "Must contain a lowercase letter")
+    .regex(/[A-Z]/, "Must contain an uppercase letter")
+    .regex(/[0-9]/, "Must contain a digit"),
   firstName: z.string().min(1).max(200),
   lastName: z.string().min(1).max(200),
   company: z.string().max(200).optional(),
@@ -68,11 +74,13 @@ export const updateReportSchema = z.object({
 });
 
 export const updateEntriesSchema = z.object({
-  entries: z.array(
-    z.object({
-      id: z.string().min(1),
-      value: z.number().min(0).max(1).optional(),
-      note: z.string().max(1000).optional(),
-    }),
-  ),
+  entries: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        value: z.number().min(0).max(1).optional(),
+        note: z.string().max(1000).optional(),
+      }),
+    )
+    .max(31),
 });

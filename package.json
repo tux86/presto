@@ -54,5 +54,8 @@
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "husky": "^9.1.7",
     "semantic-release": "^24.2.1"
+  },
+  "dependencies": {
+    "hono": "^4.12.1"
   }
 }

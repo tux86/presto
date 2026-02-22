@@ -15,9 +15,10 @@ async function getOrCreateDefaultUser(): Promise<{ id: string; email: string }> 
   const { email, password, firstName, lastName } = config.auth.defaultUser;
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    const hashedPassword = password
-      ? await Bun.password.hash(password, { algorithm: "bcrypt", cost: config.auth.bcryptCost })
-      : "";
+    const hashedPassword = await Bun.password.hash(password || crypto.randomUUID(), {
+      algorithm: "bcrypt",
+      cost: config.auth.bcryptCost,
+    });
     user = await prisma.user.create({
       data: { email, password: hashedPassword, firstName, lastName },
     });
@@ -49,6 +50,12 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
   } catch {
     throw new HTTPException(401, { message: "Invalid or expired token" });
   }
+
+  const user = await prisma.user.findUnique({ where: { id: payload.sub }, select: { id: true } });
+  if (!user) {
+    throw new HTTPException(401, { message: "User no longer exists" });
+  }
+
   c.set("userId", payload.sub);
   c.set("userEmail", payload.email);
   await next();

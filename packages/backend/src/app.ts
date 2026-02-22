@@ -17,7 +17,19 @@ import reporting from "./routes/reporting.js";
 const app = new Hono();
 
 app.use("*", logger());
-app.use("*", secureHeaders());
+app.use(
+  "*",
+  secureHeaders({
+    contentSecurityPolicy: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+    },
+    strictTransportSecurity: "max-age=31536000; includeSubDomains",
+  }),
+);
 app.use("*", bodyLimit({ maxSize: 1024 * 1024 })); // 1 MB
 app.use(
   "*",
@@ -39,7 +51,7 @@ app.onError((err, c) => {
     return c.json({ error: "Cannot delete: record has associated data" }, 409);
   }
 
-  console.error("Unhandled error:", err);
+  console.error("Unhandled error:", err instanceof Error ? err.message : String(err));
   return c.json({ error: "Internal server error" }, 500);
 });
 

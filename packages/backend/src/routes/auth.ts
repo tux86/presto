@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { getConnInfo } from "hono/bun";
 import { HTTPException } from "hono/http-exception";
 import { rateLimiter } from "hono-rate-limiter";
 import { config } from "../lib/config.js";
@@ -21,8 +22,14 @@ auth.use("*", async (c, next) => {
 const authLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 20,
-  keyGenerator: (c) =>
-    c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? c.req.header("x-real-ip") ?? "127.0.0.1",
+  keyGenerator: (c) => {
+    try {
+      const info = getConnInfo(c);
+      return info.remote.address ?? "127.0.0.1";
+    } catch {
+      return c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? c.req.header("x-real-ip") ?? "127.0.0.1";
+    }
+  },
 });
 
 function serializeUser(user: {
@@ -46,6 +53,10 @@ function serializeUser(user: {
 }
 
 auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c) => {
+  if (!config.auth.registrationEnabled) {
+    throw new HTTPException(403, { message: "Registration is disabled" });
+  }
+
   const { email, password, firstName, lastName, company } = c.req.valid("json");
 
   const existing = await prisma.user.findUnique({ where: { email } });

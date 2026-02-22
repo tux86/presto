@@ -20,9 +20,11 @@ A self-hosted time-tracking application for freelancers and consultants. Generat
 
 ```bash
 curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.production.yml
-```
 
-```bash
+# Required: set secrets before starting
+export POSTGRES_PASSWORD="$(openssl rand -base64 32)"
+export JWT_SECRET="$(openssl rand -base64 48)"
+
 docker compose -f docker-compose.production.yml up -d
 ```
 
@@ -37,7 +39,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: presto
-      POSTGRES_PASSWORD: change-me
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
       POSTGRES_DB: presto
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -54,9 +56,10 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://presto:change-me@postgres:5432/presto?schema=public
-      JWT_SECRET: change-me-in-production
+      DATABASE_URL: postgresql://presto:${POSTGRES_PASSWORD:?}@postgres:5432/presto?schema=public
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set (min 32 chars)}
       AUTH_ENABLED: "true"
+      REGISTRATION_ENABLED: "true"
     ports:
       - "8080:8080"
 
@@ -70,8 +73,9 @@ volumes:
 docker run -d \
   -p 8080:8080 \
   -e DATABASE_URL="postgresql://user:pass@host:5432/presto" \
-  -e JWT_SECRET="your-secret-here" \
+  -e JWT_SECRET="$(openssl rand -base64 48)" \
   -e AUTH_ENABLED="true" \
+  -e REGISTRATION_ENABLED="true" \
   axforge/presto:latest
 ```
 
@@ -79,9 +83,10 @@ docker run -d \
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | *(required)* | PostgreSQL connection string |
-| `JWT_SECRET` | `change-me-in-production` | Secret for signing JWT tokens |
+| `DATABASE_URL` | **required** | PostgreSQL connection string |
+| `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
+| `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `HOLIDAY_COUNTRY` | `FR` | Country code for public holidays |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |
 | `PORT` | `8080` | HTTP port inside the container |

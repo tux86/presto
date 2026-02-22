@@ -1,3 +1,13 @@
+## [1.8.0](https://github.com/tux86/presto/compare/v1.7.2...v1.8.0) (2026-02-22)
+
+### Features
+
+* optimize Dockerfile with multi-stage build ([8628b98](https://github.com/tux86/presto/commit/8628b984fb6bb21ecff52007d41398dc7456f53a))
+
+### Bug Fixes
+
+* **frontend:** handle Zod validation errors in API client ([78741c0](https://github.com/tux86/presto/commit/78741c03d8f9779f828d0404bcdfdb24ca045f8d))
+
 ## [1.7.2](https://github.com/tux86/presto/compare/v1.7.1...v1.7.2) (2026-02-22)
 
 ### Bug Fixes

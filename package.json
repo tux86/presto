@@ -1,6 +1,6 @@
 {
   "name": "presto",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "Self-hosted time-tracking app for freelancers and consultants. Generate monthly activity reports and export them as PDF.",
   "keywords": [
     "time-tracking",

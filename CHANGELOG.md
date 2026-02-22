@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/tux86/presto/compare/v1.4.0...v1.5.0) (2026-02-22)
+
+### Features
+
+* enforce report status rules on PDF export and entry editing ([d7be6d2](https://github.com/tux86/presto/commit/d7be6d2b94f9bb71d61616796ea01b72cf16cc5a))
+
 ## [1.4.0](https://github.com/tux86/presto/compare/v1.3.3...v1.4.0) (2026-02-21)
 
 ### Features

@@ -130,11 +130,15 @@ export function useClearReport() {
 export function useDownloadPdf() {
   return useMutation({
     mutationFn: async (reportId: string) => {
-      const blob = await api.getBlob(`/activity-reports/${reportId}/pdf`);
+      const res = await api.getBlob(`/activity-reports/${reportId}/pdf`);
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const filenameMatch = disposition.match(/filename="(.+?)"/);
+      const filename = filenameMatch?.[1] ?? `presto-${reportId}.pdf`;
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `presto-${reportId}.pdf`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     },

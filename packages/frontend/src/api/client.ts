@@ -34,7 +34,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return res.json();
 }
 
-async function requestBlob(path: string, options: RequestInit = {}): Promise<Blob> {
+async function requestBlob(path: string, options: RequestInit = {}): Promise<Response> {
   const token = useAuthStore.getState().token;
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
@@ -51,7 +51,7 @@ async function requestBlob(path: string, options: RequestInit = {}): Promise<Blo
     throw new Error(body.error || `Request failed: ${res.status}`);
   }
 
-  return res.blob();
+  return res;
 }
 
 export const api = {

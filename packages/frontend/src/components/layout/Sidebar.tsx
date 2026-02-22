@@ -194,6 +194,7 @@ export function Sidebar() {
             </p>
           </div>
           <button
+            type="button"
             onClick={logout}
             className="text-faint hover:text-muted transition-colors cursor-pointer"
             title={t("common.logout")}

@@ -138,6 +138,7 @@ export function Login() {
           <p className="mt-4 text-center text-sm text-muted">
             {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
             <button
+              type="button"
               onClick={() => {
                 setIsRegister(!isRegister);
                 setError("");

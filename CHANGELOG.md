@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/tux86/presto/compare/v1.6.0...v1.7.0) (2026-02-22)
+
+### Features
+
+* redesign PDF CRA with professional styling and entry notes ([9cf82ac](https://github.com/tux86/presto/commit/9cf82ac4b1ea0f46b16f3552853007e04d9b7ff0)), closes [#4f46e5](https://github.com/tux86/presto/issues/4f46e5)
+
 ## [1.6.0](https://github.com/tux86/presto/compare/v1.5.1...v1.6.0) (2026-02-22)
 
 ### Features

@@ -24,7 +24,7 @@ model User {
 model Client {
   id         String    @id @default(cuid())
   name       String
-  businessId String?   @map("siret")
+  businessId String?
   email      String?
   address    String?
   userId     String
@@ -41,7 +41,7 @@ model Mission {
   client          Client           @relation(fields: [clientId], references: [id])
   userId          String
   user            User             @relation(fields: [userId], references: [id])
-  dailyRate       Float?           @map("tjm")
+  dailyRate       Float?
   startDate       DateTime?
   endDate         DateTime?
   isActive        Boolean          @default(true)
@@ -67,14 +67,11 @@ model ActivityReport {
 
   @@unique([missionId, month, year])
   @@index([userId, year, month])
-  @@map("Cra")
 }
 
 enum ReportStatus {
   DRAFT
   COMPLETED
-
-  @@map("CraStatus")
 }
 
 model ReportEntry {
@@ -84,9 +81,8 @@ model ReportEntry {
   task        String?
   isWeekend   Boolean  @default(false)
   isHoliday   Boolean  @default(false)
-  reportId    String   @map("craId")
+  reportId    String
   report      ActivityReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
   @@unique([reportId, date])
-  @@map("CraEntry")
 }

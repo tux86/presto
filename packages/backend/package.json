@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
-    "db:migrate": "bunx prisma migrate dev && bunx prisma generate",
+    "db:migrate": "bunx prisma migrate deploy",
+    "db:migrate:dev": "bunx prisma migrate dev",
     "db:seed": "bunx prisma db seed",
     "db:generate": "bunx prisma generate",
     "typecheck": "tsc --noEmit"

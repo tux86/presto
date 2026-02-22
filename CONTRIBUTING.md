@@ -14,8 +14,9 @@ git clone https://github.com/tux86/presto.git
 cd presto
 bun install
 cp .env.example .env
-docker compose up -d postgres
+docker compose up -d
 bun run db:migrate
+bun run db:generate
 bun run db:seed
 bun run dev
 ```
@@ -33,7 +34,8 @@ bun run typecheck        # Type-check all packages
 bun run lint             # Lint + format check (Biome)
 bun run lint:fix         # Auto-fix lint + format
 bun run db:generate      # Regenerate Prisma client after schema changes
-bun run db:migrate       # Apply pending migrations
+bun run db:migrate       # Apply pending migrations (uses migrate deploy)
+bun run db:migrate:dev   # Create new migration from schema changes (uses migrate dev)
 bun run db:seed          # Seed sample data
 ```
 
@@ -94,12 +96,11 @@ Copy `.env.example` to `.env`. All defaults work for local development.
 | `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |
 | `DEFAULT_USER_PASSWORD` | _(empty)_ | Default admin password |
 
-### Docker Compose
+### Docker (Production)
 
 | Variable | Default | Description |
 |---|---|---|
-| `BACKEND_PORT` | `3001` | Host port for backend container |
-| `FRONTEND_PORT` | `8080` | Host port for frontend container |
+| `PORT` | `8080` | Host port for the Presto container |
 
 ## API Routes
 

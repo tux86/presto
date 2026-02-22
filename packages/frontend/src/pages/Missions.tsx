@@ -108,7 +108,7 @@ export function Missions() {
               render: (m) => <span className="text-muted">{m.client?.name ?? "-"}</span>,
             },
             {
-              key: "tjm",
+              key: "dailyRate",
               header: t("missions.dailyRate"),
               render: (m) => (
                 <span className="text-muted font-mono">{m.dailyRate ? formatCurrency(m.dailyRate) : "-"}</span>

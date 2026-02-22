@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "CraStatus" AS ENUM ('DRAFT', 'COMPLETED');
+CREATE TYPE "ReportStatus" AS ENUM ('DRAFT', 'COMPLETED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -19,7 +19,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Client" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "siret" TEXT,
+    "businessId" TEXT,
     "email" TEXT,
     "address" TEXT,
     "userId" TEXT NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE "Mission" (
     "name" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "tjm" DOUBLE PRECISION,
+    "dailyRate" DOUBLE PRECISION,
     "startDate" TIMESTAMP(3),
     "endDate" TIMESTAMP(3),
     "isActive" BOOLEAN NOT NULL DEFAULT true,
@@ -46,11 +46,11 @@ CREATE TABLE "Mission" (
 );
 
 -- CreateTable
-CREATE TABLE "Cra" (
+CREATE TABLE "ActivityReport" (
     "id" TEXT NOT NULL,
     "month" INTEGER NOT NULL,
     "year" INTEGER NOT NULL,
-    "status" "CraStatus" NOT NULL DEFAULT 'DRAFT',
+    "status" "ReportStatus" NOT NULL DEFAULT 'DRAFT',
     "totalDays" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "note" TEXT,
     "missionId" TEXT NOT NULL,
@@ -58,33 +58,33 @@ CREATE TABLE "Cra" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Cra_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ActivityReport_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "CraEntry" (
+CREATE TABLE "ReportEntry" (
     "id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "value" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "task" TEXT,
     "isWeekend" BOOLEAN NOT NULL DEFAULT false,
     "isHoliday" BOOLEAN NOT NULL DEFAULT false,
-    "craId" TEXT NOT NULL,
+    "reportId" TEXT NOT NULL,
 
-    CONSTRAINT "CraEntry_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ReportEntry_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "Cra_userId_year_month_idx" ON "Cra"("userId", "year", "month");
+CREATE INDEX "ActivityReport_userId_year_month_idx" ON "ActivityReport"("userId", "year", "month");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Cra_missionId_month_year_key" ON "Cra"("missionId", "month", "year");
+CREATE UNIQUE INDEX "ActivityReport_missionId_month_year_key" ON "ActivityReport"("missionId", "month", "year");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CraEntry_craId_date_key" ON "CraEntry"("craId", "date");
+CREATE UNIQUE INDEX "ReportEntry_reportId_date_key" ON "ReportEntry"("reportId", "date");
 
 -- AddForeignKey
 ALTER TABLE "Client" ADD CONSTRAINT "Client_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -96,10 +96,10 @@ ALTER TABLE "Mission" ADD CONSTRAINT "Mission_clientId_fkey" FOREIGN KEY ("clien
 ALTER TABLE "Mission" ADD CONSTRAINT "Mission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Cra" ADD CONSTRAINT "Cra_missionId_fkey" FOREIGN KEY ("missionId") REFERENCES "Mission"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ActivityReport" ADD CONSTRAINT "ActivityReport_missionId_fkey" FOREIGN KEY ("missionId") REFERENCES "Mission"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Cra" ADD CONSTRAINT "Cra_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ActivityReport" ADD CONSTRAINT "ActivityReport_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "CraEntry" ADD CONSTRAINT "CraEntry_craId_fkey" FOREIGN KEY ("craId") REFERENCES "Cra"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ReportEntry" ADD CONSTRAINT "ReportEntry_reportId_fkey" FOREIGN KEY ("reportId") REFERENCES "ActivityReport"("id") ON DELETE CASCADE ON UPDATE CASCADE;

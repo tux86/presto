@@ -105,7 +105,7 @@ GET http://localhost:8080/api/health
 
 Returns `{ "status": "ok" }`.
 
-The image includes a built-in `HEALTHCHECK` (curl-based, 30s interval).
+The image includes a built-in `HEALTHCHECK` (30s interval).
 
 ## Source Code
 

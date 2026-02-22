@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-cd /app/packages/backend
+cd /app
 
 echo "Running database migrations..."
 bunx prisma migrate deploy
 
-echo "Starting Presto backend..."
+echo "Starting Presto..."
 exec bun ./dist/index.js

@@ -1,3 +1,13 @@
+## [1.6.0](https://github.com/tux86/presto/compare/v1.5.1...v1.6.0) (2026-02-22)
+
+### Features
+
+* redesign login page with split branding layout and update logos ([177fad7](https://github.com/tux86/presto/commit/177fad7d7c341fbb3724c0e42ae73c3e7d3033ea))
+
+### Bug Fixes
+
+* add explicit type="button" to non-submit buttons ([cccab12](https://github.com/tux86/presto/commit/cccab129aebc5df8743ad64bc3aa71102497a7db))
+
 ## [1.5.1](https://github.com/tux86/presto/compare/v1.5.0...v1.5.1) (2026-02-22)
 
 ### Bug Fixes

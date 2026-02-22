@@ -2,6 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useT } from "@/i18n";
 
+const commandPaletteListeners = new Set<() => void>();
+
+export function triggerCommandPalette() {
+  for (const listener of commandPaletteListeners) {
+    listener();
+  }
+}
+
 interface CommandItem {
   id: string;
   label: string;
@@ -66,14 +74,20 @@ export function CommandPalette() {
   }, [query, commands]);
 
   useEffect(() => {
+    const toggle = () => setOpen((prev) => !prev);
+    commandPaletteListeners.add(toggle);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        setOpen((prev) => !prev);
+        toggle();
       }
     };
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      commandPaletteListeners.delete(toggle);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   useEffect(() => {

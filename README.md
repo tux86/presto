@@ -15,7 +15,10 @@
 <br/>
 
 <p align="center">
-  <img src="docs/images/demo.png" alt="Presto Dashboard and Reporting" width="100%" />
+  <img src="docs/images/demo-dashboard.png" alt="Presto — Activity Reports Dashboard" width="100%" />
+</p>
+<p align="center">
+  <img src="docs/images/demo-reporting.png" alt="Presto — Reporting & Revenue Charts" width="100%" />
 </p>
 
 ## Why Presto?

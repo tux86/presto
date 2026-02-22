@@ -1,9 +1,13 @@
+import type { CurrencyCode } from "../currencies.js";
+
 export interface Client {
   id: string;
   name: string;
-  businessId: string | null;
   email: string | null;
+  phone: string | null;
   address: string | null;
+  businessId: string | null;
+  currency: CurrencyCode;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -11,14 +15,18 @@ export interface Client {
 
 export interface CreateClientRequest {
   name: string;
-  businessId?: string;
   email?: string;
+  phone?: string;
   address?: string;
+  businessId?: string;
+  currency?: CurrencyCode;
 }
 
 export interface UpdateClientRequest {
   name?: string;
-  businessId?: string;
   email?: string;
+  phone?: string;
   address?: string;
+  businessId?: string;
+  currency?: CurrencyCode;
 }

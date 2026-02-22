@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
+import { useT } from "./i18n";
 import { ActivityReportEditor } from "./pages/ActivityReportEditor";
 import { Clients } from "./pages/Clients";
 import { Dashboard } from "./pages/Dashboard";
@@ -9,6 +11,7 @@ import { Missions } from "./pages/Missions";
 import { Reporting } from "./pages/Reporting";
 import { useAuthStore } from "./stores/auth.store";
 import { useConfigStore } from "./stores/config.store";
+import { usePreferencesStore } from "./stores/preferences.store";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
@@ -24,10 +27,21 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   const { token, fetchMe, isAuthenticated } = useAuthStore();
   const { config, loaded, fetchConfig } = useConfigStore();
+  const initFromServerDefaults = usePreferencesStore((s) => s.initFromServerDefaults);
+  const { t } = useT();
 
   useEffect(() => {
     fetchConfig();
   }, [fetchConfig]);
+
+  useEffect(() => {
+    if (!loaded || !config) return;
+    initFromServerDefaults({ locale: config.locale });
+  }, [loaded, config, initFromServerDefaults]);
+
+  useEffect(() => {
+    document.title = t("app.title");
+  }, [t]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -44,21 +58,23 @@ export default function App() {
   const authEnabled = config?.authEnabled ?? true;
 
   return (
-    <Routes>
-      <Route path="/login" element={!authEnabled || token ? <Navigate to="/" replace /> : <Login />} />
-      <Route
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/activity/:id" element={<ActivityReportEditor />} />
-        <Route path="/clients" element={<Clients />} />
-        <Route path="/missions" element={<Missions />} />
-        <Route path="/reporting" element={<Reporting />} />
-      </Route>
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/login" element={!authEnabled || token ? <Navigate to="/" replace /> : <Login />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/activity/:id" element={<ActivityReportEditor />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/missions" element={<Missions />} />
+          <Route path="/reporting" element={<Reporting />} />
+        </Route>
+      </Routes>
+    </ErrorBoundary>
   );
 }

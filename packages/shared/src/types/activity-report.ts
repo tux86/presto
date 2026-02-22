@@ -1,4 +1,5 @@
-export type ReportStatus = "DRAFT" | "COMPLETED";
+export const REPORT_STATUSES = ["DRAFT", "COMPLETED"] as const;
+export type ReportStatus = (typeof REPORT_STATUSES)[number];
 
 export interface ReportEntry {
   id: string;
@@ -10,6 +11,8 @@ export interface ReportEntry {
   holidayName: string | null;
   reportId: string;
 }
+
+import type { CurrencyCode } from "../currencies.js";
 
 export interface ActivityReport {
   id: string;
@@ -30,6 +33,7 @@ export interface ActivityReport {
     client: {
       id: string;
       name: string;
+      currency: CurrencyCode;
     };
   };
 }
@@ -66,6 +70,7 @@ export interface ReportingData {
   clientData: {
     clientId: string;
     clientName: string;
+    currency: CurrencyCode;
     days: number;
     revenue: number;
   }[];

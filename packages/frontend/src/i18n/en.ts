@@ -1,11 +1,15 @@
 import type { TranslationKey } from "./fr";
 
 export const en: Record<TranslationKey, string> = {
+  // App
+  "app.title": "Presto - Activity Tracking",
+
   // Navigation
   "nav.activities": "Activities",
   "nav.clients": "Clients",
   "nav.missions": "Missions",
   "nav.reporting": "Reporting",
+  "nav.more": "More",
 
   // Dashboard
   "dashboard.title": "My Activities",
@@ -27,8 +31,10 @@ export const en: Record<TranslationKey, string> = {
   "clients.name": "Name / Company name",
   "clients.businessId": "Business ID",
   "clients.email": "Email",
+  "clients.phone": "Phone",
   "clients.address": "Address",
   "clients.deleteTitle": "Delete this client",
+  "clients.currency": "Currency",
   "clients.deleteMessage": "This client and its data will be deleted. This action is irreversible.",
 
   // Missions
@@ -41,7 +47,6 @@ export const en: Record<TranslationKey, string> = {
   "missions.client": "Client",
   "missions.selectClient": "Select a client",
   "missions.dailyRate": "Daily rate",
-  "missions.dailyRateOptional": "Daily rate (optional)",
   "missions.status": "Status",
   "missions.active": "Active",
   "missions.inactive": "Inactive",
@@ -96,7 +101,7 @@ export const en: Record<TranslationKey, string> = {
   "auth.password": "Password",
   "auth.firstName": "First name",
   "auth.lastName": "Last name",
-  "auth.company": "Company (optional)",
+  "auth.company": "Company",
   "auth.companyPlaceholder": "My Company Ltd",
   "auth.emailPlaceholder": "you@example.com",
   "auth.submitLogin": "Sign in",
@@ -116,6 +121,7 @@ export const en: Record<TranslationKey, string> = {
   "common.back": "Back",
   "common.search": "Search...",
   "common.noResults": "No results",
+  "common.optional": "optional",
   "common.navigation": "Navigation",
   "common.logout": "Sign out",
 
@@ -123,4 +129,9 @@ export const en: Record<TranslationKey, string> = {
   "theme.dark": "Dark",
   "theme.light": "Light",
   "theme.auto": "Auto",
+
+  // Preferences
+  "preferences.title": "Preferences",
+  "preferences.theme": "Theme",
+  "preferences.language": "Language",
 };

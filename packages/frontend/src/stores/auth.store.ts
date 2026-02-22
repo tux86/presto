@@ -2,6 +2,7 @@ import type { AuthResponse, User } from "@presto/shared";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { api } from "../api/client";
+import { queryClient } from "../lib/query-client";
 
 interface AuthState {
   token: string | null;
@@ -41,6 +42,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         set({ token: null, user: null, isAuthenticated: false });
+        queryClient.clear();
       },
 
       fetchMe: async () => {

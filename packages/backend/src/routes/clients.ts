@@ -20,15 +20,16 @@ clients.get("/", async (c) => {
 
 clients.post("/", zValidator("json", createClientSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, businessId, email, address } = c.req.valid("json");
+  const { name, email, phone, address, businessId, currency } = c.req.valid("json");
 
   const client = await prisma.client.create({
-    data: { name, businessId, email, address, userId },
+    data: { name, email, phone, address, businessId, currency, userId },
   });
+  c.header("Location", `/api/clients/${client.id}`);
   return c.json(client, 201);
 });
 
-clients.put("/:id", zValidator("json", updateClientSchema), async (c) => {
+clients.patch("/:id", zValidator("json", updateClientSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const data = c.req.valid("json");
@@ -39,9 +40,11 @@ clients.put("/:id", zValidator("json", updateClientSchema), async (c) => {
     where: { id },
     data: {
       name: data.name,
-      businessId: data.businessId,
       email: data.email,
+      phone: data.phone,
       address: data.address,
+      businessId: data.businessId,
+      currency: data.currency,
     },
   });
   return c.json(client);
@@ -54,7 +57,7 @@ clients.delete("/:id", async (c) => {
   await findOwned("client", id, userId);
 
   await prisma.client.delete({ where: { id } });
-  return c.json({ success: true });
+  return c.body(null, 204);
 });
 
 export default clients;

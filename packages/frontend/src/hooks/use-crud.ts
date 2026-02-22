@@ -21,7 +21,7 @@ export function createCrudHooks<T, TCreate, TUpdate>(endpoint: string) {
   const useUpdate = () => {
     const qc = useQueryClient();
     return useMutation({
-      mutationFn: ({ id, ...data }: TUpdate & { id: string }) => api.put<T>(`${endpoint}/${id}`, data),
+      mutationFn: ({ id, ...data }: TUpdate & { id: string }) => api.patch<T>(`${endpoint}/${id}`, data),
       onSuccess: () => qc.invalidateQueries({ queryKey: key }),
     });
   };

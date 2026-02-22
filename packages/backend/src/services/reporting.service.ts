@@ -1,12 +1,12 @@
-import type { ReportingData } from "@presto/shared";
+import type { CurrencyCode, ReportingData } from "@presto/shared";
 import { prisma } from "../lib/prisma.js";
 
 export async function getYearlyReport(userId: string, year: number): Promise<ReportingData> {
   const reports = await prisma.activityReport.findMany({
-    where: { userId, year },
+    where: { userId, year, status: "COMPLETED" },
     include: {
       mission: {
-        include: { client: { select: { id: true, name: true } } },
+        include: { client: { select: { id: true, name: true, currency: true } } },
       },
     },
   });
@@ -17,7 +17,10 @@ export async function getYearlyReport(userId: string, year: number): Promise<Rep
   let dailyRateCount = 0;
 
   const monthlyMap = new Map<number, { days: number; revenue: number }>();
-  const clientMap = new Map<string, { clientId: string; clientName: string; days: number; revenue: number }>();
+  const clientMap = new Map<
+    string,
+    { clientId: string; clientName: string; currency: CurrencyCode; days: number; revenue: number }
+  >();
 
   for (const report of reports) {
     totalDays += report.totalDays;
@@ -41,6 +44,7 @@ export async function getYearlyReport(userId: string, year: number): Promise<Rep
     const clientExisting = clientMap.get(clientKey) ?? {
       clientId: report.mission.client.id,
       clientName: report.mission.client.name,
+      currency: report.mission.client.currency as CurrencyCode,
       days: 0,
       revenue: 0,
     };

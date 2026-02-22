@@ -7,7 +7,6 @@ interface AppConfig {
   authEnabled: boolean;
   locale: "fr" | "en";
   holidayCountry: string;
-  currency: string;
 }
 
 interface ConfigState {
@@ -30,9 +29,8 @@ export const useConfigStore = create<ConfigState>()((set) => ({
           appName: "Presto",
           theme: "light",
           authEnabled: true,
-          locale: "fr",
+          locale: "en",
           holidayCountry: "FR",
-          currency: "EUR",
         },
         loaded: true,
       });

@@ -111,7 +111,9 @@ export function Missions() {
               key: "dailyRate",
               header: t("missions.dailyRate"),
               render: (m) => (
-                <span className="text-muted font-mono">{m.dailyRate ? formatCurrency(m.dailyRate) : "-"}</span>
+                <span className="text-muted font-mono">
+                  {m.dailyRate ? formatCurrency(m.dailyRate, m.client?.currency) : "-"}
+                </span>
               ),
             },
             {
@@ -167,11 +169,12 @@ export function Missions() {
             ))}
           </Select>
           <Input
-            label={t("missions.dailyRateOptional")}
+            label={t("missions.dailyRate")}
             type="number"
             value={dailyRate}
             onChange={(e) => setDailyRate(e.target.value)}
             placeholder="550"
+            optional
           />
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>

@@ -24,23 +24,27 @@ model User {
 model Client {
   id         String    @id @default(cuid())
   name       String
-  businessId String?
   email      String?
+  phone      String?
   address    String?
+  businessId String?
+  currency   String    @default("EUR")
   userId     String
-  user       User      @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   missions   Mission[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 model Mission {
   id              String           @id @default(cuid())
   name            String
   clientId        String
-  client          Client           @relation(fields: [clientId], references: [id])
+  client          Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
   userId          String
-  user            User             @relation(fields: [userId], references: [id])
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   dailyRate       Float?
   startDate       DateTime?
   endDate         DateTime?
@@ -48,6 +52,9 @@ model Mission {
   activityReports ActivityReport[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([clientId])
 }
 
 model ActivityReport {
@@ -58,9 +65,9 @@ model ActivityReport {
   totalDays Float        @default(0)
   note      String?
   missionId String
-  mission   Mission      @relation(fields: [missionId], references: [id])
+  mission   Mission      @relation(fields: [missionId], references: [id], onDelete: Cascade)
   userId    String
-  user      User         @relation(fields: [userId], references: [id])
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   entries   ReportEntry[]
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt

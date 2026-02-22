@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
+import { PreferencesControls, PreferencesMenu } from "@/components/layout/PreferencesMenu";
+import { triggerCommandPalette } from "@/components/ui/CommandPalette";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
-import { useThemeStore } from "@/stores/theme.store";
 
 const navIcons = {
   activities:
@@ -18,17 +20,9 @@ const navIcons = {
     "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
 };
 
-const themeIcons = {
-  light:
-    "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z",
-  dark: "M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z",
-  auto: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-};
-
 export function Sidebar() {
   const { user, logout } = useAuthStore();
   const authEnabled = useConfigStore((s) => s.config?.authEnabled ?? true);
-  const { mode, setMode } = useThemeStore();
   const { t } = useT();
   const isMobile = useIsMobile();
 
@@ -39,35 +33,96 @@ export function Sidebar() {
     { to: "/reporting", label: t("nav.reporting"), icon: navIcons.reporting },
   ];
 
-  const themeLabel = mode === "dark" ? t("theme.dark") : mode === "light" ? t("theme.light") : t("theme.auto");
-
-  const cycleTheme = () => {
-    const next = mode === "dark" ? "light" : mode === "light" ? "auto" : "dark";
-    setMode(next);
-  };
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (isMobile) {
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-edge bg-panel safe-bottom">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            className={({ isActive }) =>
-              cn(
-                "flex flex-col items-center gap-0.5 px-3 py-2 text-[10px] transition-colors",
-                isActive ? "text-accent" : "text-muted",
-              )
-            }
+      <>
+        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-edge bg-panel safe-bottom">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === "/"}
+              onClick={() => setMobileMenuOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  "flex flex-col items-center gap-0.5 px-3 py-2 text-[10px] transition-colors",
+                  isActive ? "text-accent" : "text-muted",
+                )
+              }
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+              </svg>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-3 py-2 text-[10px] transition-colors cursor-pointer",
+              mobileMenuOpen ? "text-accent" : "text-muted",
+            )}
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              />
             </svg>
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
-      </nav>
+            <span>{t("nav.more")}</span>
+          </button>
+        </nav>
+
+        {/* Mobile menu bottom sheet */}
+        {mobileMenuOpen && (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
+            <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl bg-panel border-t border-edge safe-bottom">
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="h-1 w-10 rounded-full bg-edge" />
+              </div>
+
+              <div className="px-5 pb-5 space-y-5">
+                {/* Preferences */}
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-heading">{t("preferences.title")}</p>
+                  <PreferencesControls iconSize="h-4 w-4" />
+                </div>
+
+                {/* User + logout */}
+                {authEnabled && (
+                  <div className="border-t border-edge pt-4 flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
+                      {user?.firstName?.[0]}
+                      {user?.lastName?.[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-heading truncate">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        logout();
+                      }}
+                      className="text-sm text-muted hover:text-body transition-colors cursor-pointer"
+                    >
+                      {t("common.logout")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </>
     );
   }
 
@@ -76,6 +131,27 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-5 py-5">
         <LogoHorizontal className="h-8" />
+      </div>
+
+      {/* Search trigger */}
+      <div className="px-3 mb-3">
+        <button
+          type="button"
+          onClick={() => triggerCommandPalette()}
+          className="flex items-center gap-2 w-full rounded-lg border border-edge bg-inset px-3 py-1.5 text-sm text-faint hover:text-muted hover:border-muted/30 transition-colors cursor-pointer"
+        >
+          <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+          <span className="flex-1 text-left">{t("common.search")}</span>
+          <kbd className="text-[10px] text-faint/70 font-mono">
+            {navigator.platform.includes("Mac") ? "\u2318K" : "Ctrl+K"}
+          </kbd>
+        </button>
       </div>
 
       {/* Nav */}
@@ -100,25 +176,9 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Theme toggle + shortcut hint */}
-      <div className="px-4 py-2 space-y-2">
-        <button
-          onClick={cycleTheme}
-          className="flex items-center gap-2 text-[11px] text-muted hover:text-body transition-colors w-full rounded-md px-1 py-1 hover:bg-elevated/50 cursor-pointer"
-          title={themeLabel}
-        >
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={themeIcons[mode]} />
-          </svg>
-          <span className="capitalize">{themeLabel}</span>
-        </button>
-        <div className="flex items-center gap-2 text-[11px] text-faint px-1">
-          <kbd className="rounded border border-edge px-1.5 py-0.5">
-            {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}
-          </kbd>
-          <kbd className="rounded border border-edge px-1.5 py-0.5">K</kbd>
-          <span>{t("common.search").replace("...", "")}</span>
-        </div>
+      {/* Preferences */}
+      <div className="px-3 py-2">
+        <PreferencesMenu />
       </div>
 
       {/* User */}

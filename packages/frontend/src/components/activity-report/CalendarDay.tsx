@@ -6,7 +6,9 @@ interface CalendarDayProps {
   entry: ReportEntry;
   dayNumber: number;
   dayName: string;
+  selected?: boolean;
   onToggle?: (entryId: string, newValue: number) => void;
+  onSelect?: (entryId: string) => void;
 }
 
 type DayKind = "holiday" | "weekend" | "normal";
@@ -49,12 +51,13 @@ const dayNameStyles: Record<DayKind, Record<DayValue, string>> = {
   normal: { 0: "text-muted", 0.5: "text-muted", 1: "text-indigo-200" },
 };
 
-export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDayProps) {
+export function CalendarDay({ entry, dayNumber, dayName, selected, onToggle, onSelect }: CalendarDayProps) {
   const { t } = useT();
   const kind = getDayKind(entry);
-  const value = entry.value as DayValue;
+  const value: DayValue = entry.value === 1 ? 1 : entry.value === 0.5 ? 0.5 : 0;
 
   const handleClick = () => {
+    onSelect?.(entry.id);
     if (!onToggle) return;
     const next = entry.value === 0 ? 1 : entry.value === 1 ? 0.5 : 0;
     onToggle(entry.id, next);
@@ -66,6 +69,7 @@ export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDay
         "relative flex flex-col items-center justify-center rounded-lg h-12 sm:h-16 transition-all duration-100 select-none overflow-hidden",
         onToggle ? "cursor-pointer active:scale-[0.97]" : "cursor-default",
         containerStyles[kind][value],
+        selected && "ring-2 ring-accent ring-offset-1 ring-offset-panel",
       )}
       onClick={handleClick}
       title={entry.isHoliday ? (entry.holidayName ?? t("activity.holiday")) : undefined}
@@ -91,6 +95,16 @@ export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDay
       {/* Half-day badge */}
       {entry.value === 0.5 && (
         <span className="absolute bottom-0.5 right-1.5 z-10 text-[10px] font-bold text-indigo-300">&frac12;</span>
+      )}
+
+      {/* Task indicator */}
+      {entry.task && !entry.isHoliday && (
+        <div
+          className={cn(
+            "absolute top-1 left-1/2 -translate-x-1/2 z-10 h-1 w-3 rounded-full",
+            value > 0 ? "bg-white/50" : "bg-accent/60",
+          )}
+        />
       )}
 
       {/* Holiday indicator */}

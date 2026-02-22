@@ -35,13 +35,13 @@ export function parseDate(str: string): Date {
   return new Date(y, m - 1, d);
 }
 
-const localeMap: Record<string, string> = {
+export const localeMap: Record<string, string> = {
   fr: "fr-FR",
   en: "en-US",
 };
 
 function resolveLocale(locale?: string): string {
-  return localeMap[locale ?? "fr"] ?? "fr-FR";
+  return localeMap[locale ?? "en"] ?? "en-US";
 }
 
 /**

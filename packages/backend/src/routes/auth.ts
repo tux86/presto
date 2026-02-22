@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { rateLimiter } from "hono-rate-limiter";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
@@ -12,7 +13,7 @@ const auth = new Hono<AppEnv>();
 
 auth.use("*", async (c, next) => {
   if (!config.auth.enabled && c.req.path !== "/api/auth/me") {
-    return c.json({ error: "Auth is disabled" }, 404);
+    throw new HTTPException(404, { message: "Auth is disabled" });
   }
   return next();
 });
@@ -49,12 +50,12 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return c.json({ error: "Email already registered" }, 409);
+    throw new HTTPException(409, { message: "Email already registered" });
   }
 
   const hashedPassword = await Bun.password.hash(password, {
     algorithm: "bcrypt",
-    cost: 10,
+    cost: config.auth.bcryptCost,
   });
 
   const user = await prisma.user.create({
@@ -76,12 +77,12 @@ auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return c.json({ error: "Invalid credentials" }, 401);
+    throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
   const valid = await Bun.password.verify(password, user.password);
   if (!valid) {
-    return c.json({ error: "Invalid credentials" }, 401);
+    throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
   const token = await createToken(user.id, user.email);
@@ -104,7 +105,7 @@ auth.get("/me", authMiddleware, async (c) => {
   });
 
   if (!user) {
-    return c.json({ error: "User not found" }, 404);
+    throw new HTTPException(404, { message: "User not found" });
   }
 
   return c.json(user);

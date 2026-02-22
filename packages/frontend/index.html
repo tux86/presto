@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Presto - Gestion d'activité</title>
+    <title>Presto</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script>
       // Prevent flash: apply theme before render
       (function() {
         try {
-          var stored = JSON.parse(localStorage.getItem('presto-theme') || '{}');
-          var mode = (stored.state && stored.state.mode) || 'dark';
+          var stored = JSON.parse(localStorage.getItem('presto-preferences') || '{}');
+          var mode = (stored.state && stored.state.theme) || 'dark';
           if (mode === 'auto') {
             if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
               document.documentElement.classList.add('dark');
@@ -18,6 +18,8 @@
           } else if (mode === 'dark') {
             document.documentElement.classList.add('dark');
           }
+          var locale = (stored.state && stored.state.locale) || 'en';
+          document.documentElement.lang = locale;
         } catch(e) {
           document.documentElement.classList.add('dark');
         }

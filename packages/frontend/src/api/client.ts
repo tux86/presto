@@ -30,17 +30,34 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new Error(body.error || `Request failed: ${res.status}`);
   }
 
-  if (res.headers.get("content-type")?.includes("application/pdf")) {
-    return res.blob() as unknown as T;
+  if (res.status === 204) return undefined as T;
+  return res.json();
+}
+
+async function requestBlob(path: string, options: RequestInit = {}): Promise<Blob> {
+  const token = useAuthStore.getState().token;
+  const headers: Record<string, string> = {
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
-  return res.json();
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Request failed: ${res.status}`);
+  }
+
+  return res.blob();
 }
 
 export const api = {
   get: <T>(path: string) => request<T>(path),
+  getBlob: (path: string) => requestBlob(path),
   post: <T>(path: string, data?: unknown) => request<T>(path, { method: "POST", body: JSON.stringify(data) }),
-  put: <T>(path: string, data?: unknown) => request<T>(path, { method: "PUT", body: JSON.stringify(data) }),
   patch: <T>(path: string, data?: unknown) => request<T>(path, { method: "PATCH", body: JSON.stringify(data) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };

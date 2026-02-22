@@ -92,6 +92,7 @@ export function Login() {
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder={t("auth.companyPlaceholder")}
+                optional
               />
             )}
 

@@ -58,10 +58,11 @@ activityReports.post("/", zValidator("json", createReportSchema), async (c) => {
     where: { missionId_month_year: { missionId, month, year } },
   });
   if (existing) {
-    return c.json({ error: "Activity already exists for this mission/month/year" }, 409);
+    throw new HTTPException(409, { message: "Activity already exists for this mission/month/year" });
   }
 
   const report = await createReportWithEntries(userId, missionId, month, year);
+  c.header("Location", `/api/activity-reports/${report.id}`);
   return c.json(report, 201);
 });
 
@@ -75,13 +76,13 @@ activityReports.get("/:id", async (c) => {
     include: REPORT_INCLUDE,
   });
   if (!report) {
-    return c.json({ error: "Activity not found" }, 404);
+    throw new HTTPException(404, { message: "Activity not found" });
   }
   return c.json(enrichReport(report));
 });
 
 // Update activity report (status, note)
-activityReports.put("/:id", zValidator("json", updateReportSchema), async (c) => {
+activityReports.patch("/:id", zValidator("json", updateReportSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const data = c.req.valid("json");
@@ -101,10 +102,11 @@ activityReports.delete("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  await findOwned("activityReport", id, userId);
+  const report = await findOwned("activityReport", id, userId);
+  ensureDraft(report);
 
   await prisma.activityReport.delete({ where: { id } });
-  return c.json({ success: true });
+  return c.body(null, 204);
 });
 
 // Batch update entries
@@ -113,7 +115,7 @@ activityReports.patch("/:id/entries", zValidator("json", updateEntriesSchema), a
   const id = c.req.param("id");
   const { entries } = c.req.valid("json");
 
-  const report = await findOwned<{ status: string }>("activityReport", id, userId);
+  const report = await findOwned("activityReport", id, userId);
   ensureDraft(report);
 
   // Verify all entry IDs belong to this report
@@ -122,7 +124,7 @@ activityReports.patch("/:id/entries", zValidator("json", updateEntriesSchema), a
     where: { id: { in: entryIds }, reportId: id },
   });
   if (ownedCount !== entryIds.length) {
-    return c.json({ error: "One or more entries do not belong to this report" }, 400);
+    throw new HTTPException(400, { message: "One or more entries do not belong to this report" });
   }
 
   await prisma.$transaction(
@@ -146,7 +148,7 @@ activityReports.patch("/:id/fill", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const report = await findOwned<{ status: string }>("activityReport", id, userId);
+  const report = await findOwned("activityReport", id, userId);
   ensureDraft(report);
   await autoFillReport(id);
   return c.json(await fetchEnrichedReport(id));
@@ -157,7 +159,7 @@ activityReports.patch("/:id/clear", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  const report = await findOwned<{ status: string }>("activityReport", id, userId);
+  const report = await findOwned("activityReport", id, userId);
   ensureDraft(report);
   await clearReport(id);
   return c.json(await fetchEnrichedReport(id));
@@ -167,14 +169,15 @@ activityReports.patch("/:id/clear", async (c) => {
 activityReports.get("/:id/pdf", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
-  const locale = (c.req.query("locale") as "fr" | "en") || "fr";
+  const localeParam = c.req.query("locale");
+  const locale = localeParam === "fr" ? "fr" : "en";
 
   const report = await prisma.activityReport.findFirst({
     where: { id, userId },
     include: REPORT_INCLUDE_PDF,
   });
   if (!report) {
-    return c.json({ error: "Activity not found" }, 404);
+    throw new HTTPException(404, { message: "Activity not found" });
   }
   if (report.status === "DRAFT") {
     throw new HTTPException(400, { message: "Cannot export a draft report. Mark it as completed first." });

@@ -45,7 +45,7 @@ export function ActivityReportCard({ report }: ActivityReportCardProps) {
               title={`${new Date(entry.date).getDate()} - ${entry.value}${entry.value > 1 ? t("activity.days") : t("activity.day")}`}
               className={cn(
                 "w-3 h-3 rounded-sm transition-colors overflow-hidden relative",
-                isOff ? "bg-elevated" : entry.value === 1 ? "bg-indigo-500" : isHalf ? "bg-elevated" : "bg-inset",
+                isOff ? "bg-elevated" : entry.value === 1 ? "bg-indigo-500" : isHalf ? "bg-indigo-500/40" : "bg-inset",
               )}
             >
               {isHalf && (
@@ -63,7 +63,7 @@ export function ActivityReportCard({ report }: ActivityReportCardProps) {
         </span>
         {report.mission?.dailyRate && (
           <span className="text-accent-text font-medium">
-            {formatCurrency(report.totalDays * report.mission.dailyRate)}
+            {formatCurrency(report.totalDays * report.mission.dailyRate, report.mission?.client?.currency)}
           </span>
         )}
       </div>

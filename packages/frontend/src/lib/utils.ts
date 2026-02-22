@@ -1,21 +1,21 @@
-import { useConfigStore } from "@/stores/config.store";
+import { localeMap } from "@presto/shared";
+import { usePreferencesStore } from "@/stores/preferences.store";
 
 export function cn(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-const localeMap: Record<string, string> = {
-  fr: "fr-FR",
-  en: "en-US",
+const defaultCurrencyMap: Record<string, string> = {
+  fr: "EUR",
+  en: "USD",
 };
 
-export function formatCurrency(amount: number): string {
-  const config = useConfigStore.getState().config;
-  const locale = localeMap[config?.locale ?? "fr"] ?? "fr-FR";
-  const currency = config?.currency ?? "EUR";
+export function formatCurrency(amount: number, currency?: string): string {
+  const prefs = usePreferencesStore.getState();
+  const locale = localeMap[prefs.locale] ?? "en-US";
   return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency,
+    currency: currency ?? defaultCurrencyMap[prefs.locale] ?? "EUR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);

@@ -13,7 +13,7 @@ missions.get("/", async (c) => {
   const userId = c.get("userId");
   const list = await prisma.mission.findMany({
     where: { userId },
-    include: { client: { select: { id: true, name: true } } },
+    include: { client: { select: { id: true, name: true, currency: true } } },
     orderBy: { createdAt: "desc" },
   });
   return c.json(list);
@@ -34,12 +34,13 @@ missions.post("/", zValidator("json", createMissionSchema), async (c) => {
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
     },
-    include: { client: { select: { id: true, name: true } } },
+    include: { client: { select: { id: true, name: true, currency: true } } },
   });
+  c.header("Location", `/api/missions/${mission.id}`);
   return c.json(mission, 201);
 });
 
-missions.put("/:id", zValidator("json", updateMissionSchema), async (c) => {
+missions.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const data = c.req.valid("json");
@@ -56,7 +57,7 @@ missions.put("/:id", zValidator("json", updateMissionSchema), async (c) => {
       endDate: data.endDate ? new Date(data.endDate) : undefined,
       isActive: data.isActive,
     },
-    include: { client: { select: { id: true, name: true } } },
+    include: { client: { select: { id: true, name: true, currency: true } } },
   });
   return c.json(mission);
 });
@@ -68,7 +69,7 @@ missions.delete("/:id", async (c) => {
   await findOwned("mission", id, userId);
 
   await prisma.mission.delete({ where: { id } });
-  return c.json({ success: true });
+  return c.body(null, 204);
 });
 
 export default missions;

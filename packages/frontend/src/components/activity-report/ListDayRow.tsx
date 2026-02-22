@@ -67,7 +67,7 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
         ) : (
           <input
             type="text"
-            value={entry.task || ""}
+            defaultValue={entry.task || ""}
             onChange={(e) => onTaskChange?.(entry.id, e.target.value)}
             placeholder={entry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.taskPlaceholder")}
             className="w-full bg-transparent text-sm text-body placeholder:text-placeholder outline-none"

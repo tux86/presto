@@ -92,7 +92,6 @@ Copy `.env.example` to `.env`. All defaults work for local development.
 | `APP_NAME` | `Presto` | Application name in public config API |
 | `APP_THEME` | `light` | Default theme (`light` or `dark`) |
 | `APP_LOCALE` | `fr` | Default locale (`fr` or `en`) |
-| `APP_CURRENCY` | `EUR` | Currency used in reports |
 | `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |
 | `DEFAULT_USER_PASSWORD` | _(empty)_ | Default admin password |
 

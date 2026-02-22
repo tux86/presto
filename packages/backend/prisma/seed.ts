@@ -33,9 +33,11 @@ async function main() {
     create: {
       id: "demo-client-1",
       name: "Acme Corp",
-      businessId: "12345678901234",
       email: "contact@acme.com",
+      phone: "+33 1 23 45 67 89",
       address: "123 rue de Paris, 75001 Paris",
+      businessId: "12345678901234",
+      currency: "EUR",
       userId: user.id,
     },
   });

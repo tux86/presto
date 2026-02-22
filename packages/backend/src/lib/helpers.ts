@@ -1,8 +1,14 @@
 import { HTTPException } from "hono/http-exception";
-import type { Prisma } from "../../prisma/generated/prisma/client.js";
+import type { ActivityReport, Client, Mission, Prisma } from "../../prisma/generated/prisma/client.js";
 import { prisma } from "./prisma.js";
 
 type OwnedModel = "activityReport" | "client" | "mission";
+
+type OwnedModelResult = {
+  activityReport: ActivityReport;
+  client: Client;
+  mission: Mission;
+};
 
 const labels: Record<OwnedModel, string> = {
   activityReport: "Activity",
@@ -13,8 +19,15 @@ const labels: Record<OwnedModel, string> = {
 /**
  * Ownership-checked lookup. Throws HTTPException(404) if not found or not owned by user.
  * Returns the found record.
+ *
+ * Note: There is a theoretical TOCTOU gap between this check and the subsequent mutation,
+ * but this is acceptable for a single-user freelancer app.
  */
-export async function findOwned<T = unknown>(model: OwnedModel, id: string, userId: string): Promise<T> {
+export async function findOwned<M extends OwnedModel>(
+  model: M,
+  id: string,
+  userId: string,
+): Promise<OwnedModelResult[M]> {
   let record: unknown;
   switch (model) {
     case "activityReport":
@@ -30,14 +43,14 @@ export async function findOwned<T = unknown>(model: OwnedModel, id: string, user
   if (!record) {
     throw new HTTPException(404, { message: `${labels[model]} not found` });
   }
-  return record as T;
+  return record as OwnedModelResult[M];
 }
 
 /** Standard include for activity report queries (entries + mission + client name). */
 export const REPORT_INCLUDE = {
   entries: { orderBy: { date: "asc" as const } },
   mission: {
-    include: { client: { select: { id: true, name: true } } },
+    include: { client: { select: { id: true, name: true, currency: true } } },
   },
 } satisfies Prisma.ActivityReportInclude;
 

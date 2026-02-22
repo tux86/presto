@@ -1,3 +1,5 @@
+import type { CurrencyCode } from "../currencies.js";
+
 export interface Mission {
   id: string;
   name: string;
@@ -12,6 +14,7 @@ export interface Mission {
   client?: {
     id: string;
     name: string;
+    currency: CurrencyCode;
   };
 }
 

@@ -2,6 +2,7 @@ import { sign, verify } from "hono/jwt";
 import { config } from "./config.js";
 
 const SECRET = config.jwt.secret;
+const JWT_EXPIRY_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 export interface JwtPayload {
   sub: string;
@@ -13,7 +14,7 @@ export async function createToken(userId: string, email: string): Promise<string
   const payload = {
     sub: userId,
     email,
-    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
+    exp: Math.floor(Date.now() / 1000) + JWT_EXPIRY_SECONDS,
   };
   return await sign(payload, SECRET, "HS256");
 }

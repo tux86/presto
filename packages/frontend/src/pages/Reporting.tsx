@@ -79,7 +79,7 @@ export function Reporting() {
                       <div className="flex justify-between items-center mb-1.5">
                         <span className="text-sm text-body">{client.clientName}</span>
                         <span className="text-xs text-faint">
-                          {formatNumber(client.days)}j &middot; {formatCurrency(client.revenue)}
+                          {formatNumber(client.days)}j &middot; {formatCurrency(client.revenue, client.currency)}
                         </span>
                       </div>
                       <div className="h-2 rounded-full bg-inset overflow-hidden">

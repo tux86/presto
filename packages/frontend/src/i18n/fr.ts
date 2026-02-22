@@ -1,9 +1,13 @@
 export const fr = {
+  // App
+  "app.title": "Presto - Suivi d'activit\u00e9",
+
   // Navigation
   "nav.activities": "Activit\u00e9s",
   "nav.clients": "Clients",
   "nav.missions": "Missions",
   "nav.reporting": "Reporting",
+  "nav.more": "Plus",
 
   // Dashboard
   "dashboard.title": "Mes Activit\u00e9s",
@@ -25,8 +29,10 @@ export const fr = {
   "clients.name": "Nom / Raison sociale",
   "clients.businessId": "SIRET",
   "clients.email": "Email",
+  "clients.phone": "T\u00e9l\u00e9phone",
   "clients.address": "Adresse",
   "clients.deleteTitle": "Supprimer ce client",
+  "clients.currency": "Devise",
   "clients.deleteMessage": "Ce client et ses donn\u00e9es seront supprim\u00e9s. Cette action est irr\u00e9versible.",
 
   // Missions
@@ -39,7 +45,6 @@ export const fr = {
   "missions.client": "Client",
   "missions.selectClient": "S\u00e9lectionner un client",
   "missions.dailyRate": "Taux journalier",
-  "missions.dailyRateOptional": "Taux journalier (optionnel)",
   "missions.status": "Statut",
   "missions.active": "Active",
   "missions.inactive": "Inactive",
@@ -95,7 +100,7 @@ export const fr = {
   "auth.password": "Mot de passe",
   "auth.firstName": "Pr\u00e9nom",
   "auth.lastName": "Nom",
-  "auth.company": "Soci\u00e9t\u00e9 (optionnel)",
+  "auth.company": "Soci\u00e9t\u00e9",
   "auth.companyPlaceholder": "Ma Soci\u00e9t\u00e9 SARL",
   "auth.emailPlaceholder": "vous@exemple.com",
   "auth.submitLogin": "Se connecter",
@@ -115,6 +120,7 @@ export const fr = {
   "common.back": "Retour",
   "common.search": "Rechercher...",
   "common.noResults": "Aucun r\u00e9sultat",
+  "common.optional": "optionnel",
   "common.navigation": "Navigation",
   "common.logout": "D\u00e9connexion",
 
@@ -122,6 +128,11 @@ export const fr = {
   "theme.dark": "Sombre",
   "theme.light": "Clair",
   "theme.auto": "Auto",
+
+  // Preferences
+  "preferences.title": "Pr\u00e9f\u00e9rences",
+  "preferences.theme": "Th\u00e8me",
+  "preferences.language": "Langue",
 } as const;
 
 export type TranslationKey = keyof typeof fr;

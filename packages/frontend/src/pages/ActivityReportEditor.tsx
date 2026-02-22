@@ -1,6 +1,6 @@
 import type { ReportEntry } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
 import { ListView } from "@/components/activity-report/ListView";
@@ -37,6 +37,14 @@ export function ActivityReportEditor() {
   const { t, locale } = useT();
 
   const taskTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  useEffect(() => {
+    return () => {
+      for (const timer of Object.values(taskTimerRef.current)) {
+        clearTimeout(timer);
+      }
+    };
+  }, []);
 
   const isCompleted = report?.status === "COMPLETED";
   const entries = report?.entries ?? [];
@@ -170,7 +178,12 @@ export function ActivityReportEditor() {
           {/* Content */}
           <div className="rounded-xl border border-edge bg-panel p-6">
             {viewMode === "calendar" ? (
-              <CalendarGrid entries={entries} onToggle={handleToggle} readOnly={isCompleted} />
+              <CalendarGrid
+                entries={entries}
+                onToggle={handleToggle}
+                onTaskChange={handleTaskChange}
+                readOnly={isCompleted}
+              />
             ) : (
               <ListView
                 entries={entries}

@@ -26,12 +26,12 @@ export const config = {
     name: env("APP_NAME", "Presto"),
     port: envInt("PORT", 3001),
     theme: env("APP_THEME", "light") as "light" | "dark",
-    locale: env("APP_LOCALE", "fr") as "fr" | "en",
+    locale: env("APP_LOCALE", "en") as "fr" | "en",
     holidayCountry: env("HOLIDAY_COUNTRY", "FR"),
-    currency: env("APP_CURRENCY", "EUR"),
   },
   auth: {
     enabled: envBool("AUTH_ENABLED", true),
+    bcryptCost: envInt("BCRYPT_COST", 10),
     defaultUser: {
       email: env("DEFAULT_USER_EMAIL", "admin@localhost"),
       password: env("DEFAULT_USER_PASSWORD", ""),
@@ -46,7 +46,9 @@ export const config = {
     secret: envRequired("JWT_SECRET"),
   },
   cors: {
-    origins: env("CORS_ORIGINS", "http://localhost:5173").split(","),
+    origins: env("CORS_ORIGINS", "http://localhost:5173")
+      .split(",")
+      .map((s) => s.trim()),
   },
 } as const;
 
@@ -58,6 +60,5 @@ export function getPublicConfig() {
     authEnabled: config.auth.enabled,
     locale: config.app.locale,
     holidayCountry: config.app.holidayCountry,
-    currency: config.app.currency,
   };
 }

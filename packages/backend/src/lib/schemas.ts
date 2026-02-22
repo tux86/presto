@@ -1,49 +1,57 @@
+import { CURRENCIES, REPORT_STATUSES } from "@presto/shared";
 import { z } from "zod";
+
+const currencySchema = z.enum(CURRENCIES);
+const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 // Auth
 export const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  company: z.string().optional(),
+  email: z.string().email().max(254),
+  password: z.string().min(8).max(128),
+  firstName: z.string().min(1).max(200),
+  lastName: z.string().min(1).max(200),
+  company: z.string().max(200).optional(),
 });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email().max(254),
+  password: z.string().min(1).max(128),
 });
 
 // Clients
 export const createClientSchema = z.object({
-  name: z.string().min(1),
-  businessId: z.string().optional(),
-  email: z.string().email().optional(),
-  address: z.string().optional(),
+  name: z.string().min(1).max(200),
+  email: z.string().email().max(254).optional(),
+  phone: z.string().max(50).optional(),
+  address: z.string().max(500).optional(),
+  businessId: z.string().max(100).optional(),
+  currency: currencySchema.optional(),
 });
 
 export const updateClientSchema = z.object({
-  name: z.string().min(1).optional(),
-  businessId: z.string().optional(),
-  email: z.string().email().optional(),
-  address: z.string().optional(),
+  name: z.string().min(1).max(200).optional(),
+  email: z.string().email().max(254).optional(),
+  phone: z.string().max(50).optional(),
+  address: z.string().max(500).optional(),
+  businessId: z.string().max(100).optional(),
+  currency: currencySchema.optional(),
 });
 
 // Missions
 export const createMissionSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1).max(200),
   clientId: z.string().min(1),
   dailyRate: z.number().min(0).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  startDate: dateString.optional(),
+  endDate: dateString.optional(),
 });
 
 export const updateMissionSchema = z.object({
-  name: z.string().min(1).optional(),
+  name: z.string().min(1).max(200).optional(),
   clientId: z.string().min(1).optional(),
   dailyRate: z.number().min(0).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  startDate: dateString.optional(),
+  endDate: dateString.optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -55,8 +63,8 @@ export const createReportSchema = z.object({
 });
 
 export const updateReportSchema = z.object({
-  status: z.enum(["DRAFT", "COMPLETED"]).optional(),
-  note: z.string().optional(),
+  status: z.enum(REPORT_STATUSES).optional(),
+  note: z.string().max(2000).optional(),
 });
 
 export const updateEntriesSchema = z.object({
@@ -64,7 +72,7 @@ export const updateEntriesSchema = z.object({
     z.object({
       id: z.string().min(1),
       value: z.number().min(0).max(1).optional(),
-      task: z.string().optional(),
+      task: z.string().max(1000).optional(),
     }),
   ),
 });

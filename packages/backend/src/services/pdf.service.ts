@@ -87,7 +87,7 @@ interface PdfReport {
   mission: {
     name: string;
     dailyRate: number | null;
-    client: { name: string };
+    client: { name: string; currency: string };
   };
   user: {
     firstName: string;
@@ -96,10 +96,18 @@ interface PdfReport {
   };
 }
 
-function ReportDocument({ report, locale = "fr" }: { report: PdfReport; locale?: "fr" | "en" }) {
+function ReportDocument({ report, locale = "en" }: { report: PdfReport; locale?: "fr" | "en" }) {
   const l = labels[locale];
   const monthName = getMonthName(report.month);
   const currencyLocale = locale === "fr" ? "fr-FR" : "en-US";
+  const currency = report.mission.client.currency || "EUR";
+  const formatAmount = (amount: number) =>
+    new Intl.NumberFormat(currencyLocale, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
 
   return React.createElement(
     Document,
@@ -190,14 +198,14 @@ function ReportDocument({ report, locale = "fr" }: { report: PdfReport; locale?:
           React.createElement(
             Text,
             { style: styles.total },
-            `${l.amount} : ${(report.totalDays * report.mission.dailyRate).toLocaleString(currencyLocale)} \u20ac`,
+            `${l.amount} : ${formatAmount(report.totalDays * report.mission.dailyRate)}`,
           ),
       ),
     ),
   );
 }
 
-export async function generateReportPdf(report: PdfReport, locale: "fr" | "en" = "fr"): Promise<Buffer> {
+export async function generateReportPdf(report: PdfReport, locale: "fr" | "en" = "en"): Promise<Buffer> {
   const doc = React.createElement(ReportDocument, { report, locale });
   const buffer = await renderToBuffer(doc);
   return Buffer.from(buffer);

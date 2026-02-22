@@ -1,16 +1,24 @@
 import type { ReportEntry } from "@presto/shared";
-import { getDayName } from "@presto/shared";
+import { getDayName, getDayNameFull } from "@presto/shared";
+import { useCallback, useState } from "react";
 import { useT } from "@/i18n";
 import { CalendarDay } from "./CalendarDay";
 
 interface CalendarGridProps {
   entries: ReportEntry[];
   onToggle: (entryId: string, newValue: number) => void;
+  onTaskChange?: (entryId: string, task: string) => void;
   readOnly?: boolean;
 }
 
-export function CalendarGrid({ entries, onToggle, readOnly }: CalendarGridProps) {
-  const { locale } = useT();
+export function CalendarGrid({ entries, onToggle, onTaskChange, readOnly }: CalendarGridProps) {
+  const { t, locale } = useT();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const taskInputRef = useCallback((node: HTMLInputElement | null) => {
+    node?.focus();
+  }, []);
+
+  const selectedEntry = selectedId ? entries.find((e) => e.id === selectedId) : null;
 
   const offset =
     entries.length > 0
@@ -56,11 +64,32 @@ export function CalendarGrid({ entries, onToggle, readOnly }: CalendarGridProps)
               entry={entry}
               dayNumber={date.getDate()}
               dayName={getDayName(date, locale)}
+              selected={entry.id === selectedId}
               onToggle={readOnly ? undefined : onToggle}
+              onSelect={readOnly ? undefined : setSelectedId}
             />
           );
         })}
       </div>
+
+      {/* Task editor for selected day */}
+      {selectedEntry && !readOnly && !selectedEntry.isHoliday && (
+        <div className="mt-4 flex items-center gap-3 rounded-lg border border-edge bg-elevated px-4 py-3">
+          <div className="shrink-0">
+            <span className="text-sm font-bold text-heading">{new Date(selectedEntry.date).getDate()}</span>
+            <span className="ml-1.5 text-xs text-muted">{getDayNameFull(new Date(selectedEntry.date), locale)}</span>
+          </div>
+          <input
+            ref={taskInputRef}
+            type="text"
+            defaultValue={selectedEntry.task || ""}
+            key={selectedEntry.id}
+            onChange={(e) => onTaskChange?.(selectedEntry.id, e.target.value)}
+            placeholder={selectedEntry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.taskPlaceholder")}
+            className="flex-1 bg-transparent text-sm text-body placeholder:text-placeholder outline-none"
+          />
+        </div>
+      )}
     </div>
   );
 }

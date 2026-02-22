@@ -66,15 +66,35 @@ See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environme
 
 ```mermaid
 graph LR
-    Browser["Browser (SPA)"] -->|HTTP /api/*| API["Hono API<br/>port 8080"]
-    API -->|Prisma ORM| DB[(PostgreSQL)]
-    API -->|"@react-pdf/renderer"| PDF["PDF Export"]
-    Browser -->|Static files| API
+    subgraph Browser["Browser"]
+        SPA["React 19 SPA<br/>React Router 7 · Tailwind CSS 4<br/>Zustand · TanStack Query · Recharts"]
+    end
+
+    subgraph Docker["Docker Container · Bun · :8080"]
+        Static["Static Files<br/>Vite-built SPA assets"]
+        subgraph Hono["Hono 4 API Server"]
+            MW["Middleware<br/>CORS · Secure Headers · CSP<br/>Body Limit · Logger"]
+            Auth["Auth<br/>JWT · BCrypt · Rate Limiting"]
+            Routes["/api/auth · /api/clients<br/>/api/missions · /api/activity-reports<br/>/api/reporting · /api/health"]
+            PDF["PDF Export<br/>@react-pdf/renderer"]
+        end
+        Shared["@presto/shared<br/>Types · Date Utilities · Holidays"]
+    end
+
+    DB[(PostgreSQL)]
+
+    Static -.->|"HTML · JS · CSS"| SPA
+    SPA -->|"REST /api/*"| MW
+    MW --> Auth
+    Auth --> Routes
+    Routes --> PDF
+    Routes -->|"Prisma 7"| DB
+    Shared -.-> Routes
 ```
 
-Presto ships as a single Docker image. The Hono backend serves both the REST API and the pre-built React frontend as static files.
+Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The Hono backend serves both the REST API and the pre-built React frontend as static files. All data stays on your server.
 
-**Built with** TypeScript, React 19, Hono 4, Prisma 7, Vite 6, Tailwind CSS 4, and Bun.
+**Built with** TypeScript, React 19, Hono 4, Prisma 7, Vite 6, Tailwind CSS 4, Recharts, and Bun.
 
 ## Comparison
 

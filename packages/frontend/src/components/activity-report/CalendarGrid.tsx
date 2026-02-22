@@ -6,9 +6,10 @@ import { CalendarDay } from "./CalendarDay";
 interface CalendarGridProps {
   entries: ReportEntry[];
   onToggle: (entryId: string, newValue: number) => void;
+  readOnly?: boolean;
 }
 
-export function CalendarGrid({ entries, onToggle }: CalendarGridProps) {
+export function CalendarGrid({ entries, onToggle, readOnly }: CalendarGridProps) {
   const { locale } = useT();
 
   const offset =
@@ -55,7 +56,7 @@ export function CalendarGrid({ entries, onToggle }: CalendarGridProps) {
               entry={entry}
               dayNumber={date.getDate()}
               dayName={getDayName(date, locale)}
-              onToggle={onToggle}
+              onToggle={readOnly ? undefined : onToggle}
             />
           );
         })}

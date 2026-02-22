@@ -6,10 +6,11 @@ interface CalendarDayProps {
   entry: ReportEntry;
   dayNumber: number;
   dayName: string;
-  onToggle: (entryId: string, newValue: number) => void;
+  onToggle?: (entryId: string, newValue: number) => void;
 }
 
 type DayKind = "holiday" | "weekend" | "normal";
+
 type DayValue = 0 | 0.5 | 1;
 
 function getDayKind(entry: ReportEntry): DayKind {
@@ -54,6 +55,7 @@ export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDay
   const value = entry.value as DayValue;
 
   const handleClick = () => {
+    if (!onToggle) return;
     const next = entry.value === 0 ? 1 : entry.value === 1 ? 0.5 : 0;
     onToggle(entry.id, next);
   };
@@ -61,7 +63,8 @@ export function CalendarDay({ entry, dayNumber, dayName, onToggle }: CalendarDay
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center rounded-lg h-12 sm:h-16 transition-all duration-100 select-none overflow-hidden cursor-pointer active:scale-[0.97]",
+        "relative flex flex-col items-center justify-center rounded-lg h-12 sm:h-16 transition-all duration-100 select-none overflow-hidden",
+        onToggle ? "cursor-pointer active:scale-[0.97]" : "cursor-default",
         containerStyles[kind][value],
       )}
       onClick={handleClick}

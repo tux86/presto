@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { findOwned, REPORT_INCLUDE, REPORT_INCLUDE_PDF } from "../lib/helpers.js";
+import { HTTPException } from "hono/http-exception";
+import { ensureDraft, findOwned, REPORT_INCLUDE, REPORT_INCLUDE_PDF, slugify } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
 import { createReportSchema, updateEntriesSchema, updateReportSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
@@ -112,7 +113,8 @@ activityReports.patch("/:id/entries", zValidator("json", updateEntriesSchema), a
   const id = c.req.param("id");
   const { entries } = c.req.valid("json");
 
-  await findOwned("activityReport", id, userId);
+  const report = await findOwned<{ status: string }>("activityReport", id, userId);
+  ensureDraft(report);
 
   // Verify all entry IDs belong to this report
   const entryIds = entries.map((e) => e.id);
@@ -144,7 +146,8 @@ activityReports.patch("/:id/fill", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  await findOwned("activityReport", id, userId);
+  const report = await findOwned<{ status: string }>("activityReport", id, userId);
+  ensureDraft(report);
   await autoFillReport(id);
   return c.json(await fetchEnrichedReport(id));
 });
@@ -154,7 +157,8 @@ activityReports.patch("/:id/clear", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
-  await findOwned("activityReport", id, userId);
+  const report = await findOwned<{ status: string }>("activityReport", id, userId);
+  ensureDraft(report);
   await clearReport(id);
   return c.json(await fetchEnrichedReport(id));
 });
@@ -172,13 +176,18 @@ activityReports.get("/:id/pdf", async (c) => {
   if (!report) {
     return c.json({ error: "Activity not found" }, 404);
   }
+  if (report.status === "DRAFT") {
+    throw new HTTPException(400, { message: "Cannot export a draft report. Mark it as completed first." });
+  }
 
   const pdfBuffer = await generateReportPdf(enrichReport(report), locale);
+
+  const filename = `activity-report-${slugify(report.mission.client.name)}-${slugify(report.mission.name)}-${report.year}-${String(report.month).padStart(2, "0")}.pdf`;
 
   return new Response(new Uint8Array(pdfBuffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="Presto-${report.year}-${String(report.month).padStart(2, "0")}-${report.mission.client.name}.pdf"`,
+      "Content-Disposition": `attachment; filename="${filename}"`,
     },
   });
 });

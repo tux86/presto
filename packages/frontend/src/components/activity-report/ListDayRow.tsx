@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 interface ListDayRowProps {
   entry: ReportEntry;
-  onToggle: (entryId: string, newValue: number) => void;
-  onTaskChange: (entryId: string, task: string) => void;
+  onToggle?: (entryId: string, newValue: number) => void;
+  onTaskChange?: (entryId: string, task: string) => void;
 }
 
 export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
@@ -15,6 +15,7 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
   const { t, locale } = useT();
 
   const handleToggle = () => {
+    if (!onToggle) return;
     const next = entry.value === 0 ? 1 : entry.value === 1 ? 0.5 : 0;
     onToggle(entry.id, next);
   };
@@ -40,7 +41,8 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
       {/* Value toggle */}
       <button
         className={cn(
-          "relative flex h-9 w-16 items-center justify-center rounded-lg text-sm font-bold transition-all overflow-hidden cursor-pointer",
+          "relative flex h-9 w-16 items-center justify-center rounded-lg text-sm font-bold transition-all overflow-hidden",
+          onToggle ? "cursor-pointer" : "cursor-default",
           entry.value === 0 && "bg-elevated text-muted hover:bg-inset border border-edge",
           entry.value === 1 && "bg-indigo-600 text-white border border-indigo-500",
           entry.value === 0.5 && "bg-elevated text-white border border-indigo-500",
@@ -66,9 +68,10 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
           <input
             type="text"
             value={entry.task || ""}
-            onChange={(e) => onTaskChange(entry.id, e.target.value)}
+            onChange={(e) => onTaskChange?.(entry.id, e.target.value)}
             placeholder={entry.isWeekend ? t("activity.weekendPlaceholder") : t("activity.taskPlaceholder")}
             className="w-full bg-transparent text-sm text-body placeholder:text-placeholder outline-none"
+            readOnly={!onTaskChange}
           />
         )}
       </div>

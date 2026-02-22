@@ -88,13 +88,27 @@ export function ReportInfoPanel({
 
       {/* Actions */}
       <div className="space-y-2">
-        <Button variant="primary" size="md" className="w-full" onClick={onAutoFill} loading={filling}>
+        <Button
+          variant="primary"
+          size="md"
+          className="w-full"
+          onClick={onAutoFill}
+          loading={filling}
+          disabled={isCompleted}
+        >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
           </svg>
           {t("activity.fillWorkdays")}
         </Button>
-        <Button variant="secondary" size="md" className="w-full" onClick={onDownloadPdf} loading={downloading}>
+        <Button
+          variant="secondary"
+          size="md"
+          className="w-full"
+          onClick={onDownloadPdf}
+          loading={downloading}
+          disabled={!isCompleted}
+        >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path
               strokeLinecap="round"
@@ -104,7 +118,14 @@ export function ReportInfoPanel({
           </svg>
           {t("activity.exportPdf")}
         </Button>
-        <Button variant="ghost" size="md" className="w-full text-faint!" onClick={onClear} loading={clearing}>
+        <Button
+          variant="ghost"
+          size="md"
+          className="w-full text-faint!"
+          onClick={onClear}
+          loading={clearing}
+          disabled={isCompleted}
+        >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>

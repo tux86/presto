@@ -12,8 +12,9 @@ const labels: Record<OwnedModel, string> = {
 
 /**
  * Ownership-checked lookup. Throws HTTPException(404) if not found or not owned by user.
+ * Returns the found record.
  */
-export async function findOwned(model: OwnedModel, id: string, userId: string): Promise<void> {
+export async function findOwned<T = unknown>(model: OwnedModel, id: string, userId: string): Promise<T> {
   let record: unknown;
   switch (model) {
     case "activityReport":
@@ -29,6 +30,7 @@ export async function findOwned(model: OwnedModel, id: string, userId: string): 
   if (!record) {
     throw new HTTPException(404, { message: `${labels[model]} not found` });
   }
+  return record as T;
 }
 
 /** Standard include for activity report queries (entries + mission + client name). */
@@ -49,3 +51,19 @@ export const REPORT_INCLUDE_PDF = {
     select: { firstName: true, lastName: true, company: true },
   },
 } satisfies Prisma.ActivityReportInclude;
+
+/** Throws HTTPException(400) if the report status is not DRAFT. */
+export function ensureDraft(report: { status: string }) {
+  if (report.status === "COMPLETED") {
+    throw new HTTPException(400, { message: "Cannot modify a completed report" });
+  }
+}
+
+export function slugify(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .toLowerCase();
+}

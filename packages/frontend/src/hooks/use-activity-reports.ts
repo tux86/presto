@@ -6,6 +6,7 @@ import type {
 } from "@presto/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
+import { useAuthStore } from "../stores/auth.store";
 
 export function useActivityReports(filters?: { year?: number; month?: number; missionId?: string }) {
   const params = new URLSearchParams();
@@ -130,11 +131,18 @@ export function useClearReport() {
 export function useDownloadPdf() {
   return useMutation({
     mutationFn: async (reportId: string) => {
-      const blob = await api.get<Blob>(`/activity-reports/${reportId}/pdf`);
+      const token = useAuthStore.getState().token;
+      const res = await fetch(`/api/activity-reports/${reportId}/pdf`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error(`PDF download failed: ${res.status}`);
+      const disposition = res.headers.get("Content-Disposition");
+      const filename = disposition?.match(/filename="(.+)"/)?.[1] ?? `presto-${reportId}.pdf`;
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Presto-${reportId}.pdf`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     },

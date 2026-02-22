@@ -38,6 +38,7 @@ export function ActivityReportEditor() {
 
   const taskTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
+  const isCompleted = report?.status === "COMPLETED";
   const entries = report?.entries ?? [];
   const entriesRef = useRef<ReportEntry[]>(entries);
   entriesRef.current = entries;
@@ -169,9 +170,14 @@ export function ActivityReportEditor() {
           {/* Content */}
           <div className="rounded-xl border border-edge bg-panel p-6">
             {viewMode === "calendar" ? (
-              <CalendarGrid entries={entries} onToggle={handleToggle} />
+              <CalendarGrid entries={entries} onToggle={handleToggle} readOnly={isCompleted} />
             ) : (
-              <ListView entries={entries} onToggle={handleToggle} onTaskChange={handleTaskChange} />
+              <ListView
+                entries={entries}
+                onToggle={handleToggle}
+                onTaskChange={handleTaskChange}
+                readOnly={isCompleted}
+              />
             )}
           </div>
         </div>

@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/tux86/presto/compare/v1.7.1...v1.7.2) (2026-02-22)
+
+### Bug Fixes
+
+* **backend:** prevent cascade deletion, allow nullable fields, validate date ranges ([a5a31d3](https://github.com/tux86/presto/commit/a5a31d3e555f316bd437ffcc7735b8e39cfba274))
+* update architecture diagram, reduce logo text size in SVGs ([a82d26b](https://github.com/tux86/presto/commit/a82d26b28e6ebc8b555f0f0cd4055de12055bc7a))
+
 ## [1.7.1](https://github.com/tux86/presto/compare/v1.7.0...v1.7.1) (2026-02-22)
 
 ### Bug Fixes

@@ -118,31 +118,45 @@ See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environme
 ## Architecture
 
 ```mermaid
-graph LR
-    subgraph Browser["Browser"]
+flowchart LR
+    subgraph client["Browser"]
         SPA["React 19 SPA<br/>React Router 7 · Tailwind CSS 4<br/>Zustand · TanStack Query · Recharts"]
     end
 
-    subgraph Docker["Docker Container · Bun · :8080"]
-        Static["Static Files<br/>Vite-built SPA assets"]
-        subgraph Hono["Hono 4 API Server"]
-            MW["Middleware<br/>CORS · Secure Headers · CSP<br/>Body Limit · Logger"]
-            Auth["Auth<br/>JWT · BCrypt · Rate Limiting"]
-            Routes["/api/auth · /api/clients<br/>/api/missions · /api/activity-reports<br/>/api/reporting · /api/health"]
-            PDF["PDF Export<br/>@react-pdf/renderer"]
+    subgraph docker["Docker · Bun · :8080"]
+        Static["Static Files"]
+
+        subgraph hono["Hono 4 API Server"]
+            direction LR
+            MW["Middleware<br/>CORS · CSP<br/>Rate Limit"] --> Auth["Auth<br/>JWT · BCrypt"] --> Routes["Routes<br/>clients · missions<br/>reports · reporting"]
         end
-        Shared["@presto/shared<br/>Types · Date Utilities · Holidays"]
+
+        subgraph services["Services"]
+            direction LR
+            PDF["PDF Export"]
+            Shared["@presto/shared<br/>Types · Dates · Holidays"]
+        end
     end
 
-    DB[(PostgreSQL<br/>MySQL / MariaDB<br/>SQLite)]
+    DB[("PostgreSQL<br/>MySQL / MariaDB<br/>SQLite")]
 
     Static -.->|"HTML · JS · CSS"| SPA
-    SPA -->|"REST /api/*"| MW
-    MW --> Auth
-    Auth --> Routes
-    Routes --> PDF
-    Routes -->|"Drizzle ORM<br/>runtime dialect"| DB
+    SPA -->|"REST /api"| MW
+    Routes --> services
+    Routes -->|"Drizzle ORM"| DB
     Shared -.-> Routes
+
+    classDef frontend fill:#6366f1,stroke:#4f46e5,color:#fff
+    classDef backend fill:#0ea5e9,stroke:#0284c7,color:#fff
+    classDef service fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef database fill:#10b981,stroke:#059669,color:#fff
+    classDef static fill:#64748b,stroke:#475569,color:#fff
+
+    class SPA frontend
+    class MW,Auth,Routes backend
+    class PDF,Shared service
+    class DB database
+    class Static static
 ```
 
 Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The Hono backend serves both the REST API and the pre-built React frontend as static files. All data stays on your server.

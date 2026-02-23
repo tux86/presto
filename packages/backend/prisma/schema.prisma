@@ -28,8 +28,8 @@ model Client {
   phone      String?
   address    String?
   businessId String?
-  currency       String    @default("EUR")
-  holidayCountry String    @default("FR")
+  currency       String
+  holidayCountry String
   userId         String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   missions   Mission[]
@@ -65,7 +65,7 @@ model ActivityReport {
   status         ReportStatus @default(DRAFT)
   totalDays      Float        @default(0)
   note           String?
-  holidayCountry String       @default("FR")
+  holidayCountry String
   missionId String
   mission   Mission      @relation(fields: [missionId], references: [id], onDelete: Restrict)
   userId    String

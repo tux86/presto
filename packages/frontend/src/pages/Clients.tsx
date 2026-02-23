@@ -1,12 +1,6 @@
 import type { Client, CurrencyCode, HolidayCountryCode } from "@presto/shared";
-import {
-  CURRENCIES,
-  getCountryFlag,
-  getCountryName,
-  getCurrencyName,
-  getCurrencySymbol,
-  HOLIDAY_COUNTRIES,
-} from "@presto/shared";
+import { CURRENCIES, getCountryName, getCurrencyName, getCurrencySymbol, HOLIDAY_COUNTRIES } from "@presto/shared";
+import "flag-icons/css/flag-icons.min.css";
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
@@ -18,6 +12,10 @@ import { Table } from "@/components/ui/Table";
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "@/hooks/use-clients";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useT } from "@/i18n";
+
+function CountryFlag({ code }: { code: string }) {
+  return <span className={`fi fi-${code.toLowerCase()} fis`} />;
+}
 
 export function Clients() {
   const [showModal, setShowModal] = useState(false);
@@ -136,7 +134,7 @@ export function Clients() {
               header: t("clients.holidayCountry"),
               render: (c) => (
                 <span className="text-muted text-xs">
-                  {getCountryFlag(c.holidayCountry)} {c.holidayCountry}
+                  <CountryFlag code={c.holidayCountry} /> {c.holidayCountry}
                 </span>
               ),
             },
@@ -214,7 +212,8 @@ export function Clients() {
             onChange={(val) => setHolidayCountry(val as HolidayCountryCode)}
             options={HOLIDAY_COUNTRIES.map((c) => ({
               value: c,
-              label: `${getCountryFlag(c)} ${getCountryName(c, locale)}`,
+              label: getCountryName(c, locale),
+              icon: <CountryFlag code={c} />,
             }))}
           />
 

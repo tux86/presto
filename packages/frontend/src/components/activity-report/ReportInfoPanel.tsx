@@ -1,5 +1,6 @@
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
+import { Check, Download, X } from "lucide-react";
 import { useT } from "@/i18n";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Button } from "../ui/Button";
@@ -99,9 +100,7 @@ export function ReportInfoPanel({
           loading={filling}
           disabled={isCompleted}
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-          </svg>
+          <Check className="h-4 w-4" strokeWidth={2} />
           {t("activity.fillWorkdays")}
         </Button>
         <Button
@@ -112,13 +111,7 @@ export function ReportInfoPanel({
           loading={downloading}
           disabled={!isCompleted}
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-            />
-          </svg>
+          <Download className="h-4 w-4" strokeWidth={2} />
           {t("activity.exportPdf")}
         </Button>
         <Button
@@ -129,9 +122,7 @@ export function ReportInfoPanel({
           loading={clearing}
           disabled={isCompleted}
         >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="h-4 w-4" strokeWidth={2} />
           {t("activity.clearAll")}
         </Button>
       </div>

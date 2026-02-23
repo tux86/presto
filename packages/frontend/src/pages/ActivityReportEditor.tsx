@@ -1,5 +1,6 @@
 import type { ReportEntry } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
+import { ArrowLeft } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
@@ -127,7 +128,7 @@ export function ActivityReportEditor() {
         actions={
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              &larr; {t("common.back")}
+              <ArrowLeft className="h-4 w-4" /> {t("common.back")}
             </Button>
             <Button variant="danger" size="sm" onClick={handleDelete}>
               {t("common.delete")}

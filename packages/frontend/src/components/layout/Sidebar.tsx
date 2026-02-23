@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+import { BarChart3, Briefcase, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
@@ -9,28 +11,17 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
 
-const navIcons = {
-  activities:
-    "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
-  clients:
-    "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
-  missions:
-    "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-  reporting:
-    "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-};
-
 export function Sidebar() {
   const { user, logout } = useAuthStore();
   const authEnabled = useConfigStore((s) => s.config?.authEnabled ?? true);
   const { t } = useT();
   const isMobile = useIsMobile();
 
-  const navItems = [
-    { to: "/", label: t("nav.activities"), icon: navIcons.activities },
-    { to: "/clients", label: t("nav.clients"), icon: navIcons.clients },
-    { to: "/missions", label: t("nav.missions"), icon: navIcons.missions },
-    { to: "/reporting", label: t("nav.reporting"), icon: navIcons.reporting },
+  const navItems: { to: string; label: string; icon: LucideIcon }[] = [
+    { to: "/", label: t("nav.activities"), icon: Home },
+    { to: "/clients", label: t("nav.clients"), icon: Users },
+    { to: "/missions", label: t("nav.missions"), icon: Briefcase },
+    { to: "/reporting", label: t("nav.reporting"), icon: BarChart3 },
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -52,9 +43,7 @@ export function Sidebar() {
                 )
               }
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-              </svg>
+              <item.icon className="h-5 w-5" strokeWidth={1.5} />
               <span>{item.label}</span>
             </NavLink>
           ))}
@@ -66,13 +55,7 @@ export function Sidebar() {
               mobileMenuOpen ? "text-accent" : "text-muted",
             )}
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-              />
-            </svg>
+            <Ellipsis className="h-5 w-5" strokeWidth={1.5} />
             <span>{t("nav.more")}</span>
           </button>
         </nav>
@@ -140,13 +123,7 @@ export function Sidebar() {
           onClick={() => triggerCommandPalette()}
           className="flex items-center gap-2 w-full rounded-lg border border-edge bg-inset px-3 py-1.5 text-sm text-faint hover:text-muted hover:border-muted/30 transition-colors cursor-pointer"
         >
-          <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-            />
-          </svg>
+          <Search className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
           <span className="flex-1 text-left">{t("common.search")}</span>
           <kbd className="text-[10px] text-faint/70 font-mono">
             {navigator.platform.includes("Mac") ? "\u2318K" : "Ctrl+K"}
@@ -168,9 +145,7 @@ export function Sidebar() {
               )
             }
           >
-            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-            </svg>
+            <item.icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
             {item.label}
           </NavLink>
         ))}
@@ -199,13 +174,7 @@ export function Sidebar() {
             className="text-faint hover:text-muted transition-colors cursor-pointer"
             title={t("common.logout")}
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
-              />
-            </svg>
+            <LogOut className="h-4 w-4" strokeWidth={1.5} />
           </button>
         </div>
       )}

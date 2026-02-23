@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 interface Option {
   value: string;
   label: string;
+  icon?: React.ReactNode;
 }
 
 interface SearchableSelectProps {
@@ -117,11 +118,13 @@ export function SearchableSelect({
                     onClick={() => handleSelect(option.value)}
                     className={cn(
                       "w-full text-left px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors",
+                      !!option.icon && "flex items-center gap-2",
                       option.value === value
                         ? "bg-accent/10 text-accent font-medium"
                         : "text-heading hover:bg-elevated",
                     )}
                   >
+                    {option.icon && <span className="inline-flex shrink-0">{option.icon}</span>}
                     {option.label}
                   </button>
                 </li>
@@ -151,10 +154,18 @@ export function SearchableSelect({
         onClick={() => setOpen(!open)}
         className={cn(
           "w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading text-left outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent cursor-pointer",
+          !!selectedOption?.icon && "flex items-center gap-2",
           !selectedOption && "text-placeholder",
         )}
       >
-        {selectedOption?.label || placeholder || "\u00A0"}
+        {selectedOption ? (
+          <>
+            {selectedOption.icon && <span className="inline-flex shrink-0">{selectedOption.icon}</span>}
+            {selectedOption.label}
+          </>
+        ) : (
+          placeholder || "\u00A0"
+        )}
       </button>
       {dropdown}
     </div>

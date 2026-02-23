@@ -18,10 +18,10 @@ RUN cd packages/frontend && bun run build
 RUN cd packages/backend && bun build src/index.ts --outdir dist --target bun
 
 # ── Stage 2: Runtime ─────────────────────────────────────
-FROM oven/bun:1-debian
+FROM oven/bun:1-alpine
 
-RUN groupadd --system --gid 1001 presto && \
-    useradd --system --uid 1001 --gid presto --no-create-home presto
+RUN addgroup -S -g 1001 presto && \
+    adduser -S -u 1001 -G presto -H presto
 
 WORKDIR /app
 

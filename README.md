@@ -165,16 +165,16 @@ Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The
 
 | Feature | Presto | Kimai | Traggo | Wakapi |
 |---|:---:|:---:|:---:|:---:|
-| Single Docker image | Yes | No | Yes | Yes |
-| Monthly activity reports | Yes | No | No | No |
-| PDF export | Yes | Yes | No | No |
-| Multi-database | Yes | No | No | Yes |
-| Optional auth (single-user) | Yes | No | No | No |
-| i18n (FR + EN) | Yes | Yes | No | No |
-| Client/mission tracking | Yes | Yes | No | No |
-| Revenue dashboards | Yes | Yes | No | No |
-| Holiday-aware calendars | Yes | No | No | No |
-| Half-day precision | Yes | No | No | No |
+| Single Docker image | ✅ | ❌ | ✅ | ✅ |
+| Monthly activity reports | ✅ | ❌ | ❌ | ❌ |
+| PDF export | ✅ | ✅ | ❌ | ❌ |
+| Multi-database | ✅ | ❌ | ❌ | ✅ |
+| Optional auth (single-user) | ✅ | ❌ | ❌ | ❌ |
+| i18n (FR + EN) | ✅ | ✅ | ❌ | ❌ |
+| Client/mission tracking | ✅ | ✅ | ❌ | ❌ |
+| Revenue dashboards | ✅ | ✅ | ❌ | ❌ |
+| Holiday-aware calendars | ✅ | ❌ | ❌ | ❌ |
+| Half-day precision | ✅ | ❌ | ❌ | ❌ |
 
 ## Development
 

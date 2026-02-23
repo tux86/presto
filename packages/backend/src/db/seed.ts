@@ -1,5 +1,5 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
-import { insertReturning } from "./helpers.js";
+import { createId } from "./id.js";
 import { activityReports, clients, db, missions, reportEntries, userSettings, users } from "./index.js";
 import { runMigrations } from "./migrate.js";
 
@@ -47,59 +47,8 @@ interface MissionDef {
   startMonth: number;
   endYear?: number;
   endMonth?: number;
-}
-
-async function createReports(
-  userId: string,
-  missionId: string,
-  holidayCountry: string,
-  periods: { month: number; year: number; status: "DRAFT" | "COMPLETED" }[],
-) {
-  for (const { month, year, status } of periods) {
-    const dates = getMonthDates(year, month);
-
-    const entries = dates.map((date) => {
-      const weekend = isWeekend(date);
-      const holiday = !!getHolidayName(date, holidayCountry);
-      const isWorkday = !weekend && !holiday;
-
-      let value = 0;
-      if (isWorkday) {
-        const rand = Math.random();
-        value = rand < 0.06 ? 0 : rand < 0.14 ? 0.5 : 1;
-      }
-
-      let note: string | null = null;
-      if (value > 0 && Math.random() < 0.35) {
-        note = pick(NOTES_FR);
-      }
-
-      return { date, value, isWeekend: weekend, isHoliday: holiday, note };
-    });
-
-    const totalDays = entries.reduce((sum, e) => sum + e.value, 0);
-
-    const report = await insertReturning(activityReports, {
-      month,
-      year,
-      userId,
-      missionId,
-      status,
-      totalDays,
-      holidayCountry,
-    });
-
-    await db.insert(reportEntries).values(
-      entries.map((e) => ({
-        date: e.date,
-        value: e.value,
-        isWeekend: e.isWeekend,
-        isHoliday: e.isHoliday,
-        note: e.note,
-        reportId: report.id,
-      })),
-    );
-  }
+  /** Probability of filling a workday (0–1). Solo mission ≈ 0.9, part-time ≈ 0.4–0.6. */
+  fillRate?: number;
 }
 
 function monthRange(
@@ -120,7 +69,6 @@ function monthRange(
       y++;
     }
   }
-  // Mark last N months as DRAFT
   for (let i = 0; i < draftMonths && i < result.length; i++) {
     result[result.length - 1 - i].status = "DRAFT";
   }
@@ -135,18 +83,20 @@ async function main() {
   const currentMonth = now.getMonth() + 1;
 
   // --- User ---
+  const userId = createId();
   const password = await Bun.password.hash("demo1234", { algorithm: "bcrypt", cost: 10 });
 
-  const user = await insertReturning(users, {
+  await db.insert(users).values({
+    id: userId,
     email: "demo@presto.dev",
     password,
-    firstName: "Walid",
-    lastName: "Benghabrit",
-    company: "AxForge",
+    firstName: "Vrael",
+    lastName: "Synthor",
+    company: "Korvalis",
   });
 
   await db.insert(userSettings).values({
-    userId: user.id,
+    userId,
     theme: "dark",
     locale: "fr",
     baseCurrency: "EUR",
@@ -206,14 +156,20 @@ async function main() {
     },
   ];
 
-  type Client = typeof clients.$inferSelect;
-  const createdClients: Record<string, Client> = {};
-  for (const def of clientDefs) {
-    createdClients[def.name] = await insertReturning(clients, { ...def, userId: user.id });
-  }
+  const clientIds: Record<string, { id: string; holidayCountry: string }> = {};
+  const clientRows = clientDefs.map((def) => {
+    const id = createId();
+    clientIds[def.name] = { id, holidayCountry: def.holidayCountry };
+    return { id, ...def, userId };
+  });
+  await db.insert(clients).values(clientRows);
 
   // --- Missions ---
-  // Each mission maps to a client with realistic date ranges covering 4 years
+  // Realistic freelancer timeline: max 2 concurrent missions, fillRate controls time split.
+  // N-3: SocGen solo → BNP solo
+  // N-2: BNP+Swisscom part-time → Zalando solo
+  // N-1: Zalando solo → SocGen+Zalando part-time → +Deloitte
+  // N:   SocGen+Zalando+Deloitte (brief 3-way overlap, ~130% occupation)
   const missionDefs: { clientName: string; missions: MissionDef[] }[] = [
     {
       clientName: "Société Générale",
@@ -224,8 +180,9 @@ async function main() {
           isActive: false,
           startYear: currentYear - 3,
           startMonth: 1,
-          endYear: currentYear - 2,
-          endMonth: 6,
+          endYear: currentYear - 3,
+          endMonth: 10,
+          fillRate: 0.9,
         },
         {
           name: "API Open Banking",
@@ -233,6 +190,7 @@ async function main() {
           isActive: true,
           startYear: currentYear - 1,
           startMonth: 3,
+          fillRate: 0.55,
         },
       ],
     },
@@ -244,16 +202,10 @@ async function main() {
           dailyRate: 720,
           isActive: false,
           startYear: currentYear - 3,
-          startMonth: 6,
-          endYear: currentYear - 1,
+          startMonth: 11,
+          endYear: currentYear - 2,
           endMonth: 8,
-        },
-        {
-          name: "Plateforme data analytics",
-          dailyRate: 750,
-          isActive: true,
-          startYear: currentYear - 1,
-          startMonth: 9,
+          fillRate: 0.55,
         },
       ],
     },
@@ -263,9 +215,12 @@ async function main() {
         {
           name: "Modernisation infrastructure 5G",
           dailyRate: 950,
-          isActive: true,
+          isActive: false,
           startYear: currentYear - 2,
           startMonth: 1,
+          endYear: currentYear - 2,
+          endMonth: 7,
+          fillRate: 0.45,
         },
       ],
     },
@@ -276,17 +231,19 @@ async function main() {
           name: "Optimisation moteur de recherche",
           dailyRate: 680,
           isActive: false,
-          startYear: currentYear - 3,
-          startMonth: 3,
-          endYear: currentYear - 2,
-          endMonth: 12,
+          startYear: currentYear - 2,
+          startMonth: 9,
+          endYear: currentYear - 1,
+          endMonth: 4,
+          fillRate: 0.9,
         },
         {
           name: "Microservices catalogue produits",
           dailyRate: 700,
           isActive: true,
           startYear: currentYear - 1,
-          startMonth: 1,
+          startMonth: 5,
+          fillRate: 0.45,
         },
       ],
     },
@@ -298,46 +255,97 @@ async function main() {
           dailyRate: 800,
           isActive: true,
           startYear: currentYear - 1,
-          startMonth: 6,
+          startMonth: 11,
+          fillRate: 0.35,
         },
       ],
     },
   ];
 
+  // Pre-generate all missions, reports, and entries in memory
+  type MissionInsert = typeof missions.$inferInsert;
+  type ReportInsert = typeof activityReports.$inferInsert;
+  type EntryInsert = typeof reportEntries.$inferInsert;
+  const missionRows: MissionInsert[] = [];
+  const reportRows: ReportInsert[] = [];
+  const entryRows: EntryInsert[] = [];
+
   for (const { clientName, missions: mDefs } of missionDefs) {
-    const client = createdClients[clientName];
+    const client = clientIds[clientName];
 
     for (const mDef of mDefs) {
+      const missionId = createId();
       const startDate = new Date(mDef.startYear, mDef.startMonth - 1, 1);
       const endDate = mDef.endYear ? new Date(mDef.endYear, (mDef.endMonth ?? 12) - 1, 28) : undefined;
 
-      const mission = await insertReturning(missions, {
+      missionRows.push({
+        id: missionId,
         name: mDef.name,
         clientId: client.id,
-        userId: user.id,
+        userId,
         dailyRate: mDef.dailyRate,
         isActive: mDef.isActive,
         startDate,
         endDate: endDate ?? null,
       });
 
-      // Generate reports for this mission's active period
+      // Generate reports + entries for this mission
       const reportEndYear = mDef.endYear ?? currentYear;
       const reportEndMonth = mDef.endYear ? (mDef.endMonth ?? 12) : currentMonth;
-
-      // Last month is DRAFT if mission is still active and ends in current month
       const draftMonths = mDef.isActive && !mDef.endYear ? 1 : 0;
-
       const periods = monthRange(mDef.startYear, mDef.startMonth, reportEndYear, reportEndMonth, draftMonths);
+      const fillRate = mDef.fillRate ?? 0.9;
 
-      await createReports(user.id, mission.id, client.holidayCountry, periods);
+      for (const { month, year, status } of periods) {
+        const reportId = createId();
+        const dates = getMonthDates(year, month);
+
+        let totalDays = 0;
+        for (const date of dates) {
+          const weekend = isWeekend(date);
+          const holiday = !!getHolidayName(date, client.holidayCountry);
+          const isWorkday = !weekend && !holiday;
+
+          let value = 0;
+          if (isWorkday && Math.random() < fillRate) {
+            value = Math.random() < 0.1 ? 0.5 : 1;
+          }
+
+          let note: string | null = null;
+          if (value > 0 && Math.random() < 0.35) {
+            note = pick(NOTES_FR);
+          }
+
+          totalDays += value;
+          entryRows.push({ id: createId(), date, value, isWeekend: weekend, isHoliday: holiday, note, reportId });
+        }
+
+        reportRows.push({
+          id: reportId,
+          month,
+          year,
+          userId,
+          missionId,
+          status,
+          totalDays,
+          dailyRate: mDef.dailyRate,
+          holidayCountry: client.holidayCountry,
+        });
+      }
     }
   }
 
-  const totalReports = await db.select().from(activityReports);
+  // Bulk inserts
+  await db.insert(missions).values(missionRows);
+  await db.insert(activityReports).values(reportRows);
+  // SQLite has a variable limit (~999), chunk entries to stay under the limit
+  const CHUNK = 100;
+  for (let i = 0; i < entryRows.length; i += CHUNK) {
+    await db.insert(reportEntries).values(entryRows.slice(i, i + CHUNK));
+  }
 
   console.log(
-    `Seed completed: demo@presto.dev / demo1234 — ${Object.keys(createdClients).length} clients, ${totalReports.length} reports (${currentYear - 3}–${currentYear})`,
+    `Seed completed: demo@presto.dev / demo1234 — ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
   );
 }
 

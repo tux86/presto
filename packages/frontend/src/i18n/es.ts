@@ -54,6 +54,7 @@ export const es: Record<TranslationKey, string> = {
   "missions.client": "Cliente",
   "missions.selectClient": "Seleccionar un cliente",
   "missions.dailyRate": "Tarifa diaria",
+  "missions.dailyRateHint": "Se aplica solo a los nuevos informes. Los informes existentes conservan su tarifa diaria.",
   "missions.status": "Estado",
   "missions.active": "Activa",
   "missions.inactive": "Inactiva",
@@ -136,6 +137,7 @@ export const es: Record<TranslationKey, string> = {
   "common.search": "Buscar...",
   "common.noResults": "Sin resultados",
   "common.optional": "opcional",
+  "common.auto": "Auto",
   "common.navigation": "Navegaci\u00f3n",
   "common.logout": "Cerrar sesi\u00f3n",
 

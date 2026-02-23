@@ -55,6 +55,8 @@ export const pt: Record<TranslationKey, string> = {
   "missions.client": "Cliente",
   "missions.selectClient": "Selecionar um cliente",
   "missions.dailyRate": "Taxa di\u00e1ria",
+  "missions.dailyRateHint":
+    "Aplicada apenas aos novos relat\u00f3rios. Os relat\u00f3rios existentes mant\u00eam a sua taxa di\u00e1ria.",
   "missions.status": "Estado",
   "missions.active": "Ativa",
   "missions.inactive": "Inativa",
@@ -137,6 +139,7 @@ export const pt: Record<TranslationKey, string> = {
   "common.search": "Pesquisar...",
   "common.noResults": "Sem resultados",
   "common.optional": "opcional",
+  "common.auto": "Auto",
   "common.navigation": "Navega\u00e7\u00e3o",
   "common.logout": "Sair",
 

@@ -28,29 +28,17 @@ export function formatNumber(n: number, decimals = 1): string {
 }
 
 export const CLIENT_COLOR_MAP: Record<ClientColorKey, { bg: string; border: string; text: string; dot: string }> = {
-  blue: {
-    bg: "bg-blue-500/15",
-    border: "border-blue-500/25",
-    text: "text-blue-700 dark:text-blue-400",
-    dot: "bg-blue-500",
+  slate: {
+    bg: "bg-slate-500/15",
+    border: "border-slate-500/25",
+    text: "text-slate-700 dark:text-slate-400",
+    dot: "bg-slate-500",
   },
-  emerald: {
-    bg: "bg-emerald-500/15",
-    border: "border-emerald-500/25",
-    text: "text-emerald-700 dark:text-emerald-400",
-    dot: "bg-emerald-500",
-  },
-  amber: {
-    bg: "bg-amber-500/15",
-    border: "border-amber-500/25",
-    text: "text-amber-700 dark:text-amber-400",
-    dot: "bg-amber-500",
-  },
-  purple: {
-    bg: "bg-purple-500/15",
-    border: "border-purple-500/25",
-    text: "text-purple-700 dark:text-purple-400",
-    dot: "bg-purple-500",
+  zinc: {
+    bg: "bg-zinc-700/15",
+    border: "border-zinc-700/25",
+    text: "text-zinc-800 dark:text-zinc-300",
+    dot: "bg-zinc-700 dark:bg-zinc-500",
   },
   rose: {
     bg: "bg-rose-500/15",
@@ -58,17 +46,53 @@ export const CLIENT_COLOR_MAP: Record<ClientColorKey, { bg: string; border: stri
     text: "text-rose-700 dark:text-rose-400",
     dot: "bg-rose-500",
   },
+  orange: {
+    bg: "bg-orange-500/15",
+    border: "border-orange-500/25",
+    text: "text-orange-700 dark:text-orange-400",
+    dot: "bg-orange-500",
+  },
+  amber: {
+    bg: "bg-amber-500/15",
+    border: "border-amber-500/25",
+    text: "text-amber-700 dark:text-amber-400",
+    dot: "bg-amber-500",
+  },
+  lime: {
+    bg: "bg-lime-500/15",
+    border: "border-lime-500/25",
+    text: "text-lime-700 dark:text-lime-400",
+    dot: "bg-lime-500",
+  },
+  emerald: {
+    bg: "bg-emerald-500/15",
+    border: "border-emerald-500/25",
+    text: "text-emerald-700 dark:text-emerald-400",
+    dot: "bg-emerald-500",
+  },
   cyan: {
     bg: "bg-cyan-500/15",
     border: "border-cyan-500/25",
     text: "text-cyan-700 dark:text-cyan-400",
     dot: "bg-cyan-500",
   },
-  orange: {
-    bg: "bg-orange-500/15",
-    border: "border-orange-500/25",
-    text: "text-orange-700 dark:text-orange-400",
-    dot: "bg-orange-500",
+  blue: {
+    bg: "bg-blue-500/15",
+    border: "border-blue-500/25",
+    text: "text-blue-700 dark:text-blue-400",
+    dot: "bg-blue-500",
+  },
+  indigo: {
+    bg: "bg-indigo-500/15",
+    border: "border-indigo-500/25",
+    text: "text-indigo-700 dark:text-indigo-400",
+    dot: "bg-indigo-500",
+  },
+  purple: {
+    bg: "bg-purple-500/15",
+    border: "border-purple-500/25",
+    text: "text-purple-700 dark:text-purple-400",
+    dot: "bg-purple-500",
   },
   pink: {
     bg: "bg-pink-500/15",
@@ -120,45 +144,25 @@ export interface CalendarColors {
 }
 
 const CLIENT_CALENDAR_MAP: Record<ClientColorKey, CalendarColors> = {
-  blue: {
-    solid: "bg-blue-600",
-    solidMuted: "bg-blue-600/70",
-    border: "border-blue-500",
-    borderMuted: "border-blue-500/60",
-    hoverBg: "hover:bg-blue-500",
-    hoverBorder: "hover:border-blue-400",
-    textLight: "text-blue-200",
-    textBadge: "text-blue-300",
+  slate: {
+    solid: "bg-slate-600",
+    solidMuted: "bg-slate-600/70",
+    border: "border-slate-500",
+    borderMuted: "border-slate-500/60",
+    hoverBg: "hover:bg-slate-500",
+    hoverBorder: "hover:border-slate-400",
+    textLight: "text-slate-200",
+    textBadge: "text-slate-300",
   },
-  emerald: {
-    solid: "bg-emerald-600",
-    solidMuted: "bg-emerald-600/70",
-    border: "border-emerald-500",
-    borderMuted: "border-emerald-500/60",
-    hoverBg: "hover:bg-emerald-500",
-    hoverBorder: "hover:border-emerald-400",
-    textLight: "text-emerald-200",
-    textBadge: "text-emerald-300",
-  },
-  amber: {
-    solid: "bg-amber-600",
-    solidMuted: "bg-amber-600/70",
-    border: "border-amber-500",
-    borderMuted: "border-amber-500/60",
-    hoverBg: "hover:bg-amber-500",
-    hoverBorder: "hover:border-amber-400",
-    textLight: "text-amber-200",
-    textBadge: "text-amber-300",
-  },
-  purple: {
-    solid: "bg-purple-600",
-    solidMuted: "bg-purple-600/70",
-    border: "border-purple-500",
-    borderMuted: "border-purple-500/60",
-    hoverBg: "hover:bg-purple-500",
-    hoverBorder: "hover:border-purple-400",
-    textLight: "text-purple-200",
-    textBadge: "text-purple-300",
+  zinc: {
+    solid: "bg-zinc-800",
+    solidMuted: "bg-zinc-800/70",
+    border: "border-zinc-600",
+    borderMuted: "border-zinc-600/60",
+    hoverBg: "hover:bg-zinc-700",
+    hoverBorder: "hover:border-zinc-500",
+    textLight: "text-zinc-300",
+    textBadge: "text-zinc-400",
   },
   rose: {
     solid: "bg-rose-600",
@@ -170,6 +174,46 @@ const CLIENT_CALENDAR_MAP: Record<ClientColorKey, CalendarColors> = {
     textLight: "text-rose-200",
     textBadge: "text-rose-300",
   },
+  orange: {
+    solid: "bg-orange-600",
+    solidMuted: "bg-orange-600/70",
+    border: "border-orange-500",
+    borderMuted: "border-orange-500/60",
+    hoverBg: "hover:bg-orange-500",
+    hoverBorder: "hover:border-orange-400",
+    textLight: "text-orange-200",
+    textBadge: "text-orange-300",
+  },
+  amber: {
+    solid: "bg-amber-600",
+    solidMuted: "bg-amber-600/70",
+    border: "border-amber-500",
+    borderMuted: "border-amber-500/60",
+    hoverBg: "hover:bg-amber-500",
+    hoverBorder: "hover:border-amber-400",
+    textLight: "text-amber-200",
+    textBadge: "text-amber-300",
+  },
+  lime: {
+    solid: "bg-lime-600",
+    solidMuted: "bg-lime-600/70",
+    border: "border-lime-500",
+    borderMuted: "border-lime-500/60",
+    hoverBg: "hover:bg-lime-500",
+    hoverBorder: "hover:border-lime-400",
+    textLight: "text-lime-200",
+    textBadge: "text-lime-300",
+  },
+  emerald: {
+    solid: "bg-emerald-600",
+    solidMuted: "bg-emerald-600/70",
+    border: "border-emerald-500",
+    borderMuted: "border-emerald-500/60",
+    hoverBg: "hover:bg-emerald-500",
+    hoverBorder: "hover:border-emerald-400",
+    textLight: "text-emerald-200",
+    textBadge: "text-emerald-300",
+  },
   cyan: {
     solid: "bg-cyan-600",
     solidMuted: "bg-cyan-600/70",
@@ -180,15 +224,35 @@ const CLIENT_CALENDAR_MAP: Record<ClientColorKey, CalendarColors> = {
     textLight: "text-cyan-200",
     textBadge: "text-cyan-300",
   },
-  orange: {
-    solid: "bg-orange-600",
-    solidMuted: "bg-orange-600/70",
-    border: "border-orange-500",
-    borderMuted: "border-orange-500/60",
-    hoverBg: "hover:bg-orange-500",
-    hoverBorder: "hover:border-orange-400",
-    textLight: "text-orange-200",
-    textBadge: "text-orange-300",
+  blue: {
+    solid: "bg-blue-600",
+    solidMuted: "bg-blue-600/70",
+    border: "border-blue-500",
+    borderMuted: "border-blue-500/60",
+    hoverBg: "hover:bg-blue-500",
+    hoverBorder: "hover:border-blue-400",
+    textLight: "text-blue-200",
+    textBadge: "text-blue-300",
+  },
+  indigo: {
+    solid: "bg-indigo-600",
+    solidMuted: "bg-indigo-600/70",
+    border: "border-indigo-500",
+    borderMuted: "border-indigo-500/60",
+    hoverBg: "hover:bg-indigo-500",
+    hoverBorder: "hover:border-indigo-400",
+    textLight: "text-indigo-200",
+    textBadge: "text-indigo-300",
+  },
+  purple: {
+    solid: "bg-purple-600",
+    solidMuted: "bg-purple-600/70",
+    border: "border-purple-500",
+    borderMuted: "border-purple-500/60",
+    hoverBg: "hover:bg-purple-500",
+    hoverBorder: "hover:border-purple-400",
+    textLight: "text-purple-200",
+    textBadge: "text-purple-300",
   },
   pink: {
     solid: "bg-pink-600",
@@ -204,16 +268,7 @@ const CLIENT_CALENDAR_MAP: Record<ClientColorKey, CalendarColors> = {
 
 const CALENDAR_VALUES = Object.values(CLIENT_CALENDAR_MAP);
 
-const DEFAULT_CALENDAR_COLORS: CalendarColors = {
-  solid: "bg-indigo-600",
-  solidMuted: "bg-indigo-600/70",
-  border: "border-indigo-500",
-  borderMuted: "border-indigo-500/60",
-  hoverBg: "hover:bg-indigo-500",
-  hoverBorder: "hover:border-indigo-400",
-  textLight: "text-indigo-200",
-  textBadge: "text-indigo-300",
-};
+const DEFAULT_CALENDAR_COLORS = CLIENT_CALENDAR_MAP.indigo;
 
 /** Returns calendar color classes for a client. Uses explicit color key, name hash, or indigo fallback. */
 export function getClientCalendarColors(name?: string, color?: string | null): CalendarColors {
@@ -226,13 +281,17 @@ export function getClientCalendarColors(name?: string, color?: string | null): C
 
 /** Hex color map for Recharts charts (matches Tailwind 500 shades). */
 export const CLIENT_HEX_MAP: Record<ClientColorKey, string> = {
-  blue: "#3b82f6",
-  emerald: "#10b981",
-  amber: "#f59e0b",
-  purple: "#a855f7",
+  slate: "#64748b",
+  zinc: "#3f3f46",
   rose: "#f43f5e",
-  cyan: "#06b6d4",
   orange: "#f97316",
+  amber: "#f59e0b",
+  lime: "#84cc16",
+  emerald: "#10b981",
+  cyan: "#06b6d4",
+  blue: "#3b82f6",
+  indigo: "#6366f1",
+  purple: "#a855f7",
   pink: "#ec4899",
 };
 

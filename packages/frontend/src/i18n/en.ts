@@ -52,6 +52,7 @@ export const en = {
   "missions.client": "Client",
   "missions.selectClient": "Select a client",
   "missions.dailyRate": "Daily rate",
+  "missions.dailyRateHint": "Applied to new reports only. Existing reports keep their daily rate.",
   "missions.status": "Status",
   "missions.active": "Active",
   "missions.inactive": "Inactive",
@@ -133,6 +134,7 @@ export const en = {
   "common.search": "Search...",
   "common.noResults": "No results",
   "common.optional": "optional",
+  "common.auto": "Auto",
   "common.navigation": "Navigation",
   "common.logout": "Sign out",
 

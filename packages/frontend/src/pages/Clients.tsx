@@ -177,12 +177,15 @@ export function Clients() {
         open={showModal}
         onClose={() => setShowModal(false)}
         title={editing ? t("clients.editClient") : t("clients.newClient")}
+        size="lg"
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Identity */}
-          <Input label={t("clients.name")} value={name} onChange={(e) => setName(e.target.value)} required />
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Name — full width */}
+          <div className="sm:col-span-2">
+            <Input label={t("clients.name")} value={name} onChange={(e) => setName(e.target.value)} required />
+          </div>
 
-          {/* Contact */}
+          {/* Contact — two columns */}
           <Input
             label={t("clients.email")}
             type="email"
@@ -198,8 +201,6 @@ export function Clients() {
             optional
           />
           <Input label={t("clients.address")} value={address} onChange={(e) => setAddress(e.target.value)} optional />
-
-          {/* Billing */}
           <Input
             label={t("clients.businessId")}
             value={businessId}
@@ -207,30 +208,42 @@ export function Clients() {
             placeholder="123 456 789 01234"
             optional
           />
-          {/* Color picker */}
-          <div>
-            <label className="block text-sm font-medium text-heading mb-1.5">
-              {t("clients.color")} <span className="text-faint font-normal">({t("common.optional")})</span>
-            </label>
-            <div className="flex items-center gap-2">
-              {CLIENT_COLOR_KEYS.map((key) => {
-                const selected = color === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setColor(selected ? "" : key)}
-                    className={cn(
-                      "w-7 h-7 rounded-full transition-all cursor-pointer",
-                      CLIENT_COLOR_MAP[key].dot,
-                      selected && "ring-2 ring-offset-2 ring-offset-panel ring-accent",
-                    )}
-                  />
-                );
-              })}
+
+          {/* Color picker — full width */}
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-heading mb-1.5">{t("clients.color")}</label>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setColor("")}
+                className={cn(
+                  "h-7 px-2 rounded-full text-xs font-medium transition-all cursor-pointer border",
+                  color === ""
+                    ? "border-accent bg-accent/10 text-accent ring-2 ring-offset-2 ring-offset-panel ring-accent"
+                    : "border-edge bg-surface text-muted hover:border-faint",
+                )}
+              >
+                {t("common.auto")}
+              </button>
+              {CLIENT_COLOR_KEYS.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setColor(key)}
+                  className={cn(
+                    "w-7 h-7 rounded-full transition-all cursor-pointer",
+                    CLIENT_COLOR_MAP[key].dot,
+                    color === key && "ring-2 ring-offset-2 ring-offset-panel ring-accent",
+                  )}
+                />
+              ))}
             </div>
           </div>
 
+          {/* Separator */}
+          <div className="sm:col-span-2 border-t border-edge" />
+
+          {/* Settings — two columns */}
           <SearchableSelect
             label={t("clients.currency")}
             hint={t("clients.currencyHint")}
@@ -256,7 +269,8 @@ export function Clients() {
             }))}
           />
 
-          <div className="flex justify-end gap-3 pt-2">
+          {/* Buttons — full width */}
+          <div className="sm:col-span-2 flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>
               {t("common.cancel")}
             </Button>

@@ -54,6 +54,8 @@ export const fr: Record<TranslationKey, string> = {
   "missions.client": "Client",
   "missions.selectClient": "S\u00e9lectionner un client",
   "missions.dailyRate": "Taux journalier",
+  "missions.dailyRateHint":
+    "Appliqu\u00e9 aux nouveaux rapports uniquement. Les rapports existants conservent leur taux journalier.",
   "missions.status": "Statut",
   "missions.active": "Active",
   "missions.inactive": "Inactive",
@@ -136,6 +138,7 @@ export const fr: Record<TranslationKey, string> = {
   "common.search": "Rechercher...",
   "common.noResults": "Aucun r\u00e9sultat",
   "common.optional": "optionnel",
+  "common.auto": "Auto",
   "common.navigation": "Navigation",
   "common.logout": "D\u00e9connexion",
 

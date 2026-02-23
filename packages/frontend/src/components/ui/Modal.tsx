@@ -1,15 +1,22 @@
 import { type ReactNode, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
+const SIZE_MAP = {
+  sm: "max-w-sm",
+  md: "max-w-md",
+  lg: "max-w-2xl",
+} as const;
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
   className?: string;
+  size?: keyof typeof SIZE_MAP;
 }
 
-export function Modal({ open, onClose, title, children, className }: ModalProps) {
+export function Modal({ open, onClose, title, children, className, size = "md" }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +40,8 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
     >
       <div
         className={cn(
-          "w-full max-w-md rounded-xl bg-panel border border-edge shadow-2xl p-6 max-h-[85vh] overflow-y-auto",
+          "w-full rounded-xl bg-panel border border-edge shadow-2xl p-6 max-h-[85vh] overflow-y-auto",
+          SIZE_MAP[size],
           className,
         )}
       >

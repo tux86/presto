@@ -36,7 +36,7 @@ export default function App() {
 
   useEffect(() => {
     if (!loaded || !config) return;
-    initFromServerDefaults({ locale: config.locale });
+    initFromServerDefaults(config.defaults);
   }, [loaded, config, initFromServerDefaults]);
 
   useEffect(() => {

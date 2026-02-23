@@ -4,7 +4,7 @@ import { insertReturning, REPORT_WITH } from "../db/helpers.js";
 import { activityReports, db, reportEntries } from "../db/index.js";
 import { config } from "../lib/config.js";
 
-const { locale } = config.app;
+const locale = config.app.locale ?? "en";
 
 /** Minimal shape required by enrichReport: a report with entries containing date + isHoliday. */
 interface ReportLike {

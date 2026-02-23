@@ -11,7 +11,7 @@ A self-hosted time-tracking application for freelancers and consultants. Generat
 - Client and mission tracking
 - PDF export (print-ready)
 - Revenue dashboards and charts
-- French + English interface
+- Multilingual interface (EN, FR, DE, ES, PT)
 - Dark mode
 - Optional authentication (single-user friendly)
 - Multi-database: PostgreSQL, MySQL/MariaDB, SQLite
@@ -99,6 +99,7 @@ docker run -d \
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `DB_PROVIDER` | *(auto-detected)* | Force database dialect: `postgresql`, `mysql`, or `sqlite` |
+| `APP_LOCALE` | `en` | Default UI language: `en`, `fr`, `de`, `es`, `pt` |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |

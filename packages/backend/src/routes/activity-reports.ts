@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
+import { SUPPORTED_LOCALES } from "@presto/shared";
 import { and, count, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -198,7 +199,9 @@ activityReportsRouter.get("/:id/pdf", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const localeParam = c.req.query("locale");
-  const locale = localeParam === "fr" ? "fr" : "en";
+  const locale = SUPPORTED_LOCALES.includes(localeParam as any)
+    ? (localeParam as (typeof SUPPORTED_LOCALES)[number])
+    : "en";
 
   const report = await db.query.activityReports.findFirst({
     where: and(eq(activityReports.id, id), eq(activityReports.userId, userId)),

@@ -1,6 +1,5 @@
 import type { Client, CurrencyCode, HolidayCountryCode } from "@presto/shared";
 import { CURRENCIES, getCountryName, getCurrencyName, getCurrencySymbol, HOLIDAY_COUNTRIES } from "@presto/shared";
-import "flag-icons/css/flag-icons.min.css";
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";

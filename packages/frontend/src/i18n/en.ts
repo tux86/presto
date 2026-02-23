@@ -1,6 +1,4 @@
-import type { TranslationKey } from "./fr";
-
-export const en: Record<TranslationKey, string> = {
+export const en = {
   // App
   "app.title": "Presto - Activity Tracking",
 
@@ -144,4 +142,6 @@ export const en: Record<TranslationKey, string> = {
   "preferences.title": "Preferences",
   "preferences.theme": "Theme",
   "preferences.language": "Language",
-};
+} as const;
+
+export type TranslationKey = keyof typeof en;

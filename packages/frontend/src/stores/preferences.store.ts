@@ -1,8 +1,14 @@
+import { type Locale, SUPPORTED_LOCALES } from "@presto/shared";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type ThemeMode = "light" | "dark" | "auto";
-type Locale = "fr" | "en";
+
+/** Detect browser language and match to a supported locale */
+function detectBrowserLocale(): Locale | undefined {
+  const lang = navigator.language?.slice(0, 2);
+  return SUPPORTED_LOCALES.find((l) => l === lang);
+}
 
 interface PreferencesState {
   theme: ThemeMode;
@@ -11,7 +17,7 @@ interface PreferencesState {
   _initialized: boolean;
   setTheme: (theme: ThemeMode) => void;
   setLocale: (locale: Locale) => void;
-  initFromServerDefaults: (defaults: { locale: Locale }) => void;
+  initFromServerDefaults: (defaults: { locale: Locale | null; theme: ThemeMode }) => void;
 }
 
 function applyTheme(mode: ThemeMode) {
@@ -40,11 +46,11 @@ export const usePreferencesStore = create<PreferencesState>()(
       },
       initFromServerDefaults: (defaults) => {
         if (get()._initialized) return;
-        set({
-          locale: defaults.locale,
-          _initialized: true,
-        });
-        document.documentElement.lang = defaults.locale;
+        const locale = defaults.locale ?? detectBrowserLocale() ?? "en";
+        const theme = defaults.theme;
+        set({ locale, theme, _initialized: true });
+        document.documentElement.lang = locale;
+        applyTheme(theme);
       },
     }),
     {

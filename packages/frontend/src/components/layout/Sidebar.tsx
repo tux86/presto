@@ -74,7 +74,7 @@ export function Sidebar() {
                 {/* Preferences */}
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-heading">{t("preferences.title")}</p>
-                  <PreferencesControls iconSize="h-4 w-4" />
+                  <PreferencesControls />
                 </div>
 
                 {/* User + logout */}

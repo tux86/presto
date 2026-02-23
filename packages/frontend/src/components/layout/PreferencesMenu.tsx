@@ -11,9 +11,12 @@ export const themeOptions: { value: ThemeMode; icon: LucideIcon }[] = [
   { value: "auto", icon: Monitor },
 ];
 
-export const localeOptions: { value: Locale; label: string }[] = [
-  { value: "en", label: "EN" },
-  { value: "fr", label: "FR" },
+export const localeOptions: { value: Locale; label: string; flag: string }[] = [
+  { value: "en", label: "English", flag: "us" },
+  { value: "fr", label: "Fran\u00e7ais", flag: "fr" },
+  { value: "de", label: "Deutsch", flag: "de" },
+  { value: "es", label: "Espa\u00f1ol", flag: "es" },
+  { value: "pt", label: "Portugu\u00eas", flag: "pt" },
 ];
 
 export function SegmentedControl<T extends string>({
@@ -35,7 +38,7 @@ export function SegmentedControl<T extends string>({
           key={option}
           onClick={() => onChange(option)}
           className={cn(
-            "flex-1 flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium transition-colors cursor-pointer",
+            "flex-1 flex items-center justify-center rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors cursor-pointer",
             value === option ? "bg-elevated text-heading shadow-sm" : "text-muted hover:text-body",
           )}
         >
@@ -46,7 +49,7 @@ export function SegmentedControl<T extends string>({
   );
 }
 
-export function PreferencesControls({ iconSize = "h-3.5 w-3.5" }: { iconSize?: string }) {
+export function PreferencesControls({ iconSize = "h-4 w-4" }: { iconSize?: string }) {
   const { t } = useT();
   const theme = usePreferencesStore((s) => s.theme);
   const locale = usePreferencesStore((s) => s.locale);
@@ -56,7 +59,7 @@ export function PreferencesControls({ iconSize = "h-3.5 w-3.5" }: { iconSize?: s
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <span className="text-[11px] text-muted">{t("preferences.theme")}</span>
+        <span className="text-xs text-muted">{t("preferences.theme")}</span>
         <SegmentedControl
           options={themeOptions.map((o) => o.value)}
           value={theme}
@@ -74,13 +77,23 @@ export function PreferencesControls({ iconSize = "h-3.5 w-3.5" }: { iconSize?: s
         />
       </div>
       <div className="space-y-1">
-        <span className="text-[11px] text-muted">{t("preferences.language")}</span>
-        <SegmentedControl
-          options={localeOptions.map((o) => o.value)}
-          value={locale}
-          onChange={setLocale}
-          renderOption={(v) => localeOptions.find((o) => o.value === v)!.label}
-        />
+        <span className="text-xs text-muted">{t("preferences.language")}</span>
+        <div className="grid grid-cols-1 gap-0.5 rounded-lg bg-inset p-0.5">
+          {localeOptions.map((o) => (
+            <button
+              type="button"
+              key={o.value}
+              onClick={() => setLocale(o.value)}
+              className={cn(
+                "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors cursor-pointer",
+                locale === o.value ? "bg-elevated text-heading shadow-sm" : "text-muted hover:text-body",
+              )}
+            >
+              <span className={`fi fi-${o.flag} fis rounded-sm`} style={{ fontSize: "13px" }} />
+              {o.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -127,7 +140,7 @@ export function PreferencesMenu() {
           ref={menuRef}
           className="absolute bottom-full left-0 mb-1.5 right-0 rounded-lg border border-edge bg-panel shadow-lg p-3 space-y-3 z-50"
         >
-          <p className="text-xs font-medium text-heading">{t("preferences.title")}</p>
+          <p className="text-sm font-medium text-heading">{t("preferences.title")}</p>
           <PreferencesControls />
         </div>
       )}

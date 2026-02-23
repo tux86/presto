@@ -1,12 +1,15 @@
+import type { Locale } from "@presto/shared";
 import { create } from "zustand";
 import { api } from "../api/client";
 
 interface AppConfig {
   appName: string;
-  theme: string;
   authEnabled: boolean;
   registrationEnabled: boolean;
-  locale: "fr" | "en";
+  defaults: {
+    theme: "light" | "dark";
+    locale: Locale | null;
+  };
 }
 
 interface ConfigState {
@@ -27,10 +30,9 @@ export const useConfigStore = create<ConfigState>()((set) => ({
       set({
         config: {
           appName: "Presto",
-          theme: "light",
           authEnabled: true,
           registrationEnabled: true,
-          locale: "en",
+          defaults: { theme: "light", locale: null },
         },
         loaded: true,
       });

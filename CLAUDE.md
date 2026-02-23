@@ -116,7 +116,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 ## Key Conventions
 
-- i18n: English (default) + French
+- i18n: English (default), French, German, Spanish, Portuguese
 - Auth is optional, controlled by `AUTH_ENABLED` env var
 - Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
 - `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup

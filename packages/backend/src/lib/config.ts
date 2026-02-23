@@ -1,3 +1,5 @@
+import type { Locale } from "@presto/shared";
+
 function env(key: string, fallback: string): string {
   return process.env[key] ?? fallback;
 }
@@ -26,7 +28,7 @@ export const config = {
     name: env("APP_NAME", "Presto"),
     port: envInt("PORT", 3001),
     theme: env("APP_THEME", "light") as "light" | "dark",
-    locale: env("APP_LOCALE", "en") as "fr" | "en",
+    locale: (process.env.APP_LOCALE || null) as Locale | null,
   },
   auth: {
     enabled: envBool("AUTH_ENABLED", true),
@@ -77,9 +79,11 @@ export const config = {
 export function getPublicConfig() {
   return {
     appName: config.app.name,
-    theme: config.app.theme,
     authEnabled: config.auth.enabled,
     registrationEnabled: config.auth.registrationEnabled,
-    locale: config.app.locale,
+    defaults: {
+      theme: config.app.theme,
+      locale: config.app.locale,
+    },
   };
 }

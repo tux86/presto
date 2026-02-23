@@ -1,6 +1,6 @@
 // @ts-nocheck - React PDF uses JSX patterns that conflict with strict TS in Bun backend context
 
-import { getDayName, getMonthName } from "@presto/shared";
+import { getDayName, getMonthName, type Locale } from "@presto/shared";
 import { Document, Page, renderToBuffer, StyleSheet, Text, View } from "@react-pdf/renderer";
 import React from "react";
 
@@ -101,7 +101,39 @@ const colStyles = {
   ],
 } as const;
 
-const labels = {
+const labels: Record<
+  Locale,
+  {
+    title: string;
+    consultant: string;
+    client: string;
+    mission: string;
+    date: string;
+    day: string;
+    days: string;
+    description: string;
+    holiday: string;
+    note: string;
+    total: string;
+    dayUnit: (n: number) => string;
+    page: string;
+  }
+> = {
+  en: {
+    title: "Activity Report",
+    consultant: "Consultant",
+    client: "Client",
+    mission: "Mission",
+    date: "Date",
+    day: "Day",
+    days: "Days",
+    description: "Description",
+    holiday: "Holiday",
+    note: "Note",
+    total: "Total",
+    dayUnit: (n: number) => `day${n > 1 ? "s" : ""}`,
+    page: "Page",
+  },
   fr: {
     title: "Compte-Rendu d'Activit\u00e9",
     consultant: "Consultant",
@@ -117,20 +149,50 @@ const labels = {
     dayUnit: (n: number) => `jour${n > 1 ? "s" : ""}`,
     page: "Page",
   },
-  en: {
-    title: "Activity Report",
-    consultant: "Consultant",
-    client: "Client",
-    mission: "Mission",
-    date: "Date",
-    day: "Day",
-    days: "Days",
-    description: "Description",
-    holiday: "Holiday",
-    note: "Note",
+  de: {
+    title: "T\u00e4tigkeitsbericht",
+    consultant: "Berater",
+    client: "Kunde",
+    mission: "Auftrag",
+    date: "Datum",
+    day: "Tag",
+    days: "Tage",
+    description: "Beschreibung",
+    holiday: "Feiertag",
+    note: "Anmerkung",
+    total: "Gesamt",
+    dayUnit: (n: number) => `Tag${n > 1 ? "e" : ""}`,
+    page: "Seite",
+  },
+  es: {
+    title: "Informe de Actividad",
+    consultant: "Consultor",
+    client: "Cliente",
+    mission: "Misi\u00f3n",
+    date: "Fecha",
+    day: "D\u00eda",
+    days: "D\u00edas",
+    description: "Descripci\u00f3n",
+    holiday: "Festivo",
+    note: "Nota",
     total: "Total",
-    dayUnit: (n: number) => `day${n > 1 ? "s" : ""}`,
-    page: "Page",
+    dayUnit: (n: number) => `d\u00eda${n > 1 ? "s" : ""}`,
+    page: "P\u00e1gina",
+  },
+  pt: {
+    title: "Relat\u00f3rio de Atividade",
+    consultant: "Consultor",
+    client: "Cliente",
+    mission: "Miss\u00e3o",
+    date: "Data",
+    day: "Dia",
+    days: "Dias",
+    description: "Descri\u00e7\u00e3o",
+    holiday: "Feriado",
+    note: "Nota",
+    total: "Total",
+    dayUnit: (n: number) => `dia${n > 1 ? "s" : ""}`,
+    page: "P\u00e1gina",
   },
 };
 
@@ -170,7 +232,7 @@ function rowBg(i: number, isNonWorked: boolean): string | undefined {
   return i % 2 !== 0 ? colors.lightBg : undefined;
 }
 
-function ReportDocument({ report, locale = "en" }: { report: PdfReport; locale?: "fr" | "en" }) {
+function ReportDocument({ report, locale = "en" }: { report: PdfReport; locale?: Locale }) {
   const l = labels[locale];
   const monthName = getMonthName(report.month, locale);
 
@@ -276,7 +338,7 @@ function ReportDocument({ report, locale = "en" }: { report: PdfReport; locale?:
   );
 }
 
-export async function generateReportPdf(report: PdfReport, locale: "fr" | "en" = "en"): Promise<Buffer> {
+export async function generateReportPdf(report: PdfReport, locale: Locale = "en"): Promise<Buffer> {
   const doc = h(ReportDocument, { report, locale });
   const buffer = await renderToBuffer(doc);
   return Buffer.from(buffer);

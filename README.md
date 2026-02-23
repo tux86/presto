@@ -55,7 +55,7 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 
 ### PDF Export
 - Professional, print-ready reports generated server-side via `@react-pdf/renderer`
-- Bilingual output — export in **French** or **English**
+- Multilingual output — export in **English**, **French**, **German**, **Spanish**, or **Portuguese**
 - Includes client info, mission name, calendar grid, totals, and notes
 - Filename auto-generated from client, mission, and period
 
@@ -76,7 +76,7 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 
 ### User Experience
 - **Dark mode** — system-aware with manual override
-- **Bilingual** — French and English (locale toggle)
+- **Multilingual** — English, French, German, Spanish, Portuguese (locale toggle)
 - **Responsive** — mobile (375px+), tablet (768px+), and desktop (1024px+)
 - Searchable select components for clients and missions
 - Dashboard filters by client and mission
@@ -170,7 +170,7 @@ Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The
 | PDF export | ✅ | ✅ | ❌ | ❌ |
 | Multi-database | ✅ | ❌ | ❌ | ✅ |
 | Optional auth (single-user) | ✅ | ❌ | ❌ | ❌ |
-| i18n (FR + EN) | ✅ | ✅ | ❌ | ❌ |
+| i18n (5 languages) | ✅ | ✅ | ❌ | ❌ |
 | Client/mission tracking | ✅ | ✅ | ❌ | ❌ |
 | Revenue dashboards | ✅ | ✅ | ❌ | ❌ |
 | Holiday-aware calendars | ✅ | ✅ | ❌ | ❌ |

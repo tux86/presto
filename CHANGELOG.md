@@ -1,3 +1,13 @@
+## [1.12.0](https://github.com/tux86/presto/compare/v1.11.1...v1.12.0) (2026-02-23)
+
+### Features
+
+* add i18n support for German, Spanish, and Portuguese ([0eb91d5](https://github.com/tux86/presto/commit/0eb91d526f6c2fc3b6a05cc1c99a395f7ca5e5f9))
+
+### Bug Fixes
+
+* correct Kimai holiday-aware calendars in comparison table ([15ad7eb](https://github.com/tux86/presto/commit/15ad7eb5dc3185a690de391f3654ee3cbf32d0c5))
+
 ## [1.11.1](https://github.com/tux86/presto/compare/v1.11.0...v1.11.1) (2026-02-23)
 
 ### Performance

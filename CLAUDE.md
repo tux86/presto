@@ -8,7 +8,8 @@ Activity report time-tracking app. Monorepo with 3 packages.
 - **Frontend:** React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts
 - **Backend:** Hono 4, Prisma 7, @react-pdf/renderer
 - **Database:** PostgreSQL 16 (supports MySQL, SQLite, SQL Server, CockroachDB via Prisma provider swap)
-- **Shared:** TypeScript types + utilities (dates, French holidays)
+- **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
+- **Testing:** Bun test runner, Hono `app.request()` (101 API E2E tests)
 - **Language:** TypeScript 5.7, strict mode
 
 ## Project Structure
@@ -31,6 +32,7 @@ bun run build              # Build all packages
 bun run typecheck          # Type-check all packages
 bun run lint               # Lint + format check (Biome)
 bun run lint:fix           # Auto-fix lint + format issues
+bun run test               # Run API E2E tests (requires presto_test DB)
 bun run db:generate        # Generate Prisma client
 bun run db:push            # Push schema changes to dev DB (no migration file)
 bun run db:migrate         # Apply committed migrations (migrate deploy)
@@ -39,10 +41,11 @@ bun run db:seed            # Seed sample data
 docker compose up -d       # Start PostgreSQL + pgweb (dev)
 ```
 
-## Docker Compose Files
+## Docker
 
 - `docker-compose.yml` — dev: PostgreSQL + pgweb (DB explorer on :8081)
 - `docker-compose.production.yml` — production: PostgreSQL + Presto app (:8080)
+- `Dockerfile` — multi-stage build, single image, `CMD` runs migrations then starts server
 
 ## Path Aliases
 
@@ -68,6 +71,16 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 - **Responsive:** `useIsMobile()` hook + Tailwind breakpoints (375px+, 768px+, 1024px+)
 - **Styling:** Tailwind utility classes, `cn()` helper for conditional classes
 
+## Testing
+
+- **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
+- **Location:** `packages/backend/tests/` — 9 test suites, 101 tests
+- **Database:** isolated `presto_test` PostgreSQL database
+- **Setup:** preload script (`setup.ts`) runs `prisma migrate deploy` + `TRUNCATE CASCADE` before tests
+- **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)
+- **Config:** `bunfig.toml` configures preload, `--env-file .env.test` loads test env vars
+- **CI:** dedicated `test` job in CI workflow with PostgreSQL service container
+
 ## Code Quality
 
 - **Linter/Formatter:** Biome (`biome.json`) — double quotes, semicolons, trailing commas, 2-space indent, 120 char line width
@@ -77,7 +90,7 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 
 ## CI/CD
 
-- **CI** (`.github/workflows/ci.yml`): lint → typecheck → build on PR/push to `main`
+- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → generate → typecheck → build) + `test` (PostgreSQL service → generate → migrate → test) on PR/push to `main`
 - **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
 - **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR on release
 
@@ -86,13 +99,13 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 - **Store:** `preferences.store.ts` — Zustand persist store (`presto-preferences` in localStorage)
 - **Scope:** theme (light/dark/auto), locale (en/fr)
 - **Defaults:** server env var `APP_LOCALE` applied on first visit via `initFromServerDefaults()`
-- **Currency:** per-client field (EUR/USD/GBP), defaults to EUR
-- **Config store** (`config.store.ts`) remains read-only server config (appName, authEnabled, registrationEnabled, holidayCountry)
+- **Currency:** per-client field (all ISO 4217 currencies via `Intl.supportedValuesOf`)
+- **Holiday country:** per-client field (all countries via `date-holidays` library)
+- **Config store** (`config.store.ts`) remains read-only server config (appName, authEnabled, registrationEnabled)
 - **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls
 
 ## Key Conventions
 
-- No test framework — no tests exist yet
 - i18n: English (default) + French
 - Auth is optional, controlled by `AUTH_ENABLED` env var
 - Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)

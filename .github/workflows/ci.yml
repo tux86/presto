@@ -19,8 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  typecheck-and-build:
-    name: Type-check and Build
+  lint-and-typecheck:
+    name: Lint, Type-check and Build
     runs-on: ubuntu-latest
 
     steps:
@@ -53,3 +53,57 @@ jobs:
 
       - name: Build
         run: bun run build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: presto
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: presto_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U presto -d presto_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bun run db:generate
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+
+      - name: Create .env.test
+        run: |
+          cat > packages/backend/.env.test << 'EOF'
+          DATABASE_URL=postgresql://presto:test_password@localhost:5432/presto_test?schema=public
+          JWT_SECRET=test-jwt-secret-for-ci-minimum-32-characters-long
+          AUTH_ENABLED=true
+          REGISTRATION_ENABLED=true
+          RATE_LIMIT_MAX=0
+          EOF
+
+      - name: Run tests
+        run: bun run test

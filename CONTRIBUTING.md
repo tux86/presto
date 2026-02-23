@@ -39,7 +39,31 @@ bun run db:push          # Push schema changes to dev DB (no migration file)
 bun run db:migrate       # Apply pending migrations (uses migrate deploy)
 bun run db:migrate:dev   # Create new migration from schema changes (uses migrate dev)
 bun run db:seed          # Seed sample data
+bun run test             # Run API E2E tests (requires presto_test DB)
 ```
+
+## Testing
+
+API E2E tests use Bun's test runner with Hono's `app.request()` for in-process HTTP testing — no running server needed. Tests run against an isolated `presto_test` PostgreSQL database.
+
+### One-time setup
+
+```bash
+# Create the test database
+docker exec -it presto-postgres psql -U presto -c "CREATE DATABASE presto_test;"
+
+# Create .env.test from the example
+cp packages/backend/.env.test.example packages/backend/.env.test
+# Edit packages/backend/.env.test: set the password to match your .env POSTGRES_PASSWORD
+```
+
+### Running tests
+
+```bash
+bun run test
+```
+
+Tests automatically run `prisma migrate deploy` and truncate all tables before each run, so your dev database is never affected.
 
 ## Project Structure
 
@@ -96,6 +120,8 @@ Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must
 | `APP_LOCALE` | `fr` | Default locale (`fr` or `en`) |
 | `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |
 | `DEFAULT_USER_PASSWORD` | _(empty)_ | Default admin password |
+| `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |
+| `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
 
 ### Docker (Production)
 
@@ -156,7 +182,7 @@ A pre-commit hook runs Biome to auto-format staged files. A commit-msg hook vali
 
 1. Keep PRs focused on a single change
 2. Fill out the PR template
-3. Ensure CI passes (lint, typecheck, build)
+3. Ensure CI passes (lint, typecheck, build, test)
 4. Describe how to test your changes
 
 ## Reporting Issues

@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { getConnInfo } from "hono/bun";
+import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { rateLimiter } from "hono-rate-limiter";
 import { config } from "../lib/config.js";
@@ -19,18 +20,23 @@ auth.use("*", async (c, next) => {
   return next();
 });
 
-const authLimiter = rateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 20,
-  keyGenerator: (c) => {
-    try {
-      const info = getConnInfo(c);
-      return info.remote.address ?? "127.0.0.1";
-    } catch {
-      return c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? c.req.header("x-real-ip") ?? "127.0.0.1";
-    }
-  },
-});
+const noopMiddleware = createMiddleware(async (_c, next) => next());
+
+const authLimiter =
+  config.rateLimit.limit > 0
+    ? rateLimiter({
+        windowMs: config.rateLimit.windowMs,
+        limit: config.rateLimit.limit,
+        keyGenerator: (c) => {
+          try {
+            const info = getConnInfo(c);
+            return info.remote.address ?? "127.0.0.1";
+          } catch {
+            return c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? c.req.header("x-real-ip") ?? "127.0.0.1";
+          }
+        },
+      })
+    : noopMiddleware;
 
 function serializeUser(user: {
   id: string;

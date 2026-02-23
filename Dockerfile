@@ -27,7 +27,7 @@ RUN groupadd --system --gid 1001 presto && \
 
 WORKDIR /app
 
-# Install only prisma CLI + dotenv (needed for entrypoint migrations and prisma.config.ts).
+# Install only prisma CLI + dotenv (needed for startup migrations and prisma.config.ts).
 # The bundled dist/index.js is self-contained and needs no other node_modules.
 RUN echo '{"dependencies":{"prisma":"^7.4.1","dotenv":"^17.3.1"}}' > package.json && \
     bun install --production && \
@@ -43,7 +43,6 @@ COPY --from=builder --link /app/packages/backend/prisma/generated prisma/generat
 COPY --from=builder --link /app/packages/backend/prisma/schema.prisma prisma/schema.prisma
 COPY --from=builder --link /app/packages/backend/prisma/migrations prisma/migrations
 COPY --link packages/backend/prisma.config.ts prisma.config.ts
-COPY --link packages/backend/docker-entrypoint.sh docker-entrypoint.sh
 
 ENV PORT=8080
 USER presto
@@ -52,4 +51,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD bun -e "fetch('http://localhost:8080/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["sh", "-c", "bunx prisma migrate deploy && exec bun ./dist/index.js"]

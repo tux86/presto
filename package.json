@@ -36,6 +36,7 @@
     "db:push": "bun run --filter '@presto/backend' db:push",
     "db:seed": "bun run --filter '@presto/backend' db:seed",
     "db:generate": "bun run --filter '@presto/backend' db:generate",
+    "test": "bun run --filter '@presto/backend' test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "prepare": "husky"

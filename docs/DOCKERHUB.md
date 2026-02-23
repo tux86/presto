@@ -88,6 +88,8 @@ docker run -d \
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |
+| `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |
+| `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
 | `PORT` | `8080` | HTTP port inside the container |
 
 ## Ports

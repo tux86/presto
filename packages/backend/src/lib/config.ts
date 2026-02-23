@@ -52,6 +52,10 @@ export const config = {
       return s;
     })(),
   },
+  rateLimit: {
+    windowMs: envInt("RATE_LIMIT_WINDOW_MS", 15 * 60 * 1000),
+    limit: envInt("RATE_LIMIT_MAX", 20),
+  },
   cors: {
     origins: env("CORS_ORIGINS", "http://localhost:5173")
       .split(",")

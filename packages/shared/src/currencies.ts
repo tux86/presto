@@ -1,33 +1,7 @@
-/** Supported currency codes (ISO 4217). */
-export const CURRENCIES = [
-  "EUR",
-  "USD",
-  "GBP",
-  "CHF",
-  "CAD",
-  "AUD",
-  "JPY",
-  "SEK",
-  "NOK",
-  "DKK",
-  "PLN",
-  "CZK",
-  "RON",
-  "HUF",
-  "BRL",
-  "MXN",
-  "SGD",
-  "HKD",
-  "NZD",
-  "ZAR",
-  "INR",
-  "AED",
-  "SAR",
-  "MAD",
-  "TND",
-] as const;
+/** All currency codes supported by the runtime (ISO 4217). */
+export const CURRENCIES = Intl.supportedValuesOf("currency") as [string, ...string[]];
 
-export type CurrencyCode = (typeof CURRENCIES)[number];
+export type CurrencyCode = string;
 
 /** Get currency symbol (e.g. "€", "$", "£"). */
 export function getCurrencySymbol(code: string, locale = "en"): string {
@@ -45,7 +19,8 @@ export function getCurrencySymbol(code: string, locale = "en"): string {
 /** Get currency display name (e.g. "Euro", "US Dollar"). */
 export function getCurrencyName(code: string, locale = "en"): string {
   try {
-    return new Intl.DisplayNames([locale], { type: "currency" }).of(code) ?? code;
+    const name = new Intl.DisplayNames([locale], { type: "currency" }).of(code) ?? code;
+    return name.charAt(0).toUpperCase() + name.slice(1);
   } catch {
     return code;
   }

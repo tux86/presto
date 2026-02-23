@@ -87,7 +87,6 @@ docker run -d \
 | `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
-| `HOLIDAY_COUNTRY` | `FR` | Country code for public holidays |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |
 | `PORT` | `8080` | HTTP port inside the container |
 

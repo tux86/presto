@@ -1,7 +1,8 @@
-import { CURRENCIES, REPORT_STATUSES } from "@presto/shared";
+import { CURRENCIES, HOLIDAY_COUNTRIES, REPORT_STATUSES } from "@presto/shared";
 import { z } from "zod";
 
 const currencySchema = z.enum(CURRENCIES);
+const holidayCountrySchema = z.enum(HOLIDAY_COUNTRIES);
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 // Auth
@@ -31,7 +32,8 @@ export const createClientSchema = z.object({
   phone: z.string().max(50).optional(),
   address: z.string().max(500).optional(),
   businessId: z.string().max(100).optional(),
-  currency: currencySchema.optional(),
+  currency: currencySchema,
+  holidayCountry: holidayCountrySchema,
 });
 
 export const updateClientSchema = z.object({
@@ -41,6 +43,7 @@ export const updateClientSchema = z.object({
   address: z.string().max(500).nullable().optional(),
   businessId: z.string().max(100).nullable().optional(),
   currency: currencySchema.optional(),
+  holidayCountry: holidayCountrySchema.optional(),
 });
 
 // Missions

@@ -60,7 +60,7 @@ activityReports.post("/", zValidator("json", createReportSchema), async (c) => {
   const userId = c.get("userId");
   const { month, year, missionId } = c.req.valid("json");
 
-  await findOwned("mission", missionId, userId);
+  const mission = await findOwned("mission", missionId, userId);
 
   const existing = await prisma.activityReport.findUnique({
     where: { missionId_month_year: { missionId, month, year } },
@@ -69,7 +69,12 @@ activityReports.post("/", zValidator("json", createReportSchema), async (c) => {
     throw new HTTPException(409, { message: "Activity already exists for this mission/month/year" });
   }
 
-  const report = await createReportWithEntries(userId, missionId, month, year);
+  const client = await prisma.client.findUniqueOrThrow({
+    where: { id: mission.clientId },
+    select: { holidayCountry: true },
+  });
+
+  const report = await createReportWithEntries(userId, missionId, month, year, client.holidayCountry);
   c.header("Location", `/api/activity-reports/${report.id}`);
   return c.json(report, 201);
 });

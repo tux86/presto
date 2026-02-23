@@ -35,6 +35,11 @@ export const en: Record<TranslationKey, string> = {
   "clients.address": "Address",
   "clients.deleteTitle": "Delete this client",
   "clients.currency": "Currency",
+  "clients.currencyHint": "Used for billing and reporting",
+  "clients.selectCurrency": "Select a currency",
+  "clients.holidayCountry": "Holiday country",
+  "clients.holidayCountryHint": "Public holidays for activity reports",
+  "clients.selectHolidayCountry": "Select a country",
   "clients.deleteMessage": "This client and its data will be deleted. This action is irreversible.",
 
   // Missions

@@ -27,7 +27,6 @@ export const config = {
     port: envInt("PORT", 3001),
     theme: env("APP_THEME", "light") as "light" | "dark",
     locale: env("APP_LOCALE", "en") as "fr" | "en",
-    holidayCountry: env("HOLIDAY_COUNTRY", "FR"),
   },
   auth: {
     enabled: envBool("AUTH_ENABLED", true),
@@ -69,6 +68,5 @@ export function getPublicConfig() {
     authEnabled: config.auth.enabled,
     registrationEnabled: config.auth.registrationEnabled,
     locale: config.app.locale,
-    holidayCountry: config.app.holidayCountry,
   };
 }

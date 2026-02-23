@@ -1,11 +1,13 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
 import { config } from "../lib/config.js";
+import { CLIENT_SUMMARY_SELECT } from "../lib/helpers.js";
 import { prisma } from "../lib/prisma.js";
 
-const { holidayCountry, locale } = config.app;
+const { locale } = config.app;
 
 /** Minimal shape required by enrichReport: a report with entries containing date + isHoliday. */
 interface ReportLike {
+  holidayCountry: string;
   entries: Array<{ date: Date | string; isHoliday: boolean }>;
 }
 
@@ -28,12 +30,18 @@ export function enrichReport<T extends ReportLike>(report: T | T[] | null): Enri
     ...report,
     entries: report.entries.map((entry) => ({
       ...entry,
-      holidayName: entry.isHoliday ? getHolidayName(new Date(entry.date), holidayCountry, locale) : null,
+      holidayName: entry.isHoliday ? getHolidayName(new Date(entry.date), report.holidayCountry, locale) : null,
     })),
   };
 }
 
-export async function createReportWithEntries(userId: string, missionId: string, month: number, year: number) {
+export async function createReportWithEntries(
+  userId: string,
+  missionId: string,
+  month: number,
+  year: number,
+  holidayCountry: string,
+) {
   const dates = getMonthDates(year, month);
 
   const report = await prisma.activityReport.create({
@@ -42,6 +50,7 @@ export async function createReportWithEntries(userId: string, missionId: string,
       year,
       userId,
       missionId,
+      holidayCountry,
       entries: {
         create: dates.map((date) => ({
           date,
@@ -54,7 +63,7 @@ export async function createReportWithEntries(userId: string, missionId: string,
     include: {
       entries: { orderBy: { date: "asc" } },
       mission: {
-        include: { client: { select: { id: true, name: true } } },
+        include: { client: { select: CLIENT_SUMMARY_SELECT } },
       },
     },
   });

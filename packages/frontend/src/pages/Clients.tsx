@@ -1,11 +1,18 @@
-import type { Client, CurrencyCode } from "@presto/shared";
-import { CURRENCIES, getCurrencyLabel, getCurrencySymbol } from "@presto/shared";
+import type { Client, CurrencyCode, HolidayCountryCode } from "@presto/shared";
+import {
+  CURRENCIES,
+  getCountryFlag,
+  getCountryName,
+  getCurrencyName,
+  getCurrencySymbol,
+  HOLIDAY_COUNTRIES,
+} from "@presto/shared";
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
-import { Select } from "@/components/ui/Select";
+import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "@/hooks/use-clients";
@@ -21,6 +28,7 @@ export function Clients() {
   const [address, setAddress] = useState("");
   const [businessId, setBusinessId] = useState("");
   const [currency, setCurrency] = useState<CurrencyCode>("EUR");
+  const [holidayCountry, setHolidayCountry] = useState<HolidayCountryCode>("");
 
   const { data: clients, isLoading } = useClients();
   const createClient = useCreateClient();
@@ -36,7 +44,8 @@ export function Clients() {
     setPhone("");
     setAddress("");
     setBusinessId("");
-    setCurrency("EUR");
+    setCurrency("");
+    setHolidayCountry("");
     setShowModal(true);
   };
   const openEdit = (client: Client) => {
@@ -47,12 +56,13 @@ export function Clients() {
     setAddress(client.address || "");
     setBusinessId(client.businessId || "");
     setCurrency(client.currency);
+    setHolidayCountry(client.holidayCountry);
     setShowModal(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name) return;
+    if (!name || !currency || !holidayCountry) return;
     const data = {
       name,
       email: email || undefined,
@@ -60,6 +70,7 @@ export function Clients() {
       address: address || undefined,
       businessId: businessId || undefined,
       currency,
+      holidayCountry,
     };
     if (editing) {
       await updateClient.mutateAsync({ id: editing.id, ...data });
@@ -121,6 +132,15 @@ export function Clients() {
               ),
             },
             {
+              key: "holidayCountry",
+              header: t("clients.holidayCountry"),
+              render: (c) => (
+                <span className="text-muted text-xs">
+                  {getCountryFlag(c.holidayCountry)} {c.holidayCountry}
+                </span>
+              ),
+            },
+            {
               key: "actions",
               header: "",
               className: "text-right",
@@ -150,51 +170,63 @@ export function Clients() {
           <Input label={t("clients.name")} value={name} onChange={(e) => setName(e.target.value)} required />
 
           {/* Contact */}
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label={t("clients.email")}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              optional
-            />
-            <Input
-              label={t("clients.phone")}
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              optional
-            />
-          </div>
+          <Input
+            label={t("clients.email")}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            optional
+          />
+          <Input
+            label={t("clients.phone")}
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            optional
+          />
           <Input label={t("clients.address")} value={address} onChange={(e) => setAddress(e.target.value)} optional />
 
           {/* Billing */}
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label={t("clients.businessId")}
-              value={businessId}
-              onChange={(e) => setBusinessId(e.target.value)}
-              placeholder="123 456 789 01234"
-              optional
-            />
-            <Select
-              label={t("clients.currency")}
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-            >
-              {CURRENCIES.map((c) => (
-                <option key={c} value={c}>
-                  {getCurrencyLabel(c, locale)}
-                </option>
-              ))}
-            </Select>
-          </div>
+          <Input
+            label={t("clients.businessId")}
+            value={businessId}
+            onChange={(e) => setBusinessId(e.target.value)}
+            placeholder="123 456 789 01234"
+            optional
+          />
+          <SearchableSelect
+            label={t("clients.currency")}
+            hint={t("clients.currencyHint")}
+            placeholder={t("clients.selectCurrency")}
+            value={currency}
+            onChange={(val) => setCurrency(val as CurrencyCode)}
+            options={CURRENCIES.map((c) => {
+              const symbol = getCurrencySymbol(c, locale);
+              const name = getCurrencyName(c, locale);
+              return { value: c, label: symbol !== c ? `${symbol} ${name}` : name };
+            })}
+          />
+          <SearchableSelect
+            label={t("clients.holidayCountry")}
+            hint={t("clients.holidayCountryHint")}
+            placeholder={t("clients.selectHolidayCountry")}
+            value={holidayCountry}
+            onChange={(val) => setHolidayCountry(val as HolidayCountryCode)}
+            options={HOLIDAY_COUNTRIES.map((c) => ({
+              value: c,
+              label: `${getCountryFlag(c)} ${getCountryName(c, locale)}`,
+            }))}
+          />
 
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>
               {t("common.cancel")}
             </Button>
-            <Button type="submit" loading={createClient.isPending || updateClient.isPending}>
+            <Button
+              type="submit"
+              loading={createClient.isPending || updateClient.isPending}
+              disabled={!name || !currency || !holidayCountry}
+            >
               {editing ? t("common.edit") : t("common.create")}
             </Button>
           </div>

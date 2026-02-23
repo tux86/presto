@@ -20,10 +20,10 @@ clients.get("/", async (c) => {
 
 clients.post("/", zValidator("json", createClientSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, email, phone, address, businessId, currency } = c.req.valid("json");
+  const { name, email, phone, address, businessId, currency, holidayCountry } = c.req.valid("json");
 
   const client = await prisma.client.create({
-    data: { name, email, phone, address, businessId, currency, userId },
+    data: { name, email, phone, address, businessId, currency, holidayCountry, userId },
   });
   c.header("Location", `/api/clients/${client.id}`);
   return c.json(client, 201);
@@ -45,6 +45,7 @@ clients.patch("/:id", zValidator("json", updateClientSchema), async (c) => {
       address: data.address,
       businessId: data.businessId,
       currency: data.currency,
+      holidayCountry: data.holidayCountry,
     },
   });
   return c.json(client);

@@ -1,3 +1,5 @@
+import type { HolidayCountryCode } from "../countries.js";
+
 export const REPORT_STATUSES = ["DRAFT", "COMPLETED"] as const;
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
 
@@ -21,6 +23,7 @@ export interface ActivityReport {
   status: ReportStatus;
   totalDays: number;
   note: string | null;
+  holidayCountry: HolidayCountryCode;
   missionId: string;
   userId: string;
   createdAt: string;
@@ -34,6 +37,7 @@ export interface ActivityReport {
       id: string;
       name: string;
       currency: CurrencyCode;
+      holidayCountry: HolidayCountryCode;
     };
   };
 }

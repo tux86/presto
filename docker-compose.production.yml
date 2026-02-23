@@ -29,7 +29,6 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-true}
-      HOLIDAY_COUNTRY: ${HOLIDAY_COUNTRY:-FR}
       CORS_ORIGINS: ${CORS_ORIGINS:-}
     ports:
       - "${PORT:-8080}:8080"

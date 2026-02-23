@@ -62,6 +62,7 @@ async function main() {
       address: "123 rue de Paris, 75001 Paris",
       businessId: "12345678901234",
       currency: "EUR",
+      holidayCountry: "FR",
       userId: user.id,
     },
   });
@@ -118,6 +119,7 @@ async function main() {
         missionId: mission.id,
         status: "COMPLETED",
         totalDays,
+        holidayCountry: "FR",
         entries: { create: entries },
       },
     });

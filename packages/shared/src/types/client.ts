@@ -1,3 +1,4 @@
+import type { HolidayCountryCode } from "../countries.js";
 import type { CurrencyCode } from "../currencies.js";
 
 export interface Client {
@@ -8,6 +9,7 @@ export interface Client {
   address: string | null;
   businessId: string | null;
   currency: CurrencyCode;
+  holidayCountry: HolidayCountryCode;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -20,6 +22,7 @@ export interface CreateClientRequest {
   address?: string;
   businessId?: string;
   currency?: CurrencyCode;
+  holidayCountry?: HolidayCountryCode;
 }
 
 export interface UpdateClientRequest {
@@ -29,4 +32,5 @@ export interface UpdateClientRequest {
   address?: string;
   businessId?: string;
   currency?: CurrencyCode;
+  holidayCountry?: HolidayCountryCode;
 }

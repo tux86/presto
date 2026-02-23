@@ -46,11 +46,19 @@ export async function findOwned<M extends OwnedModel>(
   return record as OwnedModelResult[M];
 }
 
+/** Summary select for client in report queries. */
+export const CLIENT_SUMMARY_SELECT = {
+  id: true,
+  name: true,
+  currency: true,
+  holidayCountry: true,
+} satisfies Prisma.ClientSelect;
+
 /** Standard include for activity report queries (entries + mission + client name). */
 export const REPORT_INCLUDE = {
   entries: { orderBy: { date: "asc" as const } },
   mission: {
-    include: { client: { select: { id: true, name: true, currency: true } } },
+    include: { client: { select: CLIENT_SUMMARY_SELECT } },
   },
 } satisfies Prisma.ActivityReportInclude;
 

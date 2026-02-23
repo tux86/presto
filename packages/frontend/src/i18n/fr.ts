@@ -33,6 +33,11 @@ export const fr = {
   "clients.address": "Adresse",
   "clients.deleteTitle": "Supprimer ce client",
   "clients.currency": "Devise",
+  "clients.currencyHint": "Utilis\u00e9e pour la facturation et le reporting",
+  "clients.selectCurrency": "S\u00e9lectionner une devise",
+  "clients.holidayCountry": "Pays des jours f\u00e9ri\u00e9s",
+  "clients.holidayCountryHint": "Jours f\u00e9ri\u00e9s appliqu\u00e9s aux comptes-rendus d'activit\u00e9",
+  "clients.selectHolidayCountry": "S\u00e9lectionner un pays",
   "clients.deleteMessage": "Ce client et ses donn\u00e9es seront supprim\u00e9s. Cette action est irr\u00e9versible.",
 
   // Missions

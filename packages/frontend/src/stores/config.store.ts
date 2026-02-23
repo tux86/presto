@@ -7,7 +7,6 @@ interface AppConfig {
   authEnabled: boolean;
   registrationEnabled: boolean;
   locale: "fr" | "en";
-  holidayCountry: string;
 }
 
 interface ConfigState {
@@ -32,7 +31,6 @@ export const useConfigStore = create<ConfigState>()((set) => ({
           authEnabled: true,
           registrationEnabled: true,
           locale: "en",
-          holidayCountry: "FR",
         },
         loaded: true,
       });

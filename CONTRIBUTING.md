@@ -91,7 +91,6 @@ Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins (comma-separated) |
-| `HOLIDAY_COUNTRY` | `FR` | Country code for public holidays |
 | `APP_NAME` | `Presto` | Application name in public config API |
 | `APP_THEME` | `light` | Default theme (`light` or `dark`) |
 | `APP_LOCALE` | `fr` | Default locale (`fr` or `en`) |

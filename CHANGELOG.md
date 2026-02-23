@@ -1,3 +1,20 @@
+## [1.14.0](https://github.com/tux86/presto/compare/v1.13.0...v1.14.0) (2026-02-23)
+
+### Features
+
+* add client-colored calendar cells, reporting enhancements, and DRY refactors ([544f8b1](https://github.com/tux86/presto/commit/544f8b1c23a8d661d5a1898890a478beba6f8ca2))
+* add editable user profile modal in sidebar ([679d5e9](https://github.com/tux86/presto/commit/679d5e9f8705df6f58730142b500afbb26058eed))
+* redesign client modal with two-column grid, 12-color palette, and auto-color picker ([e578384](https://github.com/tux86/presto/commit/e5783842aa399327c011585fdabb471bb108d254))
+* snapshot dailyRate on activity reports ([06adff7](https://github.com/tux86/presto/commit/06adff79d9b5e26930efb5aaa574efe00f1e79cc))
+
+### Performance
+
+* optimize seed with bulk inserts and pre-generated IDs ([4fdb280](https://github.com/tux86/presto/commit/4fdb280bea408dc5e3bd4a7c6c7f0047a54cfb26))
+
+### Refactoring
+
+* migrate ID generation from cuid2 to nanoid ([a562537](https://github.com/tux86/presto/commit/a562537bc223cebbb8ad38be8630fd5a3dfab768))
+
 ## [1.13.0](https://github.com/tux86/presto/compare/v1.12.1...v1.13.0) (2026-02-23)
 
 ### Features

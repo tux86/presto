@@ -6,13 +6,13 @@ import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { type Locale, type ThemeMode, usePreferencesStore } from "@/stores/preferences.store";
 
-export const themeOptions: { value: ThemeMode; icon: LucideIcon }[] = [
+const themeOptions: { value: ThemeMode; icon: LucideIcon }[] = [
   { value: "light", icon: Sun },
   { value: "dark", icon: Moon },
   { value: "auto", icon: Monitor },
 ];
 
-export const localeOptions: { value: Locale; label: string; flag: string }[] = [
+const localeOptions: { value: Locale; label: string; flag: string }[] = [
   { value: "en", label: "English", flag: "us" },
   { value: "fr", label: "Fran\u00e7ais", flag: "fr" },
   { value: "de", label: "Deutsch", flag: "de" },

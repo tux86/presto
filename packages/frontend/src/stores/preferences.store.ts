@@ -71,5 +71,4 @@ if (typeof window !== "undefined") {
   });
 }
 
-export { applyTheme };
 export type { ThemeMode, Locale };

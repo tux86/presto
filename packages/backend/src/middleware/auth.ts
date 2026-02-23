@@ -61,5 +61,5 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
 
   c.set("userId", payload.sub);
   c.set("userEmail", payload.email);
-  await next();
+  return await next();
 });

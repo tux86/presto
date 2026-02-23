@@ -14,7 +14,7 @@ A self-hosted time-tracking application for freelancers and consultants. Generat
 - French + English interface
 - Dark mode
 - Optional authentication (single-user friendly)
-- PostgreSQL, MySQL, SQLite, SQL Server, CockroachDB
+- Multi-database: PostgreSQL, MySQL/MariaDB, SQLite
 
 ## Quick Start
 
@@ -29,6 +29,17 @@ docker compose -f docker-compose.production.yml up -d
 ```
 
 Open [http://localhost:8080](http://localhost:8080).
+
+## Quick Start (SQLite — no external DB)
+
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -v presto-data:/data \
+  -e DATABASE_URL="file:/data/presto.db" \
+  -e JWT_SECRET="$(openssl rand -base64 48)" \
+  axforge/presto:latest
+```
 
 ## Docker Compose
 
@@ -56,7 +67,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://presto:${POSTGRES_PASSWORD:?}@postgres:5432/presto?schema=public
+      DATABASE_URL: postgresql://presto:${POSTGRES_PASSWORD:?}@postgres:5432/presto
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set (min 32 chars)}
       AUTH_ENABLED: "true"
       REGISTRATION_ENABLED: "true"
@@ -83,14 +94,25 @@ docker run -d \
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | **required** | PostgreSQL connection string |
+| `DATABASE_URL` | **required** | Database connection string (see below) |
 | `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
 | `AUTH_ENABLED` | `true` | Enable/disable authentication |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
+| `DB_PROVIDER` | *(auto-detected)* | Force database dialect: `postgresql`, `mysql`, or `sqlite` |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
 | `PORT` | `8080` | HTTP port inside the container |
+
+### DATABASE_URL examples
+
+| Database | URL format |
+|---|---|
+| PostgreSQL | `postgresql://user:pass@host:5432/presto` |
+| MySQL/MariaDB | `mysql://user:pass@host:3306/presto` |
+| SQLite | `file:/data/presto.db` |
+
+The database provider is auto-detected from the URL prefix. Use `DB_PROVIDER` to override.
 
 ## Ports
 

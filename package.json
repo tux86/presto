@@ -32,6 +32,7 @@
     "build": "bun run --filter '@presto/backend' build && bun run --filter '@presto/frontend' build",
     "typecheck": "bun run --filter '@presto/shared' typecheck && bun run --filter '@presto/backend' typecheck && bun run --filter '@presto/frontend' typecheck",
     "db:migrate": "bun run --filter '@presto/backend' db:migrate",
+    "db:reset": "bun run --filter '@presto/backend' db:reset",
     "db:seed": "bun run --filter '@presto/backend' db:seed",
     "db:generate": "bun run --filter '@presto/backend' db:generate",
     "db:studio": "bun run --filter '@presto/backend' db:studio",

@@ -1,5 +1,4 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
-import { eq } from "drizzle-orm";
 import { insertReturning } from "./helpers.js";
 import { activityReports, clients, closeDb, db, missions, reportEntries, users } from "./index.js";
 import { runMigrations } from "./migrate.js";
@@ -30,53 +29,40 @@ async function main() {
 
   const year = new Date().getFullYear();
 
-  // Create demo user (find or create)
+  // Create demo user
   const password = await Bun.password.hash("demo1234", {
     algorithm: "bcrypt",
     cost: 10,
   });
 
-  let user = await db.query.users.findFirst({ where: eq(users.email, "demo@presto.dev") });
-  if (!user) {
-    user = await insertReturning(users, {
-      email: "demo@presto.dev",
-      password,
-      firstName: "Jean",
-      lastName: "Dupont",
-      company: "JD Consulting",
-    });
-  }
+  const user = await insertReturning(users, {
+    email: "demo@presto.dev",
+    password,
+    firstName: "Jean",
+    lastName: "Dupont",
+    company: "JD Consulting",
+  });
 
-  // Create demo client (find or create)
-  const clientId = "demo-client-1";
-  let client = await db.query.clients.findFirst({ where: eq(clients.id, clientId) });
-  if (!client) {
-    client = await insertReturning(clients, {
-      id: clientId,
-      name: "Acme Corp",
-      email: "contact@acme.com",
-      phone: "+33 1 23 45 67 89",
-      address: "123 rue de Paris, 75001 Paris",
-      businessId: "12345678901234",
-      currency: "EUR",
-      holidayCountry: "FR",
-      userId: user.id,
-    });
-  }
+  // Create demo client
+  const client = await insertReturning(clients, {
+    name: "Acme Corp",
+    email: "contact@acme.com",
+    phone: "+33 1 23 45 67 89",
+    address: "123 rue de Paris, 75001 Paris",
+    businessId: "12345678901234",
+    currency: "EUR",
+    holidayCountry: "FR",
+    userId: user.id,
+  });
 
-  // Create demo mission (find or create)
-  const missionId = "demo-mission-1";
-  let mission = await db.query.missions.findFirst({ where: eq(missions.id, missionId) });
-  if (!mission) {
-    mission = await insertReturning(missions, {
-      id: missionId,
-      name: "Web Platform Development",
-      clientId: client.id,
-      userId: user.id,
-      dailyRate: 550,
-      isActive: true,
-    });
-  }
+  // Create demo mission
+  const mission = await insertReturning(missions, {
+    name: "Web Platform Development",
+    clientId: client.id,
+    userId: user.id,
+    dailyRate: 550,
+    isActive: true,
+  });
 
   // Generate reports: last 6 months of previous year + all 12 months of current year
   const months: { month: number; year: number }[] = [];

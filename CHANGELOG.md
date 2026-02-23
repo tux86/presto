@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/tux86/presto/compare/v1.12.1...v1.13.0) (2026-02-23)
+
+### Features
+
+* add user-configurable client color with dark/light theme support ([b222ad3](https://github.com/tux86/presto/commit/b222ad3ded7b3532e3383c3930747b736212e364))
+
 ## [1.12.1](https://github.com/tux86/presto/compare/v1.12.0...v1.12.1) (2026-02-23)
 
 ### Bug Fixes

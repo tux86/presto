@@ -1,3 +1,15 @@
+## [1.9.0](https://github.com/tux86/presto/compare/v1.8.0...v1.9.0) (2026-02-23)
+
+### Features
+
+* add client/mission filters to dashboard and fix completed report revert ([4a8a74d](https://github.com/tux86/presto/commit/4a8a74d548080476e136afbf918de77e861b6848))
+* add per-client holiday country and searchable selects ([546ef27](https://github.com/tux86/presto/commit/546ef27508aebaa0d4b179d599b0f97887832ac8))
+
+### Refactoring
+
+* flatten Docker runtime layout and minimize node_modules ([a441421](https://github.com/tux86/presto/commit/a441421a279115b334ce21de289bd776895470c8))
+* replace inline SVGs with lucide-react icons and SVG country flags ([11a6f33](https://github.com/tux86/presto/commit/11a6f33022378c2e9a32913b911141ec0a4d2444))
+
 ## [1.8.0](https://github.com/tux86/presto/compare/v1.7.2...v1.8.0) (2026-02-22)
 
 ### Features

@@ -29,8 +29,8 @@ export interface CreateMissionRequest {
 export interface UpdateMissionRequest {
   name?: string;
   clientId?: string;
-  dailyRate?: number;
-  startDate?: string;
-  endDate?: string;
+  dailyRate?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
   isActive?: boolean;
 }

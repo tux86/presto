@@ -35,7 +35,7 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
     }
     c.set("userId", singleUserCache.id);
     c.set("userEmail", singleUserCache.email);
-    return next();
+    return await next();
   }
 
   const authHeader = c.req.header("Authorization");

@@ -50,14 +50,14 @@ export interface CreateActivityReportRequest {
 
 export interface UpdateActivityReportRequest {
   status?: ReportStatus;
-  note?: string;
+  note?: string | null;
 }
 
 export interface UpdateEntriesRequest {
   entries: {
     id: string;
     value?: number;
-    note?: string;
+    note?: string | null;
   }[];
 }
 

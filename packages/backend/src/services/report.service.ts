@@ -1,10 +1,10 @@
-import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
+import { getHolidayName, getMonthDates, isWeekend, type Locale } from "@presto/shared";
 import { and, eq, sum } from "drizzle-orm";
 import { insertReturning, REPORT_WITH } from "../db/helpers.js";
 import { activityReports, db, reportEntries } from "../db/index.js";
 import { config } from "../lib/config.js";
 
-const locale = config.app.locale ?? "en";
+const defaultLocale: Locale = config.app.locale ?? "en";
 
 /** Minimal shape required by enrichReport: a report with entries containing date + isHoliday. */
 interface ReportLike {
@@ -18,15 +18,18 @@ type Enriched<T extends ReportLike> = Omit<T, "entries"> & {
 };
 
 /**
- * Enrich report entries with computed holidayName based on date and configured locale.
+ * Enrich report entries with computed holidayName based on date and locale.
  * Handles single reports, arrays of reports, or null.
  */
-export function enrichReport<T extends ReportLike>(report: T[]): Enriched<T>[];
-export function enrichReport<T extends ReportLike>(report: T): Enriched<T>;
-export function enrichReport<T extends ReportLike>(report: T | null): Enriched<T> | null;
-export function enrichReport<T extends ReportLike>(report: T | T[] | null): Enriched<T> | Enriched<T>[] | null {
+export function enrichReport<T extends ReportLike>(report: T[], locale?: Locale): Enriched<T>[];
+export function enrichReport<T extends ReportLike>(report: T, locale?: Locale): Enriched<T>;
+export function enrichReport<T extends ReportLike>(report: T | null, locale?: Locale): Enriched<T> | null;
+export function enrichReport<T extends ReportLike>(
+  report: T | T[] | null,
+  locale: Locale = defaultLocale,
+): Enriched<T> | Enriched<T>[] | null {
   if (!report) return null;
-  if (Array.isArray(report)) return report.map((r) => enrichReport(r));
+  if (Array.isArray(report)) return report.map((r) => enrichReport(r, locale));
   return {
     ...report,
     entries: report.entries.map((entry) => ({
@@ -45,27 +48,27 @@ export async function createReportWithEntries(
 ) {
   const dates = getMonthDates(year, month);
 
-  // Insert the report
-  const report = await insertReturning(activityReports, {
-    month,
-    year,
-    userId,
-    missionId,
-    holidayCountry,
+  // Insert report + entries atomically
+  const report = await db.transaction(async (tx) => {
+    const inserted = await insertReturning(
+      activityReports,
+      { month, year, userId, missionId, holidayCountry },
+      tx as typeof db,
+    );
+
+    const entryValues = dates.map((date) => ({
+      date,
+      value: 0,
+      isWeekend: isWeekend(date),
+      isHoliday: !!getHolidayName(date, holidayCountry),
+      reportId: inserted.id,
+    }));
+
+    await tx.insert(reportEntries).values(entryValues);
+    return inserted;
   });
 
-  // Batch insert entries
-  const entryValues = dates.map((date) => ({
-    date,
-    value: 0,
-    isWeekend: isWeekend(date),
-    isHoliday: !!getHolidayName(date, holidayCountry),
-    reportId: report.id,
-  }));
-
-  await db.insert(reportEntries).values(entryValues);
-
-  // Fetch the full report with relations
+  // Relational query must run outside the transaction
   const result = await db.query.activityReports.findFirst({
     where: eq(activityReports.id, report.id),
     with: REPORT_WITH,
@@ -75,14 +78,28 @@ export async function createReportWithEntries(
 }
 
 export async function autoFillReport(reportId: string) {
-  await db
-    .update(reportEntries)
-    .set({ value: 1 })
-    .where(
-      and(eq(reportEntries.reportId, reportId), eq(reportEntries.isWeekend, false), eq(reportEntries.isHoliday, false)),
-    );
+  await db.transaction(async (tx) => {
+    await tx
+      .update(reportEntries)
+      .set({ value: 1 })
+      .where(
+        and(
+          eq(reportEntries.reportId, reportId),
+          eq(reportEntries.isWeekend, false),
+          eq(reportEntries.isHoliday, false),
+        ),
+      );
 
-  await recalculateTotalDays(reportId);
+    const result = await tx
+      .select({ total: sum(reportEntries.value) })
+      .from(reportEntries)
+      .where(eq(reportEntries.reportId, reportId));
+    const total = Number(result[0]?.total) || 0;
+    await tx
+      .update(activityReports)
+      .set({ totalDays: total, updatedAt: new Date() })
+      .where(eq(activityReports.id, reportId));
+  });
 }
 
 export async function clearReport(reportId: string) {

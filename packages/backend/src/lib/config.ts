@@ -1,5 +1,7 @@
 import type { Locale } from "@presto/shared";
 
+export type DbProvider = "postgresql" | "mysql" | "sqlite";
+
 function env(key: string, fallback: string): string {
   return process.env[key] ?? fallback;
 }
@@ -14,7 +16,10 @@ function envRequired(key: string): string {
 
 function envInt(key: string, fallback: number): number {
   const value = process.env[key];
-  return value ? parseInt(value, 10) : fallback;
+  if (!value) return fallback;
+  const n = parseInt(value, 10);
+  if (Number.isNaN(n)) throw new Error(`Invalid integer for env variable ${key}: "${value}"`);
+  return n;
 }
 
 function envBool(key: string, fallback: boolean): boolean {
@@ -45,18 +50,29 @@ export const config = {
     url: envRequired("DATABASE_URL"),
     provider: (() => {
       const explicit = process.env.DB_PROVIDER;
-      if (explicit) return explicit as "postgresql" | "mysql" | "sqlite";
+      if (explicit) {
+        const valid: DbProvider[] = ["postgresql", "mysql", "sqlite"];
+        if (!valid.includes(explicit as DbProvider)) {
+          throw new Error(`Invalid DB_PROVIDER: "${explicit}". Must be one of: ${valid.join(", ")}`);
+        }
+        return explicit as DbProvider;
+      }
       const url = process.env.DATABASE_URL ?? "";
       if (url.startsWith("postgresql://") || url.startsWith("postgres://")) return "postgresql";
       if (url.startsWith("mysql://")) return "mysql";
       if (url.startsWith("file:") || url.endsWith(".db") || url.endsWith(".sqlite")) return "sqlite";
       return "postgresql";
-    })() as "postgresql" | "mysql" | "sqlite",
+    })() as DbProvider,
   },
   jwt: {
     secret: (() => {
+      if (!envBool("AUTH_ENABLED", true)) return "auth-disabled";
       const s = envRequired("JWT_SECRET");
-      const WEAK = ["change-me-in-production", "dev-secret-change-in-production"];
+      const WEAK = [
+        "change-me-in-production",
+        "dev-secret-change-in-production",
+        "dev-only-local-secret-not-for-production-use-1234",
+      ];
       if (WEAK.includes(s) || s.length < 32) {
         throw new Error("JWT_SECRET must be at least 32 characters and not a known default");
       }

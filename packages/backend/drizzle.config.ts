@@ -1,6 +1,6 @@
 import { defineConfig } from "drizzle-kit";
 
-const dialect = (process.env.DB_DIALECT ?? "postgresql") as "postgresql" | "mysql" | "sqlite";
+const dialect = (process.env.DB_PROVIDER ?? "postgresql") as "postgresql" | "mysql" | "sqlite";
 const schemaFile = dialect === "mysql" ? "mysql.schema.ts" : dialect === "sqlite" ? "sqlite.schema.ts" : "pg.schema.ts";
 const outDir = dialect === "postgresql" ? "pg" : dialect;
 

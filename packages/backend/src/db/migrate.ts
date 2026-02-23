@@ -11,7 +11,7 @@ export async function runMigrations() {
     await migrate(db as any, { migrationsFolder: join(baseDir, "mysql") });
   } else if (provider === "sqlite") {
     const { migrate } = await import("drizzle-orm/bun-sqlite/migrator");
-    migrate(db as any, { migrationsFolder: join(baseDir, "sqlite") });
+    await migrate(db as any, { migrationsFolder: join(baseDir, "sqlite") });
   } else {
     const { migrate } = await import("drizzle-orm/node-postgres/migrator");
     await migrate(db, { migrationsFolder: join(baseDir, "pg") });

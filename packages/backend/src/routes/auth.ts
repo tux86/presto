@@ -34,7 +34,8 @@ const authLimiter =
             const info = getConnInfo(c);
             return info.remote.address ?? "127.0.0.1";
           } catch {
-            return c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? c.req.header("x-real-ip") ?? "127.0.0.1";
+            // Behind a reverse proxy: trust x-real-ip (set by proxy) over x-forwarded-for (spoofable)
+            return c.req.header("x-real-ip") ?? c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "127.0.0.1";
           }
         },
       })
@@ -45,7 +46,8 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
     throw new HTTPException(403, { message: "Registration is disabled" });
   }
 
-  const { email, password, firstName, lastName, company } = c.req.valid("json");
+  const { password, firstName, lastName, company } = c.req.valid("json");
+  const email = c.req.valid("json").email.toLowerCase();
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (existing) {
@@ -71,7 +73,8 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
 });
 
 auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
-  const { email, password } = c.req.valid("json");
+  const { password } = c.req.valid("json");
+  const email = c.req.valid("json").email.toLowerCase();
 
   const user = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (!user) {

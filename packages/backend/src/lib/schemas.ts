@@ -3,7 +3,10 @@ import { z } from "zod";
 
 const currencySchema = z.enum(CURRENCIES);
 const holidayCountrySchema = z.enum(HOLIDAY_COUNTRIES);
-const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const dateString = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((d) => !Number.isNaN(new Date(d).getTime()), "Invalid date");
 
 // Auth
 export const registerSchema = z.object({
@@ -83,7 +86,7 @@ export const createReportSchema = z.object({
 
 export const updateReportSchema = z.object({
   status: z.enum(REPORT_STATUSES).optional(),
-  note: z.string().max(2000).optional(),
+  note: z.string().max(2000).nullable().optional(),
 });
 
 export const updateEntriesSchema = z.object({
@@ -92,8 +95,9 @@ export const updateEntriesSchema = z.object({
       z.object({
         id: z.string().min(1),
         value: z.number().min(0).max(1).optional(),
-        note: z.string().max(1000).optional(),
+        note: z.string().max(1000).nullable().optional(),
       }),
     )
+    .min(1)
     .max(31),
 });

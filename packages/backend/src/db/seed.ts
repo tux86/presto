@@ -1,6 +1,6 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
 import { insertReturning } from "./helpers.js";
-import { activityReports, clients, closeDb, db, missions, reportEntries, users } from "./index.js";
+import { activityReports, clients, db, missions, reportEntries, users } from "./index.js";
 import { runMigrations } from "./migrate.js";
 
 const NOTES = [
@@ -118,6 +118,7 @@ async function main() {
   console.log(`Seed completed: demo@presto.dev / demo1234 (${year - 1}-${year}, 18 months)`);
 }
 
-main()
-  .catch(console.error)
-  .finally(() => closeDb());
+await main().catch((err) => {
+  console.error("Seed failed:", err);
+  process.exit(1);
+});

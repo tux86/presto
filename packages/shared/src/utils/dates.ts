@@ -38,6 +38,11 @@ export function parseDate(str: string): Date {
 export const SUPPORTED_LOCALES = ["en", "fr", "de", "es", "pt"] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
+/** Type guard: checks if a string is a supported locale. */
+export function isLocale(s: string | undefined): s is Locale {
+  return !!s && (SUPPORTED_LOCALES as readonly string[]).includes(s);
+}
+
 export const localeMap: Record<Locale, string> = {
   en: "en-US",
   fr: "fr-FR",

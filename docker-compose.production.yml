@@ -29,7 +29,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-presto}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-presto}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-true}

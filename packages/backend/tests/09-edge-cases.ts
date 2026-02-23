@@ -113,7 +113,7 @@ describe("Edge Cases", () => {
     await api("DELETE", `/clients/${body.id}`);
   });
 
-  test("Empty entries array → 200", async () => {
+  test("Empty entries array → 400", async () => {
     // Revert to draft
     await api("PATCH", `/activity-reports/${state.reportId}`, {
       body: { status: "DRAFT" },
@@ -121,7 +121,7 @@ describe("Edge Cases", () => {
     const res = await api("PATCH", `/activity-reports/${state.reportId}/entries`, {
       body: { entries: [] },
     });
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(400);
     // Re-complete for FK tests
     await api("PATCH", `/activity-reports/${state.reportId}`, {
       body: { status: "COMPLETED" },

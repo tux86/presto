@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import type { AppEnv } from "../lib/types.js";
+import { parseIntParam } from "../lib/utils.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { getYearlyReport } from "../services/reporting.service.js";
 
@@ -9,12 +9,7 @@ reporting.use("*", authMiddleware);
 
 reporting.get("/", async (c) => {
   const userId = c.get("userId");
-  const yearParam = c.req.query("year");
-  let year = new Date().getFullYear();
-  if (yearParam) {
-    year = parseInt(yearParam, 10);
-    if (Number.isNaN(year)) throw new HTTPException(400, { message: "Invalid year parameter" });
-  }
+  const year = parseIntParam(c.req.query("year"), "year", 2000, 2100) ?? new Date().getFullYear();
 
   const report = await getYearlyReport(userId, year);
   return c.json(report);

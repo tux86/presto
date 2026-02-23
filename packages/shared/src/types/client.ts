@@ -21,16 +21,16 @@ export interface CreateClientRequest {
   phone?: string;
   address?: string;
   businessId?: string;
-  currency?: CurrencyCode;
-  holidayCountry?: HolidayCountryCode;
+  currency: CurrencyCode;
+  holidayCountry: HolidayCountryCode;
 }
 
 export interface UpdateClientRequest {
   name?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  businessId?: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  businessId?: string | null;
   currency?: CurrencyCode;
   holidayCountry?: HolidayCountryCode;
 }

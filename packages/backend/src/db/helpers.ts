@@ -29,23 +29,25 @@ export async function findOwned(model: OwnedModel, id: string, userId: string) {
 
 /**
  * Insert a row and return it. Handles MySQL's lack of RETURNING clause.
- * The `values` object must include `id` (pre-generated via $defaultFn) for MySQL fallback.
+ * Accepts an optional transaction handle; defaults to the module-level `db`.
  */
 export async function insertReturning<T extends PgTable>(
   table: T,
   values: T["$inferInsert"],
+  trx?: typeof db,
 ): Promise<T["$inferSelect"]> {
+  const d = trx ?? db;
   if (config.database.provider === "mysql") {
-    await db.insert(table).values(values as any);
+    await d.insert(table).values(values as any);
     const id = (values as Record<string, unknown>).id;
-    const [row] = await db
+    const [row] = await d
       .select()
       .from(table as any)
       .where(eq((table as Record<string, any>).id, id))
       .limit(1);
     return row as T["$inferSelect"];
   }
-  const [row] = await db
+  const [row] = await d
     .insert(table)
     .values(values as any)
     .returning();
@@ -71,6 +73,7 @@ export async function updateReturning<T extends PgTable>(
       .from(table as any)
       .where(eq(idCol, id))
       .limit(1);
+    if (!row) throw new HTTPException(404, { message: "Record not found" });
     return row as T["$inferSelect"];
   }
   const rows = (await db
@@ -78,6 +81,7 @@ export async function updateReturning<T extends PgTable>(
     .set(values as any)
     .where(eq(idCol, id))
     .returning()) as T["$inferSelect"][];
+  if (!rows[0]) throw new HTTPException(404, { message: "Record not found" });
   return rows[0];
 }
 

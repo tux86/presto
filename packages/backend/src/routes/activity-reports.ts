@@ -1,13 +1,13 @@
 import { zValidator } from "@hono/zod-validator";
-import { SUPPORTED_LOCALES } from "@presto/shared";
+import { isLocale } from "@presto/shared";
 import { and, count, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { findOwned, REPORT_WITH, REPORT_WITH_PDF, updateReturning } from "../db/helpers.js";
 import { activityReports, clients, db, reportEntries } from "../db/index.js";
-import { ensureDraft, slugify } from "../lib/helpers.js";
 import { createReportSchema, updateEntriesSchema, updateReportSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
+import { ensureDraft, parseIntParam, slugify } from "../lib/utils.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { generateReportPdf } from "../services/pdf.service.js";
 import {
@@ -37,18 +37,13 @@ activityReportsRouter.get("/", async (c) => {
   const monthParam = c.req.query("month");
   const missionId = c.req.query("missionId");
 
+  const year = parseIntParam(yearParam, "year", 2000, 2100);
+  const month = parseIntParam(monthParam, "month", 1, 12);
+
   const conditions = [eq(activityReports.userId, userId)];
 
-  if (yearParam) {
-    const parsed = parseInt(yearParam, 10);
-    if (Number.isNaN(parsed)) throw new HTTPException(400, { message: "Invalid year parameter" });
-    conditions.push(eq(activityReports.year, parsed));
-  }
-  if (monthParam) {
-    const parsed = parseInt(monthParam, 10);
-    if (Number.isNaN(parsed)) throw new HTTPException(400, { message: "Invalid month parameter" });
-    conditions.push(eq(activityReports.month, parsed));
-  }
+  if (year !== undefined) conditions.push(eq(activityReports.year, year));
+  if (month !== undefined) conditions.push(eq(activityReports.month, month));
   if (missionId) conditions.push(eq(activityReports.missionId, missionId));
 
   const list = await db.query.activityReports.findMany({
@@ -66,16 +61,17 @@ activityReportsRouter.post("/", zValidator("json", createReportSchema), async (c
 
   const mission = await findOwned("mission", missionId, userId);
 
-  // Check for existing report with same mission/month/year
+  // Check for existing report with same mission/month/year for this user
   const existing = await db.query.activityReports.findFirst({
     where: and(
+      eq(activityReports.userId, userId),
       eq(activityReports.missionId, missionId),
       eq(activityReports.month, month),
       eq(activityReports.year, year),
     ),
   });
   if (existing) {
-    throw new HTTPException(409, { message: "Activity already exists for this mission/month/year" });
+    throw new HTTPException(409, { message: "Report already exists for this mission/month/year" });
   }
 
   const client = await db.query.clients.findFirst({
@@ -98,7 +94,7 @@ activityReportsRouter.get("/:id", async (c) => {
 
   const report = await fetchEnrichedReport(id, userId);
   if (!report) {
-    throw new HTTPException(404, { message: "Activity not found" });
+    throw new HTTPException(404, { message: "Report not found" });
   }
   return c.json(report);
 });
@@ -199,22 +195,20 @@ activityReportsRouter.get("/:id/pdf", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const localeParam = c.req.query("locale");
-  const locale = SUPPORTED_LOCALES.includes(localeParam as any)
-    ? (localeParam as (typeof SUPPORTED_LOCALES)[number])
-    : "en";
+  const locale = isLocale(localeParam) ? localeParam : "en";
 
   const report = await db.query.activityReports.findFirst({
     where: and(eq(activityReports.id, id), eq(activityReports.userId, userId)),
     with: REPORT_WITH_PDF,
   });
   if (!report) {
-    throw new HTTPException(404, { message: "Activity not found" });
+    throw new HTTPException(404, { message: "Report not found" });
   }
   if (report.status === "DRAFT") {
     throw new HTTPException(400, { message: "Cannot export a draft report. Mark it as completed first." });
   }
 
-  const pdfBuffer = await generateReportPdf(enrichReport(report), locale);
+  const pdfBuffer = await generateReportPdf(enrichReport(report, locale), locale);
 
   const filename = `activity-report-${slugify(report.mission.client.name)}-${slugify(report.mission.name)}-${report.year}-${String(report.month).padStart(2, "0")}.pdf`;
 

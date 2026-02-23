@@ -1,0 +1,28 @@
+import type { ReportStatus } from "@presto/shared";
+import { HTTPException } from "hono/http-exception";
+
+/** Throws HTTPException(400) if the report status is not DRAFT. */
+export function ensureDraft(report: { status: ReportStatus }) {
+  if (report.status === "COMPLETED") {
+    throw new HTTPException(400, { message: "Cannot modify a completed report" });
+  }
+}
+
+export function slugify(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .toLowerCase();
+}
+
+/** Parse a query param as integer, with optional min/max validation. */
+export function parseIntParam(value: string | undefined, name: string, min?: number, max?: number): number | undefined {
+  if (value === undefined) return undefined;
+  const n = parseInt(value, 10);
+  if (Number.isNaN(n)) throw new HTTPException(400, { message: `Invalid ${name}` });
+  if (min !== undefined && n < min) throw new HTTPException(400, { message: `Invalid ${name}` });
+  if (max !== undefined && n > max) throw new HTTPException(400, { message: `Invalid ${name}` });
+  return n;
+}

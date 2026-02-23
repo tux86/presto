@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/tux86/presto/compare/v1.10.0...v1.11.0) (2026-02-23)
+
+### Features
+
+* migrate from Prisma to Drizzle ORM with multi-dialect support ([0370ec2](https://github.com/tux86/presto/commit/0370ec2dbdb5e0a731936936f33273d5593cf7a8))
+
 ## [1.10.0](https://github.com/tux86/presto/compare/v1.9.0...v1.10.0) (2026-02-23)
 
 ### Features

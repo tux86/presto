@@ -7,7 +7,7 @@ Activity report time-tracking app. Monorepo with 3 packages.
 - **Runtime:** Bun
 - **Frontend:** React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts
 - **Backend:** Hono 4, Drizzle ORM, @react-pdf/renderer
-- **Database:** PostgreSQL 16 (default), MySQL, SQLite — runtime dialect switching via `DB_PROVIDER` env var or auto-detected from `DATABASE_URL`
+- **Database:** PostgreSQL, MySQL/MariaDB, SQLite — runtime dialect switching via `DB_PROVIDER` env var or auto-detected from `DATABASE_URL`
 - **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
 - **Testing:** Bun test runner, Hono `app.request()` (101 API E2E tests)
 - **Language:** TypeScript 5.7, strict mode
@@ -32,10 +32,11 @@ bun run build              # Build all packages
 bun run typecheck          # Type-check all packages
 bun run lint               # Lint + format check (Biome)
 bun run lint:fix           # Auto-fix lint + format issues
-bun run test               # Run API E2E tests (requires presto_test DB)
+bun run test               # Run API E2E tests (in-memory SQLite, no DB needed)
 bun run db:generate        # Generate Drizzle migrations (uses DB_DIALECT env var)
 bun run db:migrate         # Apply migrations programmatically
-bun run db:seed            # Seed sample data
+bun run db:reset           # Wipe all data (for dev)
+bun run db:seed            # Seed sample data (run db:reset first)
 bun run db:studio          # Open Drizzle Studio
 docker compose up -d       # Start PostgreSQL (dev)
 ```
@@ -78,11 +79,11 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 - **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
 - **Location:** `packages/backend/tests/` — 9 test suites, 101 tests
-- **Database:** isolated `presto_test` PostgreSQL database (or SQLite via `DATABASE_URL=file:./test.db`)
-- **Setup:** preload script (`setup.ts`) runs Drizzle migrations + dialect-aware truncation before tests
+- **Database:** in-memory SQLite (`DATABASE_URL=file::memory:`) — fresh each run, no external DB needed
+- **Setup:** preload script (`setup.ts`) runs Drizzle migrations before tests
 - **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)
 - **Config:** `bunfig.toml` configures preload, `--env-file .env.test` loads test env vars
-- **CI:** dedicated `test` job in CI workflow with PostgreSQL service container
+- **CI:** dedicated `test` job in CI workflow (SQLite in-memory, no service container needed)
 
 ## Code Quality
 
@@ -93,7 +94,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 ## CI/CD
 
-- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → typecheck → build) + `test` (PostgreSQL service → test) on PR/push to `main`
+- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → typecheck → build) + `test` (SQLite in-memory) on PR/push to `main`
 - **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
 - **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR on release
 
@@ -106,6 +107,12 @@ docker compose up -d       # Start PostgreSQL (dev)
 - **Holiday country:** per-client field (all countries via `date-holidays` library)
 - **Config store** (`config.store.ts`) remains read-only server config (appName, authEnabled, registrationEnabled)
 - **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls
+
+## Environment
+
+- **`.env`** (root) — dev config: database, JWT, app settings. All `dev`, `db:*` scripts load from here.
+- **`packages/backend/.env.test`** — test config: in-memory SQLite. Used only by `bun run test`.
+- **`.env.example`** (root) — template with all available env vars.
 
 ## Key Conventions
 

@@ -110,7 +110,7 @@ See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environme
 | **Runtime** | [Bun](https://bun.sh/) |
 | **Frontend** | React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts |
 | **Backend** | Hono 4, Drizzle ORM, @react-pdf/renderer |
-| **Database** | PostgreSQL 16 (default) |
+| **Database** | PostgreSQL, MySQL/MariaDB, SQLite |
 | **Language** | TypeScript 5.7 (strict mode) |
 | **Testing** | Bun test runner, Hono `app.request()` (101 E2E tests) |
 | **CI/CD** | GitHub Actions (lint, typecheck, build, test), semantic-release |

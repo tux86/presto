@@ -21,6 +21,9 @@ export const en: Record<TranslationKey, string> = {
   "dashboard.year": "Year",
   "dashboard.mission": "Mission",
   "dashboard.selectMission": "Select a mission",
+  "dashboard.allClients": "All clients",
+  "dashboard.allMissions": "All missions",
+  "dashboard.noFilterResults": "No activities match the selected filters",
 
   // Clients
   "clients.title": "Clients",

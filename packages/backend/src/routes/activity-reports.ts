@@ -102,11 +102,8 @@ activityReports.patch("/:id", zValidator("json", updateReportSchema), async (c) 
 
   const existing = await findOwned("activityReport", id, userId);
 
-  // Allow setting status to COMPLETED, but block other mutations on completed reports
-  if (existing.status === "COMPLETED" && data.status !== "COMPLETED") {
-    throw new HTTPException(400, { message: "Cannot modify a completed report" });
-  }
-  if (existing.status === "COMPLETED" && data.note !== undefined) {
+  // Allow status changes (including revert to draft), but block note edits on completed reports
+  if (existing.status === "COMPLETED" && data.note !== undefined && data.status !== "DRAFT") {
     throw new HTTPException(400, { message: "Cannot modify a completed report" });
   }
 

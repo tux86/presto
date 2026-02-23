@@ -19,6 +19,9 @@ export const fr = {
   "dashboard.year": "Ann\u00e9e",
   "dashboard.mission": "Mission",
   "dashboard.selectMission": "S\u00e9lectionner une mission",
+  "dashboard.allClients": "Tous les clients",
+  "dashboard.allMissions": "Toutes les missions",
+  "dashboard.noFilterResults": "Aucune activit\u00e9 ne correspond aux filtres s\u00e9lectionn\u00e9s",
 
   // Clients
   "clients.title": "Clients",

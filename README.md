@@ -85,7 +85,7 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 - **Single Docker image** — backend + frontend served together
 - Auto-runs database migrations on startup
 - Built-in health check endpoint (`/api/health`)
-- **Multi-database** — PostgreSQL (default), MySQL, SQLite, SQL Server, CockroachDB via Prisma provider swap
+- **Multi-database** — PostgreSQL (default), MySQL / MariaDB, and SQLite via runtime dialect switching (Drizzle ORM)
 
 ## Quick Start
 
@@ -109,7 +109,7 @@ See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environme
 |---|---|
 | **Runtime** | [Bun](https://bun.sh/) |
 | **Frontend** | React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts |
-| **Backend** | Hono 4, Prisma 7, @react-pdf/renderer |
+| **Backend** | Hono 4, Drizzle ORM, @react-pdf/renderer |
 | **Database** | PostgreSQL 16 (default) |
 | **Language** | TypeScript 5.7 (strict mode) |
 | **Testing** | Bun test runner, Hono `app.request()` (101 E2E tests) |
@@ -141,7 +141,7 @@ graph LR
     MW --> Auth
     Auth --> Routes
     Routes --> PDF
-    Routes -->|"Prisma 7"| DB
+    Routes -->|"Drizzle ORM"| DB
     Shared -.-> Routes
 ```
 
@@ -172,7 +172,7 @@ cd presto
 bun install
 cp .env.example .env          # edit: set POSTGRES_PASSWORD + JWT_SECRET
 docker compose up -d           # start PostgreSQL
-bun run db:migrate && bun run db:generate
+bun run db:migrate
 bun run dev                    # http://localhost:5173
 ```
 

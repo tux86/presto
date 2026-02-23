@@ -1,46 +1,51 @@
 import { zValidator } from "@hono/zod-validator";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { findOwned } from "../lib/helpers.js";
-import { prisma } from "../lib/prisma.js";
+import { findOwned, insertReturning, MISSION_WITH, updateReturning } from "../db/helpers.js";
+import { db, missions } from "../db/index.js";
 import { createMissionSchema, updateMissionSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
-const missions = new Hono<AppEnv>();
-missions.use("*", authMiddleware);
+const missionsRouter = new Hono<AppEnv>();
+missionsRouter.use("*", authMiddleware);
 
-missions.get("/", async (c) => {
+missionsRouter.get("/", async (c) => {
   const userId = c.get("userId");
-  const list = await prisma.mission.findMany({
-    where: { userId },
-    include: { client: { select: { id: true, name: true, currency: true } } },
-    orderBy: { createdAt: "desc" },
+  const list = await db.query.missions.findMany({
+    where: eq(missions.userId, userId),
+    with: MISSION_WITH,
+    orderBy: (m, { desc }) => [desc(m.createdAt)],
   });
   return c.json(list);
 });
 
-missions.post("/", zValidator("json", createMissionSchema), async (c) => {
+missionsRouter.post("/", zValidator("json", createMissionSchema), async (c) => {
   const userId = c.get("userId");
   const { name, clientId, dailyRate, startDate, endDate } = c.req.valid("json");
 
   await findOwned("client", clientId, userId);
 
-  const mission = await prisma.mission.create({
-    data: {
-      name,
-      clientId,
-      userId,
-      dailyRate: dailyRate ?? null,
-      startDate: startDate ? new Date(startDate) : null,
-      endDate: endDate ? new Date(endDate) : null,
-    },
-    include: { client: { select: { id: true, name: true, currency: true } } },
+  const mission = await insertReturning(missions, {
+    name,
+    clientId,
+    userId,
+    dailyRate: dailyRate ?? null,
+    startDate: startDate ? new Date(startDate) : null,
+    endDate: endDate ? new Date(endDate) : null,
   });
+
+  // Fetch with client relation for response
+  const result = await db.query.missions.findFirst({
+    where: eq(missions.id, mission.id),
+    with: MISSION_WITH,
+  });
+
   c.header("Location", `/api/missions/${mission.id}`);
-  return c.json(mission, 201);
+  return c.json(result, 201);
 });
 
-missions.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
+missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
   const data = c.req.valid("json");
@@ -50,29 +55,31 @@ missions.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
     await findOwned("client", data.clientId, userId);
   }
 
-  const mission = await prisma.mission.update({
-    where: { id },
-    data: {
-      name: data.name,
-      clientId: data.clientId,
-      dailyRate: data.dailyRate,
-      startDate: data.startDate !== undefined ? (data.startDate ? new Date(data.startDate) : null) : undefined,
-      endDate: data.endDate !== undefined ? (data.endDate ? new Date(data.endDate) : null) : undefined,
-      isActive: data.isActive,
-    },
-    include: { client: { select: { id: true, name: true, currency: true } } },
+  await updateReturning(missions, id, {
+    name: data.name,
+    clientId: data.clientId,
+    dailyRate: data.dailyRate,
+    startDate: data.startDate !== undefined ? (data.startDate ? new Date(data.startDate) : null) : undefined,
+    endDate: data.endDate !== undefined ? (data.endDate ? new Date(data.endDate) : null) : undefined,
+    isActive: data.isActive,
+    updatedAt: new Date(),
   });
-  return c.json(mission);
+
+  const result = await db.query.missions.findFirst({
+    where: eq(missions.id, id),
+    with: MISSION_WITH,
+  });
+  return c.json(result);
 });
 
-missions.delete("/:id", async (c) => {
+missionsRouter.delete("/:id", async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
 
   await findOwned("mission", id, userId);
 
-  await prisma.mission.delete({ where: { id } });
+  await db.delete(missions).where(eq(missions.id, id));
   return c.body(null, 204);
 });
 
-export default missions;
+export default missionsRouter;

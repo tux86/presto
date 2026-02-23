@@ -10,7 +10,7 @@
     "pdf-export",
     "react",
     "hono",
-    "prisma",
+    "drizzle",
     "docker",
     "typescript"
   ],
@@ -26,16 +26,15 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run --filter '@presto/backend' dev & bun run --filter '@presto/frontend' dev",
+    "dev": "bun run --filter '@presto/backend' dev & bun run --filter '@presto/frontend' dev & bun run db:studio",
     "dev:backend": "bun run --filter '@presto/backend' dev",
     "dev:frontend": "bun run --filter '@presto/frontend' dev",
     "build": "bun run --filter '@presto/backend' build && bun run --filter '@presto/frontend' build",
     "typecheck": "bun run --filter '@presto/shared' typecheck && bun run --filter '@presto/backend' typecheck && bun run --filter '@presto/frontend' typecheck",
     "db:migrate": "bun run --filter '@presto/backend' db:migrate",
-    "db:migrate:dev": "bun run --filter '@presto/backend' db:migrate:dev",
-    "db:push": "bun run --filter '@presto/backend' db:push",
     "db:seed": "bun run --filter '@presto/backend' db:seed",
     "db:generate": "bun run --filter '@presto/backend' db:generate",
+    "db:studio": "bun run --filter '@presto/backend' db:studio",
     "test": "bun run --filter '@presto/backend' test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",

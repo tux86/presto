@@ -5,5 +5,5 @@ dist/
 **/.env.test
 *.log
 .DS_Store
-packages/backend/prisma/generated/
+*.db
 .husky/_

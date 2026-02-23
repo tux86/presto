@@ -17,12 +17,11 @@ cp .env.example .env
 # Edit .env: set POSTGRES_PASSWORD and JWT_SECRET (min 32 chars)
 docker compose up -d
 bun run db:migrate
-bun run db:generate
 bun run db:seed
 bun run dev
 ```
 
-This starts the backend (hot reload) on `http://localhost:3001` and the frontend (Vite HMR) on `http://localhost:5173`. The frontend proxies `/api` requests to the backend.
+This starts the backend (hot reload) on `http://localhost:3001`, the frontend (Vite HMR) on `http://localhost:5173`, and [Drizzle Studio](https://local.drizzle.studio) (database explorer). The frontend proxies `/api` requests to the backend.
 
 ### Commands
 
@@ -34,10 +33,9 @@ bun run build            # Production build (all packages)
 bun run typecheck        # Type-check all packages
 bun run lint             # Lint + format check (Biome)
 bun run lint:fix         # Auto-fix lint + format
-bun run db:generate      # Regenerate Prisma client after schema changes
-bun run db:push          # Push schema changes to dev DB (no migration file)
-bun run db:migrate       # Apply pending migrations (uses migrate deploy)
-bun run db:migrate:dev   # Create new migration from schema changes (uses migrate dev)
+bun run db:generate      # Generate Drizzle migration SQL from schema changes
+bun run db:migrate       # Apply pending migrations (programmatic, runs at startup too)
+bun run db:studio        # Open Drizzle Studio (DB explorer)
 bun run db:seed          # Seed sample data
 bun run test             # Run API E2E tests (requires presto_test DB)
 ```
@@ -63,7 +61,7 @@ cp packages/backend/.env.test.example packages/backend/.env.test
 bun run test
 ```
 
-Tests automatically run `prisma migrate deploy` and truncate all tables before each run, so your dev database is never affected.
+Tests automatically run Drizzle migrations and truncate all tables before each run, so your dev database is never affected.
 
 ## Project Structure
 
@@ -77,8 +75,9 @@ packages/
 │   │   ├── index.ts          # Server entry point
 │   │   ├── lib/config.ts     # Environment variable configuration
 │   │   └── routes/           # auth, clients, missions, activity-reports, reporting
-│   └── prisma/
-│       └── schema.prisma     # Database schema
+│   │   └── db/               # Drizzle ORM schemas, migrations, helpers
+│   │       ├── schema/       # pg.schema.ts, mysql.schema.ts, sqlite.schema.ts
+│   │       └── migrations/   # pg/, mysql/, sqlite/ migration SQL
 ├── frontend/                 # @presto/frontend — React SPA
 │   └── src/
 │       ├── App.tsx           # Route definitions
@@ -104,7 +103,7 @@ Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must
 | `POSTGRES_PASSWORD` | **required** | PostgreSQL password |
 | `POSTGRES_DB` | `presto` | PostgreSQL database name |
 | `POSTGRES_PORT` | `5432` | Host port mapped to PostgreSQL |
-| `DATABASE_URL` | _(constructed)_ | Full Prisma connection string |
+| `DATABASE_URL` | _(constructed)_ | Full database connection string |
 
 ### Backend
 
@@ -149,9 +148,11 @@ Authentication uses JWT bearer tokens. When `AUTH_ENABLED=false`, all protected 
 
 ## Switching Databases
 
-Presto's Prisma schema uses only cross-database compatible field types. To use a different engine, update the `provider` in `packages/backend/prisma/schema.prisma` and set `DATABASE_URL` accordingly.
+Presto uses Drizzle ORM with runtime dialect switching. Set `DB_PROVIDER` (or let it auto-detect from your `DATABASE_URL` prefix) and provide the appropriate connection string.
 
-Supported: `postgresql`, `mysql`, `sqlite`, `sqlserver`, `cockroachdb`.
+Supported: `postgresql` (default), `mysql` / `mariadb`, `sqlite`.
+
+> **Note:** MariaDB is fully compatible with the MySQL dialect — use `mysql://` as the `DATABASE_URL` prefix.
 
 ## Branch Strategy
 

@@ -9,13 +9,7 @@
     }
   },
   "files": {
-    "includes": [
-      "packages/**/*.ts",
-      "packages/**/*.tsx",
-      "scripts/**/*.js",
-      "*.json",
-      "!packages/backend/prisma/generated"
-    ]
+    "includes": ["packages/**/*.ts", "packages/**/*.tsx", "scripts/**/*.js", "*.json"]
   },
   "formatter": {
     "enabled": true,

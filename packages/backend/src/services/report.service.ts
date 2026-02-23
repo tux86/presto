@@ -1,7 +1,8 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
+import { and, eq, sum } from "drizzle-orm";
+import { insertReturning, REPORT_WITH } from "../db/helpers.js";
+import { activityReports, db, reportEntries } from "../db/index.js";
 import { config } from "../lib/config.js";
-import { CLIENT_SUMMARY_SELECT } from "../lib/helpers.js";
-import { prisma } from "../lib/prisma.js";
 
 const { locale } = config.app;
 
@@ -44,68 +45,65 @@ export async function createReportWithEntries(
 ) {
   const dates = getMonthDates(year, month);
 
-  const report = await prisma.activityReport.create({
-    data: {
-      month,
-      year,
-      userId,
-      missionId,
-      holidayCountry,
-      entries: {
-        create: dates.map((date) => ({
-          date,
-          value: 0,
-          isWeekend: isWeekend(date),
-          isHoliday: !!getHolidayName(date, holidayCountry),
-        })),
-      },
-    },
-    include: {
-      entries: { orderBy: { date: "asc" } },
-      mission: {
-        include: { client: { select: CLIENT_SUMMARY_SELECT } },
-      },
-    },
+  // Insert the report
+  const report = await insertReturning(activityReports, {
+    month,
+    year,
+    userId,
+    missionId,
+    holidayCountry,
   });
 
-  return enrichReport(report);
+  // Batch insert entries
+  const entryValues = dates.map((date) => ({
+    date,
+    value: 0,
+    isWeekend: isWeekend(date),
+    isHoliday: !!getHolidayName(date, holidayCountry),
+    reportId: report.id,
+  }));
+
+  await db.insert(reportEntries).values(entryValues);
+
+  // Fetch the full report with relations
+  const result = await db.query.activityReports.findFirst({
+    where: eq(activityReports.id, report.id),
+    with: REPORT_WITH,
+  });
+
+  return enrichReport(result!);
 }
 
 export async function autoFillReport(reportId: string) {
-  await prisma.reportEntry.updateMany({
-    where: {
-      reportId,
-      isWeekend: false,
-      isHoliday: false,
-    },
-    data: { value: 1 },
-  });
+  await db
+    .update(reportEntries)
+    .set({ value: 1 })
+    .where(
+      and(eq(reportEntries.reportId, reportId), eq(reportEntries.isWeekend, false), eq(reportEntries.isHoliday, false)),
+    );
 
   await recalculateTotalDays(reportId);
 }
 
 export async function clearReport(reportId: string) {
-  await prisma.$transaction([
-    prisma.reportEntry.updateMany({
-      where: { reportId },
-      data: { value: 0, note: null },
-    }),
-    prisma.activityReport.update({
-      where: { id: reportId },
-      data: { totalDays: 0 },
-    }),
-  ]);
+  await db.transaction(async (tx) => {
+    await tx.update(reportEntries).set({ value: 0, note: null }).where(eq(reportEntries.reportId, reportId));
+    await tx
+      .update(activityReports)
+      .set({ totalDays: 0, updatedAt: new Date() })
+      .where(eq(activityReports.id, reportId));
+  });
 }
 
 export async function recalculateTotalDays(reportId: string) {
-  const result = await prisma.reportEntry.aggregate({
-    where: { reportId },
-    _sum: { value: true },
-  });
-  const total = result._sum.value ?? 0;
-  await prisma.activityReport.update({
-    where: { id: reportId },
-    data: { totalDays: total },
-  });
+  const result = await db
+    .select({ total: sum(reportEntries.value) })
+    .from(reportEntries)
+    .where(eq(reportEntries.reportId, reportId));
+  const total = Number(result[0]?.total) || 0;
+  await db
+    .update(activityReports)
+    .set({ totalDays: total, updatedAt: new Date() })
+    .where(eq(activityReports.id, reportId));
   return total;
 }

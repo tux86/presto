@@ -6,8 +6,8 @@ Activity report time-tracking app. Monorepo with 3 packages.
 
 - **Runtime:** Bun
 - **Frontend:** React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts
-- **Backend:** Hono 4, Prisma 7, @react-pdf/renderer
-- **Database:** PostgreSQL 16 (supports MySQL, SQLite, SQL Server, CockroachDB via Prisma provider swap)
+- **Backend:** Hono 4, Drizzle ORM, @react-pdf/renderer
+- **Database:** PostgreSQL 16 (default), MySQL, SQLite — runtime dialect switching via `DB_PROVIDER` env var or auto-detected from `DATABASE_URL`
 - **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
 - **Testing:** Bun test runner, Hono `app.request()` (101 API E2E tests)
 - **Language:** TypeScript 5.7, strict mode
@@ -33,19 +33,18 @@ bun run typecheck          # Type-check all packages
 bun run lint               # Lint + format check (Biome)
 bun run lint:fix           # Auto-fix lint + format issues
 bun run test               # Run API E2E tests (requires presto_test DB)
-bun run db:generate        # Generate Prisma client
-bun run db:push            # Push schema changes to dev DB (no migration file)
-bun run db:migrate         # Apply committed migrations (migrate deploy)
-bun run db:migrate:dev     # Create new migration from schema changes (migrate dev)
+bun run db:generate        # Generate Drizzle migrations (uses DB_DIALECT env var)
+bun run db:migrate         # Apply migrations programmatically
 bun run db:seed            # Seed sample data
-docker compose up -d       # Start PostgreSQL + pgweb (dev)
+bun run db:studio          # Open Drizzle Studio
+docker compose up -d       # Start PostgreSQL (dev)
 ```
 
 ## Docker
 
-- `docker-compose.yml` — dev: PostgreSQL + pgweb (DB explorer on :8081)
+- `docker-compose.yml` — dev: PostgreSQL (DB explorer: `bun run db:studio` → Drizzle Studio)
 - `docker-compose.production.yml` — production: PostgreSQL + Presto app (:8080)
-- `Dockerfile` — multi-stage build, single image, `CMD` runs migrations then starts server
+- `Dockerfile` — multi-stage build, single image, migrations run programmatically at startup
 
 ## Path Aliases
 
@@ -55,11 +54,15 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 
 - **Routes:** all prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `health`, `config`
 - **Errors:** throw `HTTPException` from `hono/http-exception` — don't use `c.json()` with error status codes
-- **Ownership checks:** use `findOwned(model, id, userId)` from `lib/helpers.ts` — returns the record, throws 404
+- **ORM:** Drizzle ORM with runtime dialect factory in `src/db/index.ts` — exports `db`, table references, and relations
+- **Schemas:** per-dialect schema files in `src/db/schema/{pg,mysql,sqlite}.schema.ts`
+- **Ownership checks:** use `findOwned(model, id, userId)` from `db/helpers.ts` — returns the record, throws 404
 - **Status guards:** use `ensureDraft(report)` from `lib/helpers.ts` — throws 400 if report is completed
 - **Utilities:** `slugify()` in `lib/helpers.ts` for filename-safe strings
-- **Prisma includes:** use `REPORT_INCLUDE` / `REPORT_INCLUDE_PDF` constants for consistent query shapes
+- **Query helpers:** `insertReturning()`, `updateReturning()` in `db/helpers.ts` — handle MySQL's lack of RETURNING
+- **Relational includes:** use `REPORT_WITH` / `REPORT_WITH_PDF` constants from `db/helpers.ts`
 - **Config:** all env vars accessed via `lib/config.ts` — never read `process.env` directly in routes
+- **IDs:** CUID2 generated in JS via `@paralleldrive/cuid2` — works on all dialects
 
 ## Frontend Patterns
 
@@ -75,8 +78,8 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 
 - **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
 - **Location:** `packages/backend/tests/` — 9 test suites, 101 tests
-- **Database:** isolated `presto_test` PostgreSQL database
-- **Setup:** preload script (`setup.ts`) runs `prisma migrate deploy` + `TRUNCATE CASCADE` before tests
+- **Database:** isolated `presto_test` PostgreSQL database (or SQLite via `DATABASE_URL=file:./test.db`)
+- **Setup:** preload script (`setup.ts`) runs Drizzle migrations + dialect-aware truncation before tests
 - **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)
 - **Config:** `bunfig.toml` configures preload, `--env-file .env.test` loads test env vars
 - **CI:** dedicated `test` job in CI workflow with PostgreSQL service container
@@ -90,7 +93,7 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 
 ## CI/CD
 
-- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → generate → typecheck → build) + `test` (PostgreSQL service → generate → migrate → test) on PR/push to `main`
+- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → typecheck → build) + `test` (PostgreSQL service → test) on PR/push to `main`
 - **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
 - **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR on release
 
@@ -111,5 +114,5 @@ docker compose up -d       # Start PostgreSQL + pgweb (dev)
 - Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
 - `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup
 - Registration password requires min 8 chars + uppercase + lowercase + digit
-- Prisma schema uses only cross-DB compatible types (String, Float, Boolean, DateTime, Int, enum, cuid)
+- Drizzle schemas use dialect-specific constructors — one schema file per database (pg, mysql, sqlite)
 - Completed reports are read-only — no entry editing, auto-fill, or clear. Only PDF export is allowed.

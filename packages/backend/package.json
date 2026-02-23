@@ -6,25 +6,23 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
-    "db:migrate": "bunx prisma migrate deploy",
-    "db:migrate:dev": "bunx prisma migrate dev",
-    "db:push": "bunx prisma db push",
-    "db:seed": "bunx prisma db seed",
-    "db:generate": "bunx prisma generate",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/db/migrate.ts",
+    "db:seed": "bun run src/db/seed.ts",
+    "db:studio": "bun run --env-file ../../.env drizzle-kit studio",
     "test": "bun test --env-file .env.test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.6",
+    "@paralleldrive/cuid2": "^2.2.2",
     "@presto/shared": "workspace:*",
-    "@prisma/adapter-pg": "^7.4.1",
-    "@prisma/client": "^7.4.1",
     "@react-pdf/renderer": "^4.3.0",
-    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.44.0",
     "hono": "^4.7.0",
     "hono-rate-limiter": "^0.5.3",
+    "mysql2": "^3.14.0",
     "pg": "^8.18.0",
-    "prisma": "^7.4.1",
     "react": "^19.0.0",
     "zod": "^4.3.6"
   },
@@ -32,6 +30,7 @@
     "@types/bun": "latest",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.0.0",
+    "drizzle-kit": "^0.31.0",
     "typescript": "^5.7.0"
   }
 }

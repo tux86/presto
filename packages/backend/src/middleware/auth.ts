@@ -1,8 +1,10 @@
+import { eq } from "drizzle-orm";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import { insertReturning } from "../db/helpers.js";
+import { db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { verifyToken } from "../lib/jwt.js";
-import { prisma } from "../lib/prisma.js";
 
 type AuthEnv = {
   Variables: {
@@ -13,15 +15,13 @@ type AuthEnv = {
 
 async function getOrCreateDefaultUser(): Promise<{ id: string; email: string }> {
   const { email, password, firstName, lastName } = config.auth.defaultUser;
-  let user = await prisma.user.findUnique({ where: { email } });
+  let user = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (!user) {
     const hashedPassword = await Bun.password.hash(password || crypto.randomUUID(), {
       algorithm: "bcrypt",
       cost: config.auth.bcryptCost,
     });
-    user = await prisma.user.create({
-      data: { email, password: hashedPassword, firstName, lastName },
-    });
+    user = await insertReturning(users, { email, password: hashedPassword, firstName, lastName });
   }
   return { id: user.id, email: user.email };
 }
@@ -51,7 +51,10 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
     throw new HTTPException(401, { message: "Invalid or expired token" });
   }
 
-  const user = await prisma.user.findUnique({ where: { id: payload.sub }, select: { id: true } });
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, payload.sub),
+    columns: { id: true },
+  });
   if (!user) {
     throw new HTTPException(401, { message: "User no longer exists" });
   }

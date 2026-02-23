@@ -1,12 +1,14 @@
 import { zValidator } from "@hono/zod-validator";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { getConnInfo } from "hono/bun";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { rateLimiter } from "hono-rate-limiter";
+import { insertReturning } from "../db/helpers.js";
+import { db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
-import { prisma } from "../lib/prisma.js";
 import { loginSchema, registerSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -38,26 +40,6 @@ const authLimiter =
       })
     : noopMiddleware;
 
-function serializeUser(user: {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  company: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}) {
-  return {
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    company: user.company,
-    createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString(),
-  };
-}
-
 auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c) => {
   if (!config.auth.registrationEnabled) {
     throw new HTTPException(403, { message: "Registration is disabled" });
@@ -65,7 +47,7 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
 
   const { email, password, firstName, lastName, company } = c.req.valid("json");
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (existing) {
     throw new HTTPException(409, { message: "Email already registered" });
   }
@@ -75,24 +57,23 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
     cost: config.auth.bcryptCost,
   });
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      company: company || null,
-    },
+  const user = await insertReturning(users, {
+    email,
+    password: hashedPassword,
+    firstName,
+    lastName,
+    company: company || null,
   });
 
+  const { password: _, ...safeUser } = user;
   const token = await createToken(user.id, user.email);
-  return c.json({ token, user: serializeUser(user) }, 201);
+  return c.json({ token, user: safeUser }, 201);
 });
 
 auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
   const { email, password } = c.req.valid("json");
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (!user) {
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
@@ -102,15 +83,16 @@ auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
+  const { password: _, ...safeUser } = user;
   const token = await createToken(user.id, user.email);
-  return c.json({ token, user: serializeUser(user) });
+  return c.json({ token, user: safeUser });
 });
 
 auth.get("/me", authMiddleware, async (c) => {
   const userId = c.get("userId");
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: {
       id: true,
       email: true,
       firstName: true,

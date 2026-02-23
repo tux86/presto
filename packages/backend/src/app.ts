@@ -40,14 +40,36 @@ app.use(
   }),
 );
 
+/** Detect FK constraint errors across all supported databases. */
+function isForeignKeyViolation(e: Record<string, unknown>): boolean {
+  // PostgreSQL
+  if (e.code === "23503") return true;
+  // MySQL
+  if (e.code === "ER_ROW_IS_REFERENCED_2" || e.errno === 1451) return true;
+  // SQLite
+  if (typeof e.message === "string" && e.message.includes("FOREIGN KEY constraint failed")) return true;
+  return false;
+}
+
+/** Detect FK constraint errors across all supported databases, including Drizzle-wrapped errors. */
+function isForeignKeyError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const e = err as Record<string, unknown>;
+  if (isForeignKeyViolation(e)) return true;
+  // Drizzle wraps driver errors in DrizzleQueryError with a .cause property
+  if (e.cause && typeof e.cause === "object") {
+    return isForeignKeyViolation(e.cause as Record<string, unknown>);
+  }
+  return false;
+}
+
 // Global error handler
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json({ error: err.message }, err.status);
   }
 
-  // Prisma foreign key constraint violation
-  if (err && typeof err === "object" && "code" in err && err.code === "P2003") {
+  if (isForeignKeyError(err)) {
     return c.json({ error: "Cannot delete: record has associated data" }, 409);
   }
 

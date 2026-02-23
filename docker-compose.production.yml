@@ -1,5 +1,9 @@
 # Production deployment: PostgreSQL + Presto app (http://localhost:8080)
 # Usage: docker compose -f docker-compose.production.yml up -d
+#
+# For SQLite (no separate DB needed):
+#   Set DATABASE_URL=file:/data/presto.db and mount a volume for /data
+#   Remove the postgres service and depends_on block.
 services:
   postgres:
     image: postgres:16-alpine

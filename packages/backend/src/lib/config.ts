@@ -41,6 +41,15 @@ export const config = {
   },
   database: {
     url: envRequired("DATABASE_URL"),
+    provider: (() => {
+      const explicit = process.env.DB_PROVIDER;
+      if (explicit) return explicit as "postgresql" | "mysql" | "sqlite";
+      const url = process.env.DATABASE_URL ?? "";
+      if (url.startsWith("postgresql://") || url.startsWith("postgres://")) return "postgresql";
+      if (url.startsWith("mysql://")) return "mysql";
+      if (url.startsWith("file:") || url.endsWith(".db") || url.endsWith(".sqlite")) return "sqlite";
+      return "postgresql";
+    })() as "postgresql" | "mysql" | "sqlite",
   },
   jwt: {
     secret: (() => {

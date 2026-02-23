@@ -1,13 +1,17 @@
 import type { CurrencyCode, ReportingData } from "@presto/shared";
-import { prisma } from "../lib/prisma.js";
+import { and, eq } from "drizzle-orm";
+import { MISSION_WITH } from "../db/helpers.js";
+import { activityReports, db } from "../db/index.js";
 
 export async function getYearlyReport(userId: string, year: number): Promise<ReportingData> {
-  const reports = await prisma.activityReport.findMany({
-    where: { userId, year, status: "COMPLETED" },
-    include: {
-      mission: {
-        include: { client: { select: { id: true, name: true, currency: true } } },
-      },
+  const reports = await db.query.activityReports.findMany({
+    where: and(
+      eq(activityReports.userId, userId),
+      eq(activityReports.year, year),
+      eq(activityReports.status, "COMPLETED"),
+    ),
+    with: {
+      mission: { with: MISSION_WITH },
     },
   });
 

@@ -15,9 +15,7 @@ COPY packages/backend/ packages/backend/
 
 RUN cd packages/frontend && bun run build
 
-ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-RUN cd packages/backend && bunx prisma generate && \
-    bun build src/index.ts --outdir dist --target bun
+RUN cd packages/backend && bun build src/index.ts --outdir dist --target bun
 
 # ── Stage 2: Runtime ─────────────────────────────────────
 FROM oven/bun:1-debian
@@ -27,22 +25,19 @@ RUN groupadd --system --gid 1001 presto && \
 
 WORKDIR /app
 
-# Install only prisma CLI + dotenv (needed for startup migrations and prisma.config.ts).
-# The bundled dist/index.js is self-contained and needs no other node_modules.
-RUN echo '{"dependencies":{"prisma":"^7.4.1","dotenv":"^17.3.1"}}' > package.json && \
+# Install runtime DB drivers. The bundled dist/index.js is self-contained
+# but needs native driver packages available at runtime.
+RUN echo '{"dependencies":{"pg":"^8.18.0","mysql2":"^3.14.0"}}' > package.json && \
     bun install --production && \
     rm package.json
 
 # Copy built artifacts into a flat production layout:
-#   /app/dist/index.js   — backend bundle
-#   /app/public/          — frontend static files
-#   /app/prisma/          — schema, migrations, generated client
+#   /app/dist/index.js      — backend bundle
+#   /app/public/             — frontend static files
+#   /app/dist/migrations/    — Drizzle SQL migration files
 COPY --from=builder --link /app/packages/backend/dist dist
 COPY --from=builder --link /app/packages/frontend/dist public
-COPY --from=builder --link /app/packages/backend/prisma/generated prisma/generated
-COPY --from=builder --link /app/packages/backend/prisma/schema.prisma prisma/schema.prisma
-COPY --from=builder --link /app/packages/backend/prisma/migrations prisma/migrations
-COPY --link packages/backend/prisma.config.ts prisma.config.ts
+COPY --from=builder --link /app/packages/backend/src/db/migrations dist/migrations
 
 ENV PORT=8080
 USER presto
@@ -51,4 +46,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD bun -e "fetch('http://localhost:8080/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"
 
-CMD ["sh", "-c", "bunx prisma migrate deploy && exec bun ./dist/index.js"]
+# Migrations run programmatically inside the app at startup
+CMD ["bun", "./dist/index.js"]

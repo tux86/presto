@@ -6,11 +6,12 @@ CREATE TABLE "ActivityReport" (
 	"status" "ReportStatus" DEFAULT 'DRAFT' NOT NULL,
 	"totalDays" double precision DEFAULT 0 NOT NULL,
 	"note" text,
+	"dailyRate" double precision,
 	"holidayCountry" text NOT NULL,
 	"missionId" text NOT NULL,
 	"userId" text NOT NULL,
-	"createdAt" timestamp (3) DEFAULT now() NOT NULL,
-	"updatedAt" timestamp (3) DEFAULT now() NOT NULL,
+	"createdAt" timestamp (3) NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL,
 	CONSTRAINT "ActivityReport_missionId_month_year_key" UNIQUE("missionId","month","year")
 );
 --> statement-breakpoint
@@ -21,11 +22,18 @@ CREATE TABLE "Client" (
 	"phone" text,
 	"address" text,
 	"businessId" text,
+	"color" text,
 	"currency" text NOT NULL,
 	"holidayCountry" text NOT NULL,
 	"userId" text NOT NULL,
-	"createdAt" timestamp (3) DEFAULT now() NOT NULL,
-	"updatedAt" timestamp (3) DEFAULT now() NOT NULL
+	"createdAt" timestamp (3) NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "ExchangeRate" (
+	"currency" text PRIMARY KEY NOT NULL,
+	"rate" double precision NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "Mission" (
@@ -37,8 +45,8 @@ CREATE TABLE "Mission" (
 	"startDate" timestamp (3),
 	"endDate" timestamp (3),
 	"isActive" boolean DEFAULT true NOT NULL,
-	"createdAt" timestamp (3) DEFAULT now() NOT NULL,
-	"updatedAt" timestamp (3) DEFAULT now() NOT NULL
+	"createdAt" timestamp (3) NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "ReportEntry" (
@@ -52,6 +60,15 @@ CREATE TABLE "ReportEntry" (
 	CONSTRAINT "ReportEntry_reportId_date_key" UNIQUE("reportId","date")
 );
 --> statement-breakpoint
+CREATE TABLE "UserSettings" (
+	"userId" text PRIMARY KEY NOT NULL,
+	"theme" text DEFAULT 'dark' NOT NULL,
+	"locale" text DEFAULT 'en' NOT NULL,
+	"baseCurrency" text DEFAULT 'EUR' NOT NULL,
+	"createdAt" timestamp (3) NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "User" (
 	"id" text PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
@@ -59,8 +76,8 @@ CREATE TABLE "User" (
 	"firstName" text NOT NULL,
 	"lastName" text NOT NULL,
 	"company" text,
-	"createdAt" timestamp (3) DEFAULT now() NOT NULL,
-	"updatedAt" timestamp (3) DEFAULT now() NOT NULL,
+	"createdAt" timestamp (3) NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL,
 	CONSTRAINT "User_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -70,6 +87,7 @@ ALTER TABLE "Client" ADD CONSTRAINT "Client_userId_User_id_fk" FOREIGN KEY ("use
 ALTER TABLE "Mission" ADD CONSTRAINT "Mission_clientId_Client_id_fk" FOREIGN KEY ("clientId") REFERENCES "public"."Client"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Mission" ADD CONSTRAINT "Mission_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ReportEntry" ADD CONSTRAINT "ReportEntry_reportId_ActivityReport_id_fk" FOREIGN KEY ("reportId") REFERENCES "public"."ActivityReport"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "UserSettings" ADD CONSTRAINT "UserSettings_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "ActivityReport_userId_year_month_idx" ON "ActivityReport" USING btree ("userId","year","month");--> statement-breakpoint
 CREATE INDEX "Client_userId_idx" ON "Client" USING btree ("userId");--> statement-breakpoint
 CREATE INDEX "Mission_userId_idx" ON "Mission" USING btree ("userId");--> statement-breakpoint

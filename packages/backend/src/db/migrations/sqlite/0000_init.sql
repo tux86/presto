@@ -5,6 +5,7 @@ CREATE TABLE `ActivityReport` (
 	`status` text DEFAULT 'DRAFT' NOT NULL,
 	`totalDays` real DEFAULT 0 NOT NULL,
 	`note` text,
+	`dailyRate` real,
 	`holidayCountry` text NOT NULL,
 	`missionId` text NOT NULL,
 	`userId` text NOT NULL,
@@ -23,6 +24,7 @@ CREATE TABLE `Client` (
 	`phone` text,
 	`address` text,
 	`businessId` text,
+	`color` text,
 	`currency` text NOT NULL,
 	`holidayCountry` text NOT NULL,
 	`userId` text NOT NULL,
@@ -32,6 +34,12 @@ CREATE TABLE `Client` (
 );
 --> statement-breakpoint
 CREATE INDEX `Client_userId_idx` ON `Client` (`userId`);--> statement-breakpoint
+CREATE TABLE `ExchangeRate` (
+	`currency` text PRIMARY KEY NOT NULL,
+	`rate` real NOT NULL,
+	`updatedAt` integer NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `Mission` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -61,6 +69,16 @@ CREATE TABLE `ReportEntry` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `ReportEntry_reportId_date_key` ON `ReportEntry` (`reportId`,`date`);--> statement-breakpoint
+CREATE TABLE `UserSettings` (
+	`userId` text PRIMARY KEY NOT NULL,
+	`theme` text DEFAULT 'dark' NOT NULL,
+	`locale` text DEFAULT 'en' NOT NULL,
+	`baseCurrency` text DEFAULT 'EUR' NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL,
+	FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `User` (
 	`id` text PRIMARY KEY NOT NULL,
 	`email` text NOT NULL,

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1771852694396,
-      "tag": "0000_curious_the_hand",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1771864429054,
-      "tag": "0001_outgoing_dexter_bennett",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1771866296985,
-      "tag": "0002_amusing_taskmaster",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1771867196915,
-      "tag": "0003_long_blue_blade",
+      "when": 1771882622206,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

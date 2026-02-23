@@ -134,14 +134,14 @@ graph LR
         Shared["@presto/shared<br/>Types · Date Utilities · Holidays"]
     end
 
-    DB[(PostgreSQL)]
+    DB[(PostgreSQL<br/>MySQL / MariaDB<br/>SQLite)]
 
     Static -.->|"HTML · JS · CSS"| SPA
     SPA -->|"REST /api/*"| MW
     MW --> Auth
     Auth --> Routes
     Routes --> PDF
-    Routes -->|"Drizzle ORM"| DB
+    Routes -->|"Drizzle ORM<br/>runtime dialect"| DB
     Shared -.-> Routes
 ```
 

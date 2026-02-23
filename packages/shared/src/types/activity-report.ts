@@ -23,6 +23,7 @@ export interface ActivityReport {
   status: ReportStatus;
   totalDays: number;
   note: string | null;
+  dailyRate: number | null;
   holidayCountry: HolidayCountryCode;
   missionId: string;
   userId: string;

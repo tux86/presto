@@ -82,7 +82,14 @@ activityReportsRouter.post("/", zValidator("json", createReportSchema), async (c
     throw new HTTPException(404, { message: "Client not found" });
   }
 
-  const report = await createReportWithEntries(userId, missionId, month, year, client.holidayCountry);
+  const report = await createReportWithEntries(
+    userId,
+    missionId,
+    month,
+    year,
+    client.holidayCountry,
+    mission.dailyRate,
+  );
   c.header("Location", `/api/activity-reports/${report.id}`);
   return c.json(report, 201);
 });

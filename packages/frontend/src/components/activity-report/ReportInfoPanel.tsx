@@ -28,7 +28,8 @@ export function ReportInfoPanel({
 }: ReportInfoPanelProps) {
   const { t, locale } = useT();
   const clientCurrency = report.mission?.client?.currency;
-  const revenue = report.mission?.dailyRate ? report.totalDays * report.mission.dailyRate : null;
+  const dailyRate = report.dailyRate ?? report.mission?.dailyRate;
+  const revenue = dailyRate != null ? report.totalDays * dailyRate : null;
   const isCompleted = report.status === "COMPLETED";
 
   return (
@@ -70,13 +71,11 @@ export function ReportInfoPanel({
           <span className="text-sm text-muted">{t("activity.daysWorked")}</span>
           <span className="text-lg font-bold text-heading">{report.totalDays}</span>
         </div>
-        {report.mission?.dailyRate && (
+        {dailyRate != null && (
           <>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted">{t("missions.dailyRate")}</span>
-              <span className="text-base font-semibold text-body">
-                {formatCurrency(report.mission.dailyRate, clientCurrency)}
-              </span>
+              <span className="text-base font-semibold text-body">{formatCurrency(dailyRate, clientCurrency)}</span>
             </div>
             {revenue !== null && (
               <div className="flex justify-between items-center">

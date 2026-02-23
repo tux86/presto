@@ -16,10 +16,9 @@ export function ActivityReportCard({ report, locale }: ActivityReportCardProps) 
   const entries = report.entries ?? [];
   const color = getClientColor(report.mission?.client?.name ?? "", report.mission?.client?.color);
 
+  const dailyRate = report.dailyRate ?? report.mission?.dailyRate;
   const revenue =
-    report.mission?.dailyRate != null
-      ? formatCurrency(report.totalDays * report.mission.dailyRate, report.mission?.client?.currency)
-      : null;
+    dailyRate != null ? formatCurrency(report.totalDays * dailyRate, report.mission?.client?.currency) : null;
 
   const monthLabel = `${getMonthName(report.month, locale)} ${report.year}`;
   const daysLabel = `${formatNumber(report.totalDays)} ${report.totalDays > 1 ? t("activity.days") : t("activity.day")}`;

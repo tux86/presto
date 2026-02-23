@@ -45,6 +45,7 @@ export async function createReportWithEntries(
   month: number,
   year: number,
   holidayCountry: string,
+  dailyRate?: number | null,
 ) {
   const dates = getMonthDates(year, month);
 
@@ -52,7 +53,7 @@ export async function createReportWithEntries(
   const report = await db.transaction(async (tx) => {
     const inserted = await insertReturning(
       activityReports,
-      { month, year, userId, missionId, holidayCountry },
+      { month, year, userId, missionId, holidayCountry, dailyRate: dailyRate ?? null },
       tx as typeof db,
     );
 

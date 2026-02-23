@@ -30,7 +30,8 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
   const allReports = [...reports, ...prevReports];
   const conversions = await Promise.all(
     allReports.map((r) => {
-      const revenue = r.totalDays * (r.mission.dailyRate ?? 0);
+      const rate = r.dailyRate ?? r.mission.dailyRate ?? 0;
+      const revenue = r.totalDays * rate;
       return convertAmount(revenue, r.mission.client.currency, baseCurrency);
     }),
   );
@@ -60,7 +61,8 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
   for (let i = 0; i < reports.length; i++) {
     const report = reports[i];
     const days = report.totalDays;
-    const revenue = days * (report.mission.dailyRate ?? 0);
+    const rate = report.dailyRate ?? report.mission.dailyRate ?? 0;
+    const revenue = days * rate;
     const converted = conversions[i];
     const clientCurrency = report.mission.client.currency as CurrencyCode;
 

@@ -198,6 +198,7 @@ export function Missions() {
           </Select>
           <Input
             label={t("missions.dailyRate")}
+            hint={t("missions.dailyRateHint")}
             type="number"
             value={dailyRate}
             onChange={(e) => setDailyRate(e.target.value)}

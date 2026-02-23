@@ -1,3 +1,9 @@
+## [1.12.1](https://github.com/tux86/presto/compare/v1.12.0...v1.12.1) (2026-02-23)
+
+### Bug Fixes
+
+* comprehensive backend audit — transaction safety, auth hardening, type fixes ([a6ed052](https://github.com/tux86/presto/commit/a6ed052fd4b9ee43d19a59c3df98d50371b4a8a6))
+
 ## [1.12.0](https://github.com/tux86/presto/compare/v1.11.1...v1.12.0) (2026-02-23)
 
 ### Features

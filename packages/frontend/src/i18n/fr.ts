@@ -128,7 +128,14 @@ export const fr: Record<TranslationKey, string> = {
   "auth.tagline": "Suivez votre temps.\nSimplifiez vos comptes-rendus.",
   "auth.brandingDescription": "Suivi du temps et comptes-rendus d'activit\u00e9, simplifi\u00e9s.",
 
+  // Profile
+  "profile.title": "Modifier le profil",
+  "profile.firstName": "Pr\u00e9nom",
+  "profile.lastName": "Nom",
+  "profile.company": "Soci\u00e9t\u00e9",
+
   // Common
+  "common.save": "Enregistrer",
   "common.create": "Cr\u00e9er",
   "common.edit": "Modifier",
   "common.cancel": "Annuler",

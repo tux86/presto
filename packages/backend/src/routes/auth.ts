@@ -5,18 +5,18 @@ import { getConnInfo } from "hono/bun";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { rateLimiter } from "hono-rate-limiter";
-import { insertReturning } from "../db/helpers.js";
+import { insertReturning, updateReturning } from "../db/helpers.js";
 import { db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
-import { loginSchema, registerSchema } from "../lib/schemas.js";
+import { loginSchema, registerSchema, updateProfileSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const auth = new Hono<AppEnv>();
 
 auth.use("*", async (c, next) => {
-  if (config.auth.disabled && c.req.path !== "/api/auth/me") {
+  if (config.auth.disabled && c.req.path !== "/api/auth/me" && c.req.path !== "/api/auth/profile") {
     throw new HTTPException(404, { message: "Auth is disabled" });
   }
   return next();
@@ -111,6 +111,15 @@ auth.get("/me", authMiddleware, async (c) => {
   }
 
   return c.json(user);
+});
+
+auth.patch("/profile", authMiddleware, zValidator("json", updateProfileSchema), async (c) => {
+  const userId = c.get("userId");
+  const body = c.req.valid("json");
+
+  const updated = await updateReturning(users, userId, { ...body, updatedAt: new Date() });
+  const { password: _, ...safeUser } = updated;
+  return c.json(safeUser);
 });
 
 export default auth;

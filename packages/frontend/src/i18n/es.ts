@@ -127,7 +127,14 @@ export const es: Record<TranslationKey, string> = {
   "auth.tagline": "Registre su tiempo.\nSimplifique sus informes.",
   "auth.brandingDescription": "Seguimiento del tiempo e informes de actividad, simplificados.",
 
+  // Profile
+  "profile.title": "Editar perfil",
+  "profile.firstName": "Nombre",
+  "profile.lastName": "Apellido",
+  "profile.company": "Empresa",
+
   // Common
+  "common.save": "Guardar",
   "common.create": "Crear",
   "common.edit": "Editar",
   "common.cancel": "Cancelar",

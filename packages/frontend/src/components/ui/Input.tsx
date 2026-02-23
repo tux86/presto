@@ -4,27 +4,31 @@ import { cn } from "@/lib/utils";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  hint?: string;
   error?: string;
   optional?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, optional, className, id, ...props }, ref) => {
+  ({ label, hint, error, optional, className, id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
     const { t } = useT();
     return (
       <div className="space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-muted">
-            {label}
-            {optional && <span className="ml-1 text-xs font-normal text-faint">({t("common.optional")})</span>}
-          </label>
+          <div>
+            <label htmlFor={inputId} className="block text-sm font-medium text-muted">
+              {label}
+              {optional && <span className="ml-1 text-xs font-normal text-faint">({t("common.optional")})</span>}
+            </label>
+            {hint && <p className="text-xs text-faint mt-0.5">{hint}</p>}
+          </div>
         )}
         <input
           ref={ref}
           id={inputId}
           className={cn(
-            "w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading placeholder:text-placeholder outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent",
+            "w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading placeholder:text-placeholder outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:bg-inset disabled:text-muted disabled:opacity-100",
             error && "border-red-500 focus:border-red-500 focus:ring-red-500",
             className,
           )}

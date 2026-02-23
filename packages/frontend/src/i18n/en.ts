@@ -124,7 +124,14 @@ export const en = {
   "auth.tagline": "Track your time.\nSimplify your reports.",
   "auth.brandingDescription": "Time tracking and activity reports, simplified.",
 
+  // Profile
+  "profile.title": "Edit Profile",
+  "profile.firstName": "First Name",
+  "profile.lastName": "Last Name",
+  "profile.company": "Company",
+
   // Common
+  "common.save": "Save",
   "common.create": "Create",
   "common.edit": "Edit",
   "common.cancel": "Cancel",

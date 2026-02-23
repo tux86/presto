@@ -18,6 +18,7 @@ interface AuthState {
   }) => Promise<void>;
   logout: () => void;
   fetchMe: () => Promise<void>;
+  updateProfile: (data: { firstName?: string; lastName?: string; company?: string | null }) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -52,6 +53,11 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           get().logout();
         }
+      },
+
+      updateProfile: async (data) => {
+        await api.patch("/auth/profile", data);
+        await get().fetchMe();
       },
     }),
     {

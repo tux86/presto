@@ -23,6 +23,12 @@ export const registerSchema = z.object({
   company: z.string().max(200).optional(),
 });
 
+export const updateProfileSchema = z.object({
+  firstName: z.string().min(1).max(200).optional(),
+  lastName: z.string().min(1).max(200).optional(),
+  company: z.string().max(200).nullable().optional(),
+});
+
 export const loginSchema = z.object({
   email: z.string().email().max(254),
   password: z.string().min(1).max(128),

@@ -173,7 +173,7 @@ Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The
 | i18n (FR + EN) | ✅ | ✅ | ❌ | ❌ |
 | Client/mission tracking | ✅ | ✅ | ❌ | ❌ |
 | Revenue dashboards | ✅ | ✅ | ❌ | ❌ |
-| Holiday-aware calendars | ✅ | ❌ | ❌ | ❌ |
+| Holiday-aware calendars | ✅ | ✅ | ❌ | ❌ |
 | Half-day precision | ✅ | ❌ | ❌ | ❌ |
 
 ## Development

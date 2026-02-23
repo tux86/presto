@@ -1,4 +1,9 @@
-import { createId } from "@paralleldrive/cuid2";
+// nanoid imported directly — drizzle-kit loads schemas via CJS and can't resolve local .ts files
+// alphabet/length must match db/id.ts
+import { customAlphabet } from "nanoid";
+
+const createId = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 21);
+
 import { index, integer, real, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 // Common column helpers
@@ -101,6 +106,7 @@ export const activityReports = sqliteTable(
       .default("DRAFT"),
     totalDays: real("totalDays").notNull().default(0),
     note: text("note"),
+    dailyRate: real("dailyRate"),
     holidayCountry: text("holidayCountry").notNull(),
     missionId: text("missionId")
       .notNull()

@@ -1,4 +1,9 @@
-import { createId } from "@paralleldrive/cuid2";
+// nanoid imported directly — drizzle-kit loads schemas via CJS and can't resolve local .ts files
+// alphabet/length must match db/id.ts
+import { customAlphabet } from "nanoid";
+
+const createId = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 21);
+
 import {
   boolean,
   datetime,
@@ -110,6 +115,7 @@ export const activityReports = mysqlTable(
     status: mysqlEnum("status", ["DRAFT", "COMPLETED"]).notNull().default("DRAFT"),
     totalDays: double("totalDays").notNull().default(0),
     note: text("note"),
+    dailyRate: double("dailyRate"),
     holidayCountry: varchar("holidayCountry", { length: 10 }).notNull(),
     missionId: varchar("missionId", { length: 36 })
       .notNull()

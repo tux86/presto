@@ -1,3 +1,5 @@
+export { createId } from "./id.js";
+
 import { relations } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { config } from "../lib/config.js";

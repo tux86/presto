@@ -1,4 +1,9 @@
-import { createId } from "@paralleldrive/cuid2";
+// nanoid imported directly — drizzle-kit loads schemas via CJS and can't resolve local .ts files
+// alphabet/length must match db/id.ts
+import { customAlphabet } from "nanoid";
+
+const createId = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 21);
+
 import {
   boolean,
   doublePrecision,
@@ -112,6 +117,7 @@ export const activityReports = pgTable(
     status: reportStatusEnum("status").notNull().default("DRAFT"),
     totalDays: doublePrecision("totalDays").notNull().default(0),
     note: text("note"),
+    dailyRate: doublePrecision("dailyRate"),
     holidayCountry: text("holidayCountry").notNull(),
     missionId: text("missionId")
       .notNull()

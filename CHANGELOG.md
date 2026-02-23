@@ -1,3 +1,9 @@
+## [1.11.1](https://github.com/tux86/presto/compare/v1.11.0...v1.11.1) (2026-02-23)
+
+### Performance
+
+* switch Docker runtime base to Alpine for smaller image ([a3e47cd](https://github.com/tux86/presto/commit/a3e47cdd2f9a578106ab81f7a33c1c32a72b0039))
+
 ## [1.11.0](https://github.com/tux86/presto/compare/v1.10.0...v1.11.0) (2026-02-23)
 
 ### Features

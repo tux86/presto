@@ -2,8 +2,9 @@ import type { CurrencyCode, ReportingData } from "@presto/shared";
 import { and, eq } from "drizzle-orm";
 import { MISSION_WITH } from "../db/helpers.js";
 import { activityReports, db } from "../db/index.js";
+import { convertAmount } from "./exchange-rate.service.js";
 
-export async function getYearlyReport(userId: string, year: number): Promise<ReportingData> {
+export async function getYearlyReport(userId: string, year: number, baseCurrency: string): Promise<ReportingData> {
   const reports = await db.query.activityReports.findMany({
     where: and(
       eq(activityReports.userId, userId),
@@ -17,30 +18,34 @@ export async function getYearlyReport(userId: string, year: number): Promise<Rep
 
   let totalDays = 0;
   let totalRevenue = 0;
-  let dailyRateSum = 0;
-  let dailyRateCount = 0;
 
   const monthlyMap = new Map<number, { days: number; revenue: number }>();
   const clientMap = new Map<
     string,
-    { clientId: string; clientName: string; currency: CurrencyCode; days: number; revenue: number }
+    {
+      clientId: string;
+      clientName: string;
+      currency: CurrencyCode;
+      days: number;
+      revenue: number;
+      convertedRevenue: number;
+    }
   >();
 
   for (const report of reports) {
-    totalDays += report.totalDays;
-    const revenue = report.totalDays * (report.mission.dailyRate ?? 0);
-    totalRevenue += revenue;
+    const days = report.totalDays;
+    const revenue = days * (report.mission.dailyRate ?? 0);
+    const clientCurrency = report.mission.client.currency as CurrencyCode;
+    const converted = await convertAmount(revenue, clientCurrency, baseCurrency);
 
-    if (report.mission.dailyRate) {
-      dailyRateSum += report.mission.dailyRate;
-      dailyRateCount++;
-    }
+    totalDays += days;
+    totalRevenue += converted;
 
-    // Monthly
+    // Monthly (in baseCurrency)
     const existing = monthlyMap.get(report.month) ?? { days: 0, revenue: 0 };
     monthlyMap.set(report.month, {
-      days: existing.days + report.totalDays,
-      revenue: existing.revenue + revenue,
+      days: existing.days + days,
+      revenue: existing.revenue + converted,
     });
 
     // Client
@@ -48,14 +53,16 @@ export async function getYearlyReport(userId: string, year: number): Promise<Rep
     const clientExisting = clientMap.get(clientKey) ?? {
       clientId: report.mission.client.id,
       clientName: report.mission.client.name,
-      currency: report.mission.client.currency as CurrencyCode,
+      currency: clientCurrency,
       days: 0,
       revenue: 0,
+      convertedRevenue: 0,
     };
     clientMap.set(clientKey, {
       ...clientExisting,
-      days: clientExisting.days + report.totalDays,
+      days: clientExisting.days + days,
       revenue: clientExisting.revenue + revenue,
+      convertedRevenue: clientExisting.convertedRevenue + converted,
     });
   }
 
@@ -72,9 +79,10 @@ export async function getYearlyReport(userId: string, year: number): Promise<Rep
 
   return {
     year,
+    baseCurrency,
     totalDays,
     totalRevenue,
-    averageDailyRate: dailyRateCount > 0 ? dailyRateSum / dailyRateCount : 0,
+    averageDailyRate: totalDays > 0 ? totalRevenue / totalDays : 0,
     monthlyData,
     clientData: Array.from(clientMap.values()),
   };

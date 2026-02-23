@@ -75,7 +75,6 @@ jobs:
           cat > packages/backend/.env.test << 'EOF'
           DATABASE_URL=file::memory:
           JWT_SECRET=test-jwt-secret-for-ci-minimum-32-characters-long
-          AUTH_ENABLED=true
           REGISTRATION_ENABLED=true
           RATE_LIMIT_MAX=0
           EOF

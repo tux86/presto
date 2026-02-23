@@ -1,4 +1,4 @@
-import { CURRENCIES, HOLIDAY_COUNTRIES, REPORT_STATUSES } from "@presto/shared";
+import { CLIENT_COLOR_KEYS, CURRENCIES, HOLIDAY_COUNTRIES, REPORT_STATUSES, SUPPORTED_LOCALES } from "@presto/shared";
 import { z } from "zod";
 
 const currencySchema = z.enum(CURRENCIES);
@@ -35,6 +35,7 @@ export const createClientSchema = z.object({
   phone: z.string().max(50).optional(),
   address: z.string().max(500).optional(),
   businessId: z.string().max(100).optional(),
+  color: z.enum(CLIENT_COLOR_KEYS).optional(),
   currency: currencySchema,
   holidayCountry: holidayCountrySchema,
 });
@@ -45,6 +46,7 @@ export const updateClientSchema = z.object({
   phone: z.string().max(50).nullable().optional(),
   address: z.string().max(500).nullable().optional(),
   businessId: z.string().max(100).nullable().optional(),
+  color: z.enum(CLIENT_COLOR_KEYS).nullable().optional(),
   currency: currencySchema.optional(),
   holidayCountry: holidayCountrySchema.optional(),
 });
@@ -100,4 +102,11 @@ export const updateEntriesSchema = z.object({
     )
     .min(1)
     .max(31),
+});
+
+// Settings
+export const updateSettingsSchema = z.object({
+  theme: z.enum(["light", "dark", "auto"]).optional(),
+  locale: z.enum(SUPPORTED_LOCALES).optional(),
+  baseCurrency: z.enum(CURRENCIES).optional(),
 });

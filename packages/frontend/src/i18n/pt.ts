@@ -43,6 +43,7 @@ export const pt: Record<TranslationKey, string> = {
   "clients.holidayCountry": "Pa\u00eds de feriados",
   "clients.holidayCountryHint": "Feriados aplicados aos relat\u00f3rios de atividade",
   "clients.selectHolidayCountry": "Selecionar um pa\u00eds",
+  "clients.color": "Cor",
   "clients.deleteMessage":
     "Este cliente e os seus dados ser\u00e3o eliminados. Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel.",
 
@@ -146,4 +147,5 @@ export const pt: Record<TranslationKey, string> = {
   "preferences.title": "Prefer\u00eancias",
   "preferences.theme": "Tema",
   "preferences.language": "Idioma",
+  "preferences.baseCurrency": "Moeda base",
 };

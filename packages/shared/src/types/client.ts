@@ -1,3 +1,4 @@
+import type { ClientColorKey } from "../colors.js";
 import type { HolidayCountryCode } from "../countries.js";
 import type { CurrencyCode } from "../currencies.js";
 
@@ -8,6 +9,7 @@ export interface Client {
   phone: string | null;
   address: string | null;
   businessId: string | null;
+  color: ClientColorKey | null;
   currency: CurrencyCode;
   holidayCountry: HolidayCountryCode;
   userId: string;
@@ -21,6 +23,7 @@ export interface CreateClientRequest {
   phone?: string;
   address?: string;
   businessId?: string;
+  color?: ClientColorKey;
   currency: CurrencyCode;
   holidayCountry: HolidayCountryCode;
 }
@@ -31,6 +34,7 @@ export interface UpdateClientRequest {
   phone?: string | null;
   address?: string | null;
   businessId?: string | null;
+  color?: ClientColorKey | null;
   currency?: CurrencyCode;
   holidayCountry?: HolidayCountryCode;
 }

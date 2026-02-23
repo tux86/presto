@@ -13,7 +13,7 @@ import { useConfigStore } from "@/stores/config.store";
 
 export function Sidebar() {
   const { user, logout } = useAuthStore();
-  const authEnabled = useConfigStore((s) => s.config?.authEnabled ?? true);
+  const authDisabled = useConfigStore((s) => s.config?.authDisabled ?? false);
   const { t } = useT();
   const isMobile = useIsMobile();
 
@@ -78,7 +78,7 @@ export function Sidebar() {
                 </div>
 
                 {/* User + logout */}
-                {authEnabled && (
+                {!authDisabled && (
                   <div className="border-t border-edge pt-4 flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
                       {user?.firstName?.[0]}
@@ -157,7 +157,7 @@ export function Sidebar() {
       </div>
 
       {/* User */}
-      {authEnabled && (
+      {!authDisabled && (
         <div className="border-t border-edge px-4 py-3 flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
             {user?.firstName?.[0]}

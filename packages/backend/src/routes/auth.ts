@@ -16,7 +16,7 @@ import { authMiddleware } from "../middleware/auth.js";
 const auth = new Hono<AppEnv>();
 
 auth.use("*", async (c, next) => {
-  if (!config.auth.enabled && c.req.path !== "/api/auth/me") {
+  if (config.auth.disabled && c.req.path !== "/api/auth/me") {
     throw new HTTPException(404, { message: "Auth is disabled" });
   }
   return next();

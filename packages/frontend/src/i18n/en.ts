@@ -41,6 +41,7 @@ export const en = {
   "clients.holidayCountry": "Holiday country",
   "clients.holidayCountryHint": "Public holidays for activity reports",
   "clients.selectHolidayCountry": "Select a country",
+  "clients.color": "Color",
   "clients.deleteMessage": "This client and its data will be deleted. This action is irreversible.",
 
   // Missions
@@ -142,6 +143,7 @@ export const en = {
   "preferences.title": "Preferences",
   "preferences.theme": "Theme",
   "preferences.language": "Language",
+  "preferences.baseCurrency": "Base currency",
 } as const;
 
 export type TranslationKey = keyof typeof en;

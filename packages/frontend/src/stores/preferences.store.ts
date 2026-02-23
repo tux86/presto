@@ -1,23 +1,17 @@
-import { type Locale, SUPPORTED_LOCALES } from "@presto/shared";
+import type { Locale, ThemeMode, UserSettings } from "@presto/shared";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-
-type ThemeMode = "light" | "dark" | "auto";
-
-/** Detect browser language and match to a supported locale */
-function detectBrowserLocale(): Locale | undefined {
-  const lang = navigator.language?.slice(0, 2);
-  return SUPPORTED_LOCALES.find((l) => l === lang);
-}
+import { api } from "../api/client";
+import { queryClient } from "../lib/query-client";
 
 interface PreferencesState {
   theme: ThemeMode;
   locale: Locale;
-  /** Tracks whether server defaults have been applied on first visit */
-  _initialized: boolean;
+  baseCurrency: string;
+  loaded: boolean;
   setTheme: (theme: ThemeMode) => void;
   setLocale: (locale: Locale) => void;
-  initFromServerDefaults: (defaults: { locale: Locale | null; theme: ThemeMode }) => void;
+  setBaseCurrency: (currency: string) => void;
+  fetchSettings: () => Promise<void>;
 }
 
 function applyTheme(mode: ThemeMode) {
@@ -30,40 +24,44 @@ function applyTheme(mode: ThemeMode) {
   }
 }
 
-export const usePreferencesStore = create<PreferencesState>()(
-  persist(
-    (set, get) => ({
-      theme: "dark",
-      locale: "en",
-      _initialized: false,
-      setTheme: (theme) => {
-        applyTheme(theme);
-        set({ theme });
-      },
-      setLocale: (locale) => {
-        document.documentElement.lang = locale;
-        set({ locale });
-      },
-      initFromServerDefaults: (defaults) => {
-        if (get()._initialized) return;
-        const locale = defaults.locale ?? detectBrowserLocale() ?? "en";
-        const theme = defaults.theme;
-        set({ locale, theme, _initialized: true });
-        document.documentElement.lang = locale;
-        applyTheme(theme);
-      },
-    }),
-    {
-      name: "presto-preferences",
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          applyTheme(state.theme);
-          document.documentElement.lang = state.locale;
-        }
-      },
-    },
-  ),
-);
+export const usePreferencesStore = create<PreferencesState>()((set) => ({
+  theme: "dark",
+  locale: "en",
+  baseCurrency: "EUR",
+  loaded: false,
+
+  setTheme: (theme) => {
+    applyTheme(theme);
+    set({ theme });
+    api.patch("/settings", { theme }).catch(() => {});
+  },
+
+  setLocale: (locale) => {
+    document.documentElement.lang = locale;
+    set({ locale });
+    api.patch("/settings", { locale }).catch(() => {});
+  },
+
+  setBaseCurrency: (baseCurrency) => {
+    set({ baseCurrency });
+    api.patch("/settings", { baseCurrency }).catch(() => {});
+    queryClient.invalidateQueries({ queryKey: ["reporting"] });
+  },
+
+  fetchSettings: async () => {
+    try {
+      const settings = await api.get<UserSettings>("/settings");
+      const theme = settings.theme as ThemeMode;
+      const locale = settings.locale as Locale;
+      applyTheme(theme);
+      document.documentElement.lang = locale;
+      set({ theme, locale, baseCurrency: settings.baseCurrency, loaded: true });
+    } catch {
+      // Fallback: keep defaults, mark as loaded
+      set({ loaded: true });
+    }
+  },
+}));
 
 // Listen for system theme changes when mode is "auto"
 if (typeof window !== "undefined") {

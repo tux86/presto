@@ -1,5 +1,12 @@
-import type { Client, CurrencyCode, HolidayCountryCode } from "@presto/shared";
-import { CURRENCIES, getCountryName, getCurrencyName, getCurrencySymbol, HOLIDAY_COUNTRIES } from "@presto/shared";
+import type { Client, ClientColorKey, CurrencyCode, HolidayCountryCode } from "@presto/shared";
+import {
+  CLIENT_COLOR_KEYS,
+  CURRENCIES,
+  getCountryName,
+  getCurrencyName,
+  getCurrencySymbol,
+  HOLIDAY_COUNTRIES,
+} from "@presto/shared";
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +18,7 @@ import { Table } from "@/components/ui/Table";
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "@/hooks/use-clients";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useT } from "@/i18n";
+import { CLIENT_COLOR_MAP, cn, getClientColor } from "@/lib/utils";
 
 function CountryFlag({ code }: { code: string }) {
   return <span className={`fi fi-${code.toLowerCase()} fis`} />;
@@ -24,6 +32,7 @@ export function Clients() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [businessId, setBusinessId] = useState("");
+  const [color, setColor] = useState<ClientColorKey | "">("");
   const [currency, setCurrency] = useState<CurrencyCode>("EUR");
   const [holidayCountry, setHolidayCountry] = useState<HolidayCountryCode>("");
 
@@ -41,6 +50,7 @@ export function Clients() {
     setPhone("");
     setAddress("");
     setBusinessId("");
+    setColor("");
     setCurrency("");
     setHolidayCountry("");
     setShowModal(true);
@@ -52,6 +62,7 @@ export function Clients() {
     setPhone(client.phone || "");
     setAddress(client.address || "");
     setBusinessId(client.businessId || "");
+    setColor(client.color || "");
     setCurrency(client.currency);
     setHolidayCountry(client.holidayCountry);
     setShowModal(true);
@@ -60,7 +71,7 @@ export function Clients() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !currency || !holidayCountry) return;
-    const data = {
+    const base = {
       name,
       email: email || undefined,
       phone: phone || undefined,
@@ -70,9 +81,9 @@ export function Clients() {
       holidayCountry,
     };
     if (editing) {
-      await updateClient.mutateAsync({ id: editing.id, ...data });
+      await updateClient.mutateAsync({ id: editing.id, ...base, color: color || null });
     } else {
-      await createClient.mutateAsync(data);
+      await createClient.mutateAsync({ ...base, color: color || undefined });
     }
     setShowModal(false);
   };
@@ -107,7 +118,12 @@ export function Clients() {
             {
               key: "name",
               header: t("clients.name"),
-              render: (c) => <span className="font-medium text-heading">{c.name}</span>,
+              render: (c) => (
+                <span className="font-medium text-heading inline-flex items-center gap-2">
+                  <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", getClientColor(c.name, c.color).dot)} />
+                  {c.name}
+                </span>
+              ),
             },
             {
               key: "email",
@@ -191,6 +207,30 @@ export function Clients() {
             placeholder="123 456 789 01234"
             optional
           />
+          {/* Color picker */}
+          <div>
+            <label className="block text-sm font-medium text-heading mb-1.5">
+              {t("clients.color")} <span className="text-faint font-normal">({t("common.optional")})</span>
+            </label>
+            <div className="flex items-center gap-2">
+              {CLIENT_COLOR_KEYS.map((key) => {
+                const selected = color === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setColor(selected ? "" : key)}
+                    className={cn(
+                      "w-7 h-7 rounded-full transition-all cursor-pointer",
+                      CLIENT_COLOR_MAP[key].dot,
+                      selected && "ring-2 ring-offset-2 ring-offset-panel ring-accent",
+                    )}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
           <SearchableSelect
             label={t("clients.currency")}
             hint={t("clients.currencyHint")}

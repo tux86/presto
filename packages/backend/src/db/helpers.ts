@@ -96,7 +96,7 @@ const ENTRIES_ORDERED = { orderBy: (e: any, { asc }: any) => [asc(e.date)] };
 export const REPORT_WITH = {
   entries: ENTRIES_ORDERED,
   mission: {
-    with: { client: { columns: { id: true, name: true, currency: true, holidayCountry: true } } },
+    with: { client: { columns: { id: true, name: true, color: true, currency: true, holidayCountry: true } } },
   },
 } as const;
 

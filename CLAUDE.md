@@ -9,7 +9,7 @@ Activity report time-tracking app. Monorepo with 3 packages.
 - **Backend:** Hono 4, Drizzle ORM, @react-pdf/renderer
 - **Database:** PostgreSQL, MySQL/MariaDB, SQLite — runtime dialect switching via `DB_PROVIDER` env var or auto-detected from `DATABASE_URL`
 - **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
-- **Testing:** Bun test runner, Hono `app.request()` (101 API E2E tests)
+- **Testing:** Bun test runner, Hono `app.request()` (109 API E2E tests)
 - **Language:** TypeScript 5.7, strict mode
 
 ## Project Structure
@@ -53,7 +53,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 ## Backend Patterns
 
-- **Routes:** all prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `health`, `config`
+- **Routes:** all prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `settings`, `health`, `config`
 - **Errors:** throw `HTTPException` from `hono/http-exception` — don't use `c.json()` with error status codes
 - **ORM:** Drizzle ORM with runtime dialect factory in `src/db/index.ts` — exports `db`, table references, and relations
 - **Schemas:** per-dialect schema files in `src/db/schema/{pg,mysql,sqlite}.schema.ts`
@@ -78,7 +78,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 ## Testing
 
 - **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
-- **Location:** `packages/backend/tests/` — 9 test suites, 101 tests
+- **Location:** `packages/backend/tests/` — 10 test suites, 109 tests
 - **Database:** in-memory SQLite (`DATABASE_URL=file::memory:`) — fresh each run, no external DB needed
 - **Setup:** preload script (`setup.ts`) runs Drizzle migrations before tests
 - **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)
@@ -100,13 +100,15 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 ## User Preferences
 
-- **Store:** `preferences.store.ts` — Zustand persist store (`presto-preferences` in localStorage)
-- **Scope:** theme (light/dark/auto), locale (en/fr)
-- **Defaults:** server env var `APP_LOCALE` applied on first visit via `initFromServerDefaults()`
-- **Currency:** per-client field (all ISO 4217 currencies via `Intl.supportedValuesOf`)
+- **Store:** `preferences.store.ts` — Zustand in-memory store, synced to server via `GET/PATCH /api/settings`
+- **Scope:** theme (light/dark/auto), locale (en/fr/de/es/pt), baseCurrency (ISO 4217)
+- **DB table:** `UserSettings` (PK = `userId`, FK cascade to users) — auto-created on first `GET /api/settings`
+- **Defaults for new users:** `DEFAULT_THEME`, `DEFAULT_LOCALE`, `DEFAULT_BASE_CURRENCY` env vars
+- **Currency:** per-client field (billing) + per-user baseCurrency (reporting aggregation)
+- **Multi-currency reporting:** revenues converted to baseCurrency via frankfurter.app (ECB rates, 1h cache)
 - **Holiday country:** per-client field (all countries via `date-holidays` library)
-- **Config store** (`config.store.ts`) remains read-only server config (appName, authEnabled, registrationEnabled)
-- **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls
+- **Config store** (`config.store.ts`) remains read-only server config (appName, authDisabled, registrationEnabled)
+- **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls + currency selector
 
 ## Environment
 
@@ -117,7 +119,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 ## Key Conventions
 
 - i18n: English (default), French, German, Spanish, Portuguese
-- Auth is optional, controlled by `AUTH_ENABLED` env var
+- Auth is optional, disabled via `AUTH_DISABLED=true` env var
 - Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
 - `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup
 - Registration password requires min 8 chars + uppercase + lowercase + digit

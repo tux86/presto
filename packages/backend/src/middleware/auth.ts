@@ -29,7 +29,7 @@ async function getOrCreateDefaultUser(): Promise<{ id: string; email: string }> 
 let singleUserCache: { id: string; email: string } | null = null;
 
 export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
-  if (!config.auth.enabled) {
+  if (config.auth.disabled) {
     if (!singleUserCache) {
       singleUserCache = await getOrCreateDefaultUser();
     }

@@ -69,7 +69,6 @@ services:
     environment:
       DATABASE_URL: postgresql://presto:${POSTGRES_PASSWORD:?}@postgres:5432/presto
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set (min 32 chars)}
-      AUTH_ENABLED: "true"
       REGISTRATION_ENABLED: "true"
     ports:
       - "8080:8080"
@@ -85,7 +84,6 @@ docker run -d \
   -p 8080:8080 \
   -e DATABASE_URL="postgresql://user:pass@host:5432/presto" \
   -e JWT_SECRET="$(openssl rand -base64 48)" \
-  -e AUTH_ENABLED="true" \
   -e REGISTRATION_ENABLED="true" \
   axforge/presto:latest
 ```
@@ -96,10 +94,12 @@ docker run -d \
 |---|---|---|
 | `DATABASE_URL` | **required** | Database connection string (see below) |
 | `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
-| `AUTH_ENABLED` | `true` | Enable/disable authentication |
+| `AUTH_DISABLED` | `false` | Set `true` to disable authentication (single-user mode) |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `DB_PROVIDER` | *(auto-detected)* | Force database dialect: `postgresql`, `mysql`, or `sqlite` |
-| `APP_LOCALE` | `en` | Default UI language: `en`, `fr`, `de`, `es`, `pt` |
+| `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
+| `DEFAULT_LOCALE` | `en` | Default locale for new users: `en`, `fr`, `de`, `es`, `pt` |
+| `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency for new users (ISO 4217) |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |

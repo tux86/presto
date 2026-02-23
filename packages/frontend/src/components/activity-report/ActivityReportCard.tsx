@@ -2,7 +2,7 @@ import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { useNavigate } from "react-router-dom";
 import { useT } from "@/i18n";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, getClientColor } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
 
 interface ActivityReportCardProps {
@@ -25,9 +25,24 @@ export function ActivityReportCard({ report }: ActivityReportCardProps) {
           <h3 className="text-sm font-medium text-heading">
             {getMonthName(report.month, locale)} {report.year}
           </h3>
-          <p className="text-xs text-muted mt-0.5">
-            {report.mission?.client?.name} &middot; {report.mission?.name}
-          </p>
+          {(() => {
+            const color = getClientColor(report.mission?.client?.name ?? "", report.mission?.client?.color);
+            return (
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-medium",
+                    color.bg,
+                    color.border,
+                    color.text,
+                  )}
+                >
+                  {report.mission?.client?.name}
+                </span>
+                <span className="text-xs text-muted truncate">{report.mission?.name}</span>
+              </div>
+            );
+          })()}
         </div>
         <Badge variant={report.status === "COMPLETED" ? "success" : "default"}>
           {report.status === "COMPLETED" ? t("activity.validated") : t("activity.draft")}

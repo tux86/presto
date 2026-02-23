@@ -31,7 +31,7 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-presto}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}@postgres:5432/${POSTGRES_DB:-presto}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
-      AUTH_ENABLED: ${AUTH_ENABLED:-true}
+      AUTH_DISABLED: ${AUTH_DISABLED:-false}
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-true}
       CORS_ORIGINS: ${CORS_ORIGINS:-}
     ports:

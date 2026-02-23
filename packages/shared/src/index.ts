@@ -1,3 +1,4 @@
+export * from "./colors.js";
 export * from "./countries.js";
 export * from "./currencies.js";
 export * from "./holidays/holidays.js";

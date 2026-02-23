@@ -8,6 +8,27 @@
       "when": 1771852703396,
       "tag": "0000_serious_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1771864448688,
+      "tag": "0001_workable_vulture",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1771866298527,
+      "tag": "0002_tranquil_landau",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1771867246855,
+      "tag": "0003_big_madripoor",
+      "breakpoints": true
     }
   ]
 }

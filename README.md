@@ -66,7 +66,7 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 - Built with Recharts
 
 ### Authentication & Security
-- **Optional** — disable for single-user setups (`AUTH_ENABLED=false`)
+- **Optional** — disable for single-user setups (`AUTH_DISABLED=true`)
 - JWT-based auth with configurable expiry
 - User registration with password policies (min 8 chars, uppercase, lowercase, digit)
 - Registration can be disabled after initial setup (`REGISTRATION_ENABLED=false`)

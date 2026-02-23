@@ -111,12 +111,13 @@ Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must
 |---|---|---|
 | `PORT` | `3001` | Backend HTTP port |
 | `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
-| `AUTH_ENABLED` | `true` | Enable/disable authentication |
+| `AUTH_DISABLED` | `false` | Set `true` to disable authentication (single-user mode) |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins (comma-separated) |
 | `APP_NAME` | `Presto` | Application name in public config API |
-| `APP_THEME` | `light` | Default theme (`light` or `dark`) |
-| `APP_LOCALE` | `fr` | Default locale (`fr` or `en`) |
+| `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
+| `DEFAULT_LOCALE` | `en` | Default locale for new users (`en`, `fr`, `de`, `es`, `pt`) |
+| `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency for new users (ISO 4217) |
 | `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |
 | `DEFAULT_USER_PASSWORD` | _(empty)_ | Default admin password |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |
@@ -143,8 +144,9 @@ All routes are prefixed with `/api`.
 | `/api/missions/*` | CRUD for missions (linked to clients) |
 | `/api/activity-reports/*` | CRUD for monthly activity reports, PDF export |
 | `/api/reporting/*` | Aggregated reporting and analytics data |
+| `/api/settings` | User preferences (theme, locale, baseCurrency) |
 
-Authentication uses JWT bearer tokens. When `AUTH_ENABLED=false`, all protected endpoints are accessible without a token.
+Authentication uses JWT bearer tokens. When `AUTH_DISABLED=true`, all protected endpoints are accessible without a token.
 
 ## Switching Databases
 

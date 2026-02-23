@@ -21,7 +21,7 @@ clientsRouter.get("/", async (c) => {
 
 clientsRouter.post("/", zValidator("json", createClientSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, email, phone, address, businessId, currency, holidayCountry } = c.req.valid("json");
+  const { name, email, phone, address, businessId, color, currency, holidayCountry } = c.req.valid("json");
 
   const client = await insertReturning(clients, {
     name,
@@ -29,6 +29,7 @@ clientsRouter.post("/", zValidator("json", createClientSchema), async (c) => {
     phone: phone ?? null,
     address: address ?? null,
     businessId: businessId ?? null,
+    color: color ?? null,
     currency,
     holidayCountry,
     userId,
@@ -50,6 +51,7 @@ clientsRouter.patch("/:id", zValidator("json", updateClientSchema), async (c) =>
     phone: data.phone,
     address: data.address,
     businessId: data.businessId,
+    color: data.color,
     currency: data.currency,
     holidayCountry: data.holidayCountry,
     updatedAt: new Date(),

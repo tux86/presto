@@ -1,3 +1,14 @@
+export type ThemeMode = "light" | "dark" | "auto";
+
+export interface UserSettings {
+  userId: string;
+  theme: ThemeMode;
+  locale: string;
+  baseCurrency: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -6,6 +17,7 @@ export interface User {
   company: string | null;
   createdAt: string;
   updatedAt: string;
+  settings?: UserSettings;
 }
 
 export interface LoginRequest {

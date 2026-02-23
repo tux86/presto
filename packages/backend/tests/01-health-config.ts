@@ -14,7 +14,7 @@ describe("Health & Config", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toHaveProperty("appName");
-    expect(body).toHaveProperty("authEnabled");
+    expect(body).toHaveProperty("authDisabled");
     expect(body).toHaveProperty("registrationEnabled");
   });
 });

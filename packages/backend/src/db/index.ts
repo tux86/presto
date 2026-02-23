@@ -19,13 +19,18 @@ const schema: Tables =
       ? ((await import("./schema/sqlite.schema.js")) as unknown as Tables)
       : await import("./schema/pg.schema.js");
 
-export const { users, clients, missions, activityReports, reportEntries } = schema;
+export const { users, userSettings, exchangeRates, clients, missions, activityReports, reportEntries } = schema;
 
 // Relations (defined once using the runtime-resolved tables)
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
+  settings: one(userSettings),
   clients: many(clients),
   missions: many(missions),
   activityReports: many(activityReports),
+}));
+
+export const userSettingsRelations = relations(userSettings, ({ one }) => ({
+  user: one(users, { fields: [userSettings.userId], references: [users.id] }),
 }));
 
 export const clientsRelations = relations(clients, ({ one, many }) => ({
@@ -53,6 +58,7 @@ export const reportEntriesRelations = relations(reportEntries, ({ one }) => ({
 const fullSchema = {
   ...schema,
   usersRelations,
+  userSettingsRelations,
   clientsRelations,
   missionsRelations,
   activityReportsRelations,

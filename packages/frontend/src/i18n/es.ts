@@ -43,6 +43,7 @@ export const es: Record<TranslationKey, string> = {
   "clients.holidayCountry": "Pa\u00eds festivos",
   "clients.holidayCountryHint": "Festivos aplicados a los informes de actividad",
   "clients.selectHolidayCountry": "Seleccionar un pa\u00eds",
+  "clients.color": "Color",
   "clients.deleteMessage": "Este cliente y sus datos ser\u00e1n eliminados. Esta acci\u00f3n es irreversible.",
 
   // Missions
@@ -145,4 +146,5 @@ export const es: Record<TranslationKey, string> = {
   "preferences.title": "Preferencias",
   "preferences.theme": "Tema",
   "preferences.language": "Idioma",
+  "preferences.baseCurrency": "Moneda base",
 };

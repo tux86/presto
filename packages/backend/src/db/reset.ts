@@ -1,10 +1,20 @@
 import { sql } from "drizzle-orm";
 import { config } from "../lib/config.js";
-import { activityReports, clients, closeDb, db, missions, reportEntries, users } from "./index.js";
+import {
+  activityReports,
+  clients,
+  closeDb,
+  db,
+  exchangeRates,
+  missions,
+  reportEntries,
+  userSettings,
+  users,
+} from "./index.js";
 
 async function main() {
   const { provider } = config.database;
-  const tables = [reportEntries, activityReports, missions, clients, users];
+  const tables = [reportEntries, activityReports, missions, clients, exchangeRates, userSettings, users];
 
   if (provider === "mysql") await db.execute(sql`SET FOREIGN_KEY_CHECKS = 0`);
   for (const table of tables) await db.delete(table);

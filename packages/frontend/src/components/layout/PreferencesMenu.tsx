@@ -1,3 +1,4 @@
+import { CURRENCIES, getCurrencyLabel } from "@presto/shared";
 import type { LucideIcon } from "lucide-react";
 import { Monitor, Moon, Settings, Sun } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -50,11 +51,13 @@ export function SegmentedControl<T extends string>({
 }
 
 export function PreferencesControls({ iconSize = "h-4 w-4" }: { iconSize?: string }) {
-  const { t } = useT();
+  const { t, locale: currentLocale } = useT();
   const theme = usePreferencesStore((s) => s.theme);
   const locale = usePreferencesStore((s) => s.locale);
+  const baseCurrency = usePreferencesStore((s) => s.baseCurrency);
   const setTheme = usePreferencesStore((s) => s.setTheme);
   const setLocale = usePreferencesStore((s) => s.setLocale);
+  const setBaseCurrency = usePreferencesStore((s) => s.setBaseCurrency);
 
   return (
     <div className="space-y-3">
@@ -94,6 +97,20 @@ export function PreferencesControls({ iconSize = "h-4 w-4" }: { iconSize?: strin
             </button>
           ))}
         </div>
+      </div>
+      <div className="space-y-1">
+        <span className="text-xs text-muted">{t("preferences.baseCurrency")}</span>
+        <select
+          value={baseCurrency}
+          onChange={(e) => setBaseCurrency(e.target.value)}
+          className="w-full rounded-lg bg-inset px-2.5 py-1.5 text-sm text-body border-none outline-none cursor-pointer"
+        >
+          {CURRENCIES.map((code) => (
+            <option key={code} value={code}>
+              {getCurrencyLabel(code, currentLocale)}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );

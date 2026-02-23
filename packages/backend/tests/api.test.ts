@@ -11,3 +11,4 @@ import "./06-report-entries";
 import "./07-report-lifecycle";
 import "./08-reporting";
 import "./09-edge-cases";
+import "./10-settings";

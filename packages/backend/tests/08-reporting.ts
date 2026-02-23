@@ -7,6 +7,7 @@ describe("Reporting", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toHaveProperty("year");
+    expect(body).toHaveProperty("baseCurrency");
     expect(body).toHaveProperty("totalDays");
     expect(body).toHaveProperty("totalRevenue");
     expect(body).toHaveProperty("averageDailyRate");

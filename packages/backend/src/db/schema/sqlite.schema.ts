@@ -29,6 +29,25 @@ export const users = sqliteTable("User", {
   updatedAt: updatedAt(),
 });
 
+export const userSettings = sqliteTable("UserSettings", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  theme: text("theme").notNull().default("dark"),
+  locale: text("locale").notNull().default("en"),
+  baseCurrency: text("baseCurrency").notNull().default("EUR"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const exchangeRates = sqliteTable("ExchangeRate", {
+  currency: text("currency").primaryKey(),
+  rate: real("rate").notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 export const clients = sqliteTable(
   "Client",
   {
@@ -38,6 +57,7 @@ export const clients = sqliteTable(
     phone: text("phone"),
     address: text("address"),
     businessId: text("businessId"),
+    color: text("color"),
     currency: text("currency").notNull(),
     holidayCountry: text("holidayCountry").notNull(),
     userId: text("userId")

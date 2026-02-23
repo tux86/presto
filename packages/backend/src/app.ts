@@ -13,6 +13,7 @@ import auth from "./routes/auth.js";
 import clients from "./routes/clients.js";
 import missions from "./routes/missions.js";
 import reporting from "./routes/reporting.js";
+import settings from "./routes/settings.js";
 
 const app = new Hono();
 
@@ -83,6 +84,7 @@ app.route("/api/clients", clients);
 app.route("/api/missions", missions);
 app.route("/api/activity-reports", activityReports);
 app.route("/api/reporting", reporting);
+app.route("/api/settings", settings);
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
 app.get("/api/config", (c) => c.json(getPublicConfig()));

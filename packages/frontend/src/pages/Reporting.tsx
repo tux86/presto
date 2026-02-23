@@ -40,8 +40,10 @@ export function Reporting() {
             />
             <KpiCard
               label={t("reporting.revenue")}
-              value={formatCurrency(report.totalRevenue)}
-              subtitle={t("reporting.avgDailyRate", { value: formatCurrency(report.averageDailyRate) })}
+              value={formatCurrency(report.totalRevenue, report.baseCurrency)}
+              subtitle={t("reporting.avgDailyRate", {
+                value: formatCurrency(report.averageDailyRate, report.baseCurrency),
+              })}
             />
             <KpiCard
               label={t("reporting.activeClients")}
@@ -63,7 +65,7 @@ export function Reporting() {
               dataKey="revenue"
               label={t("reporting.revenuePerMonth")}
               color="#10b981"
-              formatValue={(v) => formatCurrency(v)}
+              formatValue={(v) => formatCurrency(v, report.baseCurrency)}
             />
           </div>
 
@@ -74,12 +76,19 @@ export function Reporting() {
               <div className="space-y-3">
                 {report.clientData.map((client) => {
                   const percent = report.totalDays > 0 ? (client.days / report.totalDays) * 100 : 0;
+                  const showConverted = client.currency !== report.baseCurrency;
                   return (
                     <div key={client.clientId}>
                       <div className="flex justify-between items-center mb-1.5">
                         <span className="text-sm text-body">{client.clientName}</span>
                         <span className="text-xs text-faint">
                           {formatNumber(client.days)}j &middot; {formatCurrency(client.revenue, client.currency)}
+                          {showConverted && (
+                            <span className="text-faint/70">
+                              {" "}
+                              ({formatCurrency(client.convertedRevenue, report.baseCurrency)})
+                            </span>
+                          )}
                         </span>
                       </div>
                       <div className="h-2 rounded-full bg-inset overflow-hidden">

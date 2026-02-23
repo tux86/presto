@@ -44,8 +44,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers,
   });
 
-  const authEnabled = useConfigStore.getState().config?.authEnabled ?? true;
-  if (res.status === 401 && authEnabled) {
+  const authDisabled = useConfigStore.getState().config?.authDisabled ?? false;
+  if (res.status === 401 && !authDisabled) {
     useAuthStore.getState().logout();
     throw new Error("Unauthorized");
   }

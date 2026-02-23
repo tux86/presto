@@ -42,6 +42,25 @@ export const users = pgTable("User", {
   updatedAt: updatedAt(),
 });
 
+export const userSettings = pgTable("UserSettings", {
+  userId: text("userId")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  theme: text("theme").notNull().default("dark"),
+  locale: text("locale").notNull().default("en"),
+  baseCurrency: text("baseCurrency").notNull().default("EUR"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const exchangeRates = pgTable("ExchangeRate", {
+  currency: text("currency").primaryKey(),
+  rate: doublePrecision("rate").notNull(),
+  updatedAt: timestamp("updatedAt", { precision: 3, mode: "date" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 export const clients = pgTable(
   "Client",
   {
@@ -51,6 +70,7 @@ export const clients = pgTable(
     phone: text("phone"),
     address: text("address"),
     businessId: text("businessId"),
+    color: text("color"),
     currency: text("currency").notNull(),
     holidayCountry: text("holidayCountry").notNull(),
     userId: text("userId")

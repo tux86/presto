@@ -32,11 +32,14 @@ export const config = {
   app: {
     name: env("APP_NAME", "Presto"),
     port: envInt("PORT", 3001),
-    theme: env("APP_THEME", "light") as "light" | "dark",
-    locale: (process.env.APP_LOCALE || null) as Locale | null,
+  },
+  defaults: {
+    theme: env("DEFAULT_THEME", "dark") as "light" | "dark" | "auto",
+    locale: env("DEFAULT_LOCALE", "en") as Locale,
+    baseCurrency: env("DEFAULT_BASE_CURRENCY", "EUR"),
   },
   auth: {
-    enabled: envBool("AUTH_ENABLED", true),
+    disabled: envBool("AUTH_DISABLED", false),
     registrationEnabled: envBool("REGISTRATION_ENABLED", true),
     bcryptCost: envInt("BCRYPT_COST", 10),
     defaultUser: {
@@ -66,7 +69,7 @@ export const config = {
   },
   jwt: {
     secret: (() => {
-      if (!envBool("AUTH_ENABLED", true)) return "auth-disabled";
+      if (envBool("AUTH_DISABLED", false)) return "auth-disabled";
       const s = envRequired("JWT_SECRET");
       const WEAK = [
         "change-me-in-production",
@@ -95,11 +98,8 @@ export const config = {
 export function getPublicConfig() {
   return {
     appName: config.app.name,
-    authEnabled: config.auth.enabled,
+    authDisabled: config.auth.disabled,
     registrationEnabled: config.auth.registrationEnabled,
-    defaults: {
-      theme: config.app.theme,
-      locale: config.app.locale,
-    },
+    defaults: config.defaults,
   };
 }

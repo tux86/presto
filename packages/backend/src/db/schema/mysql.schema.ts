@@ -40,6 +40,25 @@ export const users = mysqlTable("User", {
   updatedAt: updatedAt(),
 });
 
+export const userSettings = mysqlTable("UserSettings", {
+  userId: varchar("userId", { length: 36 })
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  theme: varchar("theme", { length: 10 }).notNull().default("dark"),
+  locale: varchar("locale", { length: 5 }).notNull().default("en"),
+  baseCurrency: varchar("baseCurrency", { length: 10 }).notNull().default("EUR"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const exchangeRates = mysqlTable("ExchangeRate", {
+  currency: varchar("currency", { length: 10 }).primaryKey(),
+  rate: double("rate").notNull(),
+  updatedAt: datetime("updatedAt", { fsp: 3, mode: "date" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 export const clients = mysqlTable(
   "Client",
   {
@@ -49,6 +68,7 @@ export const clients = mysqlTable(
     phone: varchar("phone", { length: 50 }),
     address: text("address"),
     businessId: varchar("businessId", { length: 100 }),
+    color: varchar("color", { length: 20 }),
     currency: varchar("currency", { length: 10 }).notNull(),
     holidayCountry: varchar("holidayCountry", { length: 10 }).notNull(),
     userId: varchar("userId", { length: 36 })

@@ -1,4 +1,6 @@
+import type { ClientColorKey } from "../colors.js";
 import type { HolidayCountryCode } from "../countries.js";
+import type { CurrencyCode } from "../currencies.js";
 
 export const REPORT_STATUSES = ["DRAFT", "COMPLETED"] as const;
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
@@ -13,8 +15,6 @@ export interface ReportEntry {
   holidayName: string | null;
   reportId: string;
 }
-
-import type { CurrencyCode } from "../currencies.js";
 
 export interface ActivityReport {
   id: string;
@@ -36,6 +36,7 @@ export interface ActivityReport {
     client: {
       id: string;
       name: string;
+      color: ClientColorKey | null;
       currency: CurrencyCode;
       holidayCountry: HolidayCountryCode;
     };
@@ -63,6 +64,7 @@ export interface UpdateEntriesRequest {
 
 export interface ReportingData {
   year: number;
+  baseCurrency: string;
   totalDays: number;
   totalRevenue: number;
   averageDailyRate: number;
@@ -77,5 +79,6 @@ export interface ReportingData {
     currency: CurrencyCode;
     days: number;
     revenue: number;
+    convertedRevenue: number;
   }[];
 }

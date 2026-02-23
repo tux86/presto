@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/tux86/presto/compare/v1.9.0...v1.10.0) (2026-02-23)
+
+### Features
+
+* add 101 API E2E tests with Bun test runner ([860aea0](https://github.com/tux86/presto/commit/860aea04b94ed96c3078598fee523cba5305cc90))
+
 ## [1.9.0](https://github.com/tux86/presto/compare/v1.8.0...v1.9.0) (2026-02-23)
 
 ### Features

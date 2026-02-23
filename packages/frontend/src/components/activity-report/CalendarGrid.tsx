@@ -2,16 +2,18 @@ import type { ReportEntry } from "@presto/shared";
 import { getDayName, getDayNameFull } from "@presto/shared";
 import { useCallback, useState } from "react";
 import { useT } from "@/i18n";
+import type { CalendarColors } from "@/lib/utils";
 import { CalendarDay } from "./CalendarDay";
 
 interface CalendarGridProps {
   entries: ReportEntry[];
+  colors: CalendarColors;
   onToggle: (entryId: string, newValue: number) => void;
   onTaskChange?: (entryId: string, note: string) => void;
   readOnly?: boolean;
 }
 
-export function CalendarGrid({ entries, onToggle, onTaskChange, readOnly }: CalendarGridProps) {
+export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly }: CalendarGridProps) {
   const { t, locale } = useT();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const taskInputRef = useCallback((node: HTMLInputElement | null) => {
@@ -64,6 +66,7 @@ export function CalendarGrid({ entries, onToggle, onTaskChange, readOnly }: Cale
               entry={entry}
               dayNumber={date.getDate()}
               dayName={getDayName(date, locale)}
+              colors={colors}
               selected={entry.id === selectedId}
               onToggle={readOnly ? undefined : onToggle}
               onSelect={readOnly ? undefined : setSelectedId}

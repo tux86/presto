@@ -20,6 +20,7 @@ import {
 } from "@/hooks/use-activity-reports";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useT } from "@/i18n";
+import { getClientCalendarColors } from "@/lib/utils";
 
 type ViewMode = "calendar" | "list";
 
@@ -49,6 +50,7 @@ export function ActivityReportEditor() {
 
   const isCompleted = report?.status === "COMPLETED";
   const entries = report?.entries ?? [];
+  const calendarColors = getClientCalendarColors(report?.mission?.client?.name, report?.mission?.client?.color);
   const entriesRef = useRef<ReportEntry[]>(entries);
   entriesRef.current = entries;
 
@@ -181,6 +183,7 @@ export function ActivityReportEditor() {
             {viewMode === "calendar" ? (
               <CalendarGrid
                 entries={entries}
+                colors={calendarColors}
                 onToggle={handleToggle}
                 onTaskChange={handleTaskChange}
                 readOnly={isCompleted}
@@ -188,6 +191,7 @@ export function ActivityReportEditor() {
             ) : (
               <ListView
                 entries={entries}
+                colors={calendarColors}
                 onToggle={handleToggle}
                 onTaskChange={handleTaskChange}
                 readOnly={isCompleted}

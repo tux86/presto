@@ -81,3 +81,18 @@ export function getDayNameFull(date: Date, locale?: string): string {
   const name = new Intl.DateTimeFormat(resolveLocale(locale), { weekday: "long" }).format(date);
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
+
+/**
+ * Count weekdays (Mon-Fri) in a given year.
+ */
+export function getWorkingDaysInYear(year: number): number {
+  let count = 0;
+  for (let m = 0; m < 12; m++) {
+    const daysInMonth = new Date(year, m + 1, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      const day = new Date(year, m, d).getDay();
+      if (day !== 0 && day !== 6) count++;
+    }
+  }
+  return count;
+}

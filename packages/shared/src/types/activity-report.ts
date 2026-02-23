@@ -68,14 +68,32 @@ export interface ReportingData {
   totalDays: number;
   totalRevenue: number;
   averageDailyRate: number;
+  workingDaysInYear: number;
+  previousYear: {
+    totalDays: number;
+    totalRevenue: number;
+    averageDailyRate: number;
+    clientCount: number;
+  } | null;
   monthlyData: {
     month: number;
     days: number;
     revenue: number;
   }[];
+  monthlyClientRevenue: {
+    month: number;
+    clients: {
+      clientId: string;
+      clientName: string;
+      clientColor: ClientColorKey | null;
+      days: number;
+      revenue: number;
+    }[];
+  }[];
   clientData: {
     clientId: string;
     clientName: string;
+    clientColor: ClientColorKey | null;
     currency: CurrencyCode;
     days: number;
     revenue: number;

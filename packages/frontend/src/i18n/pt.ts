@@ -21,9 +21,7 @@ export const pt: Record<TranslationKey, string> = {
   "dashboard.year": "Ano",
   "dashboard.mission": "Miss\u00e3o",
   "dashboard.selectMission": "Selecionar uma miss\u00e3o",
-  "dashboard.allClients": "Todos os clientes",
-  "dashboard.allMissions": "Todas as miss\u00f5es",
-  "dashboard.noFilterResults": "Nenhuma atividade corresponde aos filtros selecionados",
+  "dashboard.allClients": "Todos",
 
   // Clients
   "clients.title": "Clientes",
@@ -102,6 +100,10 @@ export const pt: Record<TranslationKey, string> = {
   "reporting.daysPerMonth": "Dias por m\u00eas",
   "reporting.revenuePerMonth": "Receita por m\u00eas",
   "reporting.clientBreakdown": "Distribui\u00e7\u00e3o por cliente",
+  "reporting.utilization": "Ocupa\u00e7\u00e3o",
+  "reporting.workingDays": "{worked} / {total} dias \u00fateis",
+  "reporting.vsYear": "vs {year}",
+  "reporting.revenueByClient": "Receita por cliente",
 
   // Login / Auth
   "auth.login": "Entrar",

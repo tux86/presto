@@ -1,6 +1,7 @@
 import { getMonthName } from "@presto/shared";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useT } from "@/i18n";
+import { compactTick } from "@/lib/utils";
 
 interface MonthlyData {
   month: number;
@@ -29,10 +30,15 @@ export function MonthlyChart({ data, dataKey, label, color = "#6366f1", formatVa
       <h3 className="text-sm font-medium text-body mb-4">{label}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--th-edge)" vertical={false} />
             <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--th-muted)" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "var(--th-muted)" }} axisLine={false} tickLine={false} />
+            <YAxis
+              tick={{ fontSize: 11, fill: "var(--th-muted)" }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={compactTick}
+            />
             <Tooltip
               contentStyle={{
                 background: "var(--th-panel)",

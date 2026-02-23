@@ -1,3 +1,4 @@
+import type { ClientColorKey } from "../colors.js";
 import type { CurrencyCode } from "../currencies.js";
 
 export interface Mission {
@@ -14,6 +15,7 @@ export interface Mission {
   client?: {
     id: string;
     name: string;
+    color: ClientColorKey | null;
     currency: CurrencyCode;
   };
 }

@@ -1,15 +1,17 @@
 import type { ReportEntry } from "@presto/shared";
 import { getDayNameFull } from "@presto/shared";
 import { useT } from "@/i18n";
+import type { CalendarColors } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 interface ListDayRowProps {
   entry: ReportEntry;
+  colors: CalendarColors;
   onToggle?: (entryId: string, newValue: number) => void;
   onTaskChange?: (entryId: string, note: string) => void;
 }
 
-export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
+export function ListDayRow({ entry, colors, onToggle, onTaskChange }: ListDayRowProps) {
   const date = new Date(entry.date);
   const isSpecial = entry.isWeekend || entry.isHoliday;
   const { t, locale } = useT();
@@ -44,13 +46,13 @@ export function ListDayRow({ entry, onToggle, onTaskChange }: ListDayRowProps) {
           "relative flex h-9 w-16 items-center justify-center rounded-lg text-sm font-bold transition-all overflow-hidden",
           onToggle ? "cursor-pointer" : "cursor-default",
           entry.value === 0 && "bg-elevated text-muted hover:bg-inset border border-edge",
-          entry.value === 1 && "bg-indigo-600 text-white border border-indigo-500",
-          entry.value === 0.5 && "bg-elevated text-white border border-indigo-500",
+          entry.value === 1 && `${colors.solid} text-white border ${colors.border}`,
+          entry.value === 0.5 && `bg-elevated text-white border ${colors.border}`,
         )}
         onClick={handleToggle}
       >
         {entry.value === 0.5 && (
-          <div className="absolute inset-0 bg-indigo-600" style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
+          <div className={cn("absolute inset-0", colors.solid)} style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
         )}
         <span className="relative z-10">{entry.value === 0 ? "0" : entry.value === 0.5 ? "\u00BD" : "1"}</span>
       </button>

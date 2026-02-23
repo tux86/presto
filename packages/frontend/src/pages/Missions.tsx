@@ -1,8 +1,9 @@
 import type { Mission } from "@presto/shared";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ClientFilterChips } from "@/components/ui/ClientFilterChips";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
@@ -20,6 +21,7 @@ export function Missions() {
   const [name, setName] = useState("");
   const [clientId, setClientId] = useState("");
   const [dailyRate, setDailyRate] = useState("");
+  const [filterClientId, setFilterClientId] = useState("");
 
   const { data: missions, isLoading } = useMissions();
   const { data: clients } = useClients();
@@ -28,6 +30,21 @@ export function Missions() {
   const deleteMission = useDeleteMission();
   const { confirm, dialog } = useConfirm();
   const { t } = useT();
+
+  const clientList = useMemo(() => {
+    if (!missions) return [];
+    const map = new Map<string, { id: string; name: string; color: string | null }>();
+    for (const m of missions) {
+      if (m.client?.id && !map.has(m.client.id)) {
+        map.set(m.client.id, { id: m.client.id, name: m.client.name, color: m.client.color ?? null });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [missions]);
+
+  const filteredMissions = filterClientId
+    ? (missions ?? []).filter((m) => m.client?.id === filterClientId)
+    : (missions ?? []);
 
   const openCreate = () => {
     setEditing(null);
@@ -89,11 +106,22 @@ export function Missions() {
         actions={<Button onClick={openCreate}>{t("missions.newMission")}</Button>}
       />
 
+      {!isLoading && (
+        <ClientFilterChips
+          clients={clientList.map((c) => ({
+            ...c,
+            count: (missions ?? []).filter((m) => m.client?.id === c.id).length,
+          }))}
+          value={filterClientId}
+          onChange={setFilterClientId}
+        />
+      )}
+
       {isLoading ? (
         <Skeleton count={3} height="h-14" className="rounded-lg" />
       ) : (
         <Table
-          data={missions ?? []}
+          data={filteredMissions}
           emptyMessage={t("missions.emptyMessage")}
           onRowClick={openEdit}
           columns={[

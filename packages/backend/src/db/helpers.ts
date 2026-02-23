@@ -87,7 +87,7 @@ export async function updateReturning<T extends PgTable>(
 
 /** Relational include: mission with client summary. */
 export const MISSION_WITH = {
-  client: { columns: { id: true, name: true, currency: true } },
+  client: { columns: { id: true, name: true, color: true, currency: true } },
 } as const;
 
 const ENTRIES_ORDERED = { orderBy: (e: any, { asc }: any) => [asc(e.date)] };

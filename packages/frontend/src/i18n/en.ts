@@ -19,9 +19,7 @@ export const en = {
   "dashboard.year": "Year",
   "dashboard.mission": "Mission",
   "dashboard.selectMission": "Select a mission",
-  "dashboard.allClients": "All clients",
-  "dashboard.allMissions": "All missions",
-  "dashboard.noFilterResults": "No activities match the selected filters",
+  "dashboard.allClients": "All",
 
   // Clients
   "clients.title": "Clients",
@@ -98,6 +96,10 @@ export const en = {
   "reporting.daysPerMonth": "Days per month",
   "reporting.revenuePerMonth": "Revenue per month",
   "reporting.clientBreakdown": "Client breakdown",
+  "reporting.utilization": "Utilization",
+  "reporting.workingDays": "{worked} / {total} working days",
+  "reporting.vsYear": "vs {year}",
+  "reporting.revenueByClient": "Revenue by client",
 
   // Login / Auth
   "auth.login": "Sign in",

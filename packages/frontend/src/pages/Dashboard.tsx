@@ -1,15 +1,16 @@
 import { getMonthName } from "@presto/shared";
 import { useMemo, useState } from "react";
-import { ActivityReportCard } from "@/components/activity-report/ActivityReportCard";
+import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
+import { ClientFilterChips } from "@/components/ui/ClientFilterChips";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useActivityReports, useCreateActivityReport } from "@/hooks/use-activity-reports";
 import { useMissions } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
+import { cn, getClientColor } from "@/lib/utils";
 
 export function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -18,59 +19,41 @@ export function Dashboard() {
   const [newReportYear, setNewReportYear] = useState(new Date().getFullYear());
   const [newReportMissionId, setNewReportMissionId] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
-  const [filterMissionId, setFilterMissionId] = useState("");
 
   const { data: reports, isLoading } = useActivityReports({ year: selectedYear });
   const { data: missions } = useMissions();
   const createReport = useCreateActivityReport();
   const { t, locale } = useT();
 
-  const clients = useMemo(() => {
+  const clientGroupedReports = useMemo(() => {
     if (!reports) return [];
-    const map = new Map<string, string>();
+    const groups = new Map<string, { name: string; color: string | null; reports: typeof reports }>();
     for (const r of reports) {
-      if (r.mission?.client) {
-        map.set(r.mission.client.id, r.mission.client.name);
-      }
+      const clientId = r.mission?.client?.id ?? "unknown";
+      const group = groups.get(clientId) ?? {
+        name: r.mission?.client?.name ?? "",
+        color: r.mission?.client?.color ?? null,
+        reports: [],
+      };
+      group.reports.push(r);
+      groups.set(clientId, group);
     }
-    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(groups.entries())
+      .sort((a, b) => a[1].name.localeCompare(b[1].name))
+      .map(([id, g]) => ({
+        id,
+        ...g,
+        reports: g.reports.sort((a, b) => {
+          const ka = `${a.year}-${String(a.month).padStart(2, "0")}`;
+          const kb = `${b.year}-${String(b.month).padStart(2, "0")}`;
+          return kb.localeCompare(ka);
+        }),
+      }));
   }, [reports]);
 
-  const filterMissions = useMemo(() => {
-    if (!reports) return [];
-    const map = new Map<string, string>();
-    for (const r of reports) {
-      if (r.mission) {
-        if (filterClientId && r.mission.client?.id !== filterClientId) continue;
-        map.set(r.mission.id, r.mission.name);
-      }
-    }
-    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
-  }, [reports, filterClientId]);
-
-  const validMissionId = filterMissions.some((m) => m.id === filterMissionId) ? filterMissionId : "";
-
-  const filteredReports = useMemo(() => {
-    if (!reports) return [];
-    return reports.filter((r) => {
-      if (filterClientId && r.mission?.client?.id !== filterClientId) return false;
-      if (validMissionId && r.missionId !== validMissionId) return false;
-      return true;
-    });
-  }, [reports, filterClientId, validMissionId]);
-
-  const hasActiveFilters = filterClientId !== "" || validMissionId !== "";
-
-  const handleYearChange = (year: number) => {
-    setSelectedYear(year);
-    setFilterClientId("");
-    setFilterMissionId("");
-  };
-
-  const handleClientFilterChange = (clientId: string) => {
-    setFilterClientId(clientId);
-    setFilterMissionId("");
-  };
+  const visibleGroups = filterClientId
+    ? clientGroupedReports.filter((g) => g.id === filterClientId)
+    : clientGroupedReports;
 
   const handleCreate = async () => {
     if (!newReportMissionId) return;
@@ -82,9 +65,6 @@ export function Dashboard() {
     }
   };
 
-  const filterSelectClass =
-    "rounded-lg border border-edge bg-panel px-2.5 py-1.5 text-sm text-heading outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent";
-
   return (
     <div>
       <Header
@@ -92,51 +72,62 @@ export function Dashboard() {
         subtitle={t("dashboard.subtitle", { year: selectedYear })}
         actions={
           <div className="flex items-center gap-3 flex-wrap">
-            <YearNavigator year={selectedYear} onChange={handleYearChange} />
-            {clients.length > 1 && (
-              <select
-                value={filterClientId}
-                onChange={(e) => handleClientFilterChange(e.target.value)}
-                className={filterSelectClass}
-              >
-                <option value="">{t("dashboard.allClients")}</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            {filterMissions.length > 1 && (
-              <select
-                value={validMissionId}
-                onChange={(e) => setFilterMissionId(e.target.value)}
-                className={filterSelectClass}
-              >
-                <option value="">{t("dashboard.allMissions")}</option>
-                {filterMissions.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            )}
+            <YearNavigator year={selectedYear} onChange={setSelectedYear} />
             <Button onClick={() => setShowCreateModal(true)}>{t("dashboard.newActivity")}</Button>
           </div>
         }
       />
 
+      {!isLoading && (
+        <ClientFilterChips
+          clients={clientGroupedReports.map((g) => ({
+            id: g.id,
+            name: g.name,
+            color: g.color,
+            count: g.reports.length,
+          }))}
+          value={filterClientId}
+          onChange={setFilterClientId}
+        />
+      )}
+
       {isLoading ? (
-        <Skeleton count={6} height="h-40" grid="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" />
-      ) : filteredReports.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredReports.map((report) => (
-            <ActivityReportCard key={report.id} report={report} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} className="rounded-xl border border-edge bg-panel p-4">
+              <div className="h-5 w-32 bg-elevated rounded animate-pulse mb-3" />
+              <div className="h-3 w-44 bg-elevated rounded animate-pulse mb-2" />
+              <div className="flex flex-wrap gap-[3px] mb-2">
+                {Array.from({ length: 30 }, (_, j) => (
+                  <div key={j} className="w-[7px] h-[7px] rounded-sm bg-elevated animate-pulse" />
+                ))}
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="h-3 w-16 bg-elevated rounded animate-pulse" />
+                <div className="h-4 w-20 bg-elevated rounded animate-pulse" />
+              </div>
+            </div>
           ))}
         </div>
-      ) : hasActiveFilters ? (
-        <div className="rounded-xl border border-dashed border-edge p-12 text-center">
-          <p className="text-sm text-muted">{t("dashboard.noFilterResults")}</p>
+      ) : visibleGroups.length > 0 ? (
+        <div className="space-y-6">
+          {visibleGroups.map((group) => {
+            const color = getClientColor(group.name, group.color);
+            return (
+              <div key={group.id}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={cn("w-2.5 h-2.5 rounded-full", color.dot)} />
+                  <h3 className="text-sm font-semibold text-heading">{group.name}</h3>
+                  <span className="text-xs text-faint">({group.reports.length})</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {group.reports.map((report) => (
+                    <ActivityReportCard key={report.id} report={report} locale={locale} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-edge p-12 text-center">

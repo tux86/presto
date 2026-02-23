@@ -1,11 +1,13 @@
 import type { ReportEntry } from "@presto/shared";
 import { useT } from "@/i18n";
+import type { CalendarColors } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 interface CalendarDayProps {
   entry: ReportEntry;
   dayNumber: number;
   dayName: string;
+  colors: CalendarColors;
   selected?: boolean;
   onToggle?: (entryId: string, newValue: number) => void;
   onSelect?: (entryId: string) => void;
@@ -21,23 +23,22 @@ function getDayKind(entry: ReportEntry): DayKind {
   return "normal";
 }
 
-const containerStyles: Record<DayKind, Record<DayValue, string>> = {
-  holiday: {
-    0: "bg-holiday border border-edge opacity-50 hover:opacity-70",
-    0.5: "border border-indigo-500/60 opacity-70 hover:opacity-90",
-    1: "bg-indigo-600/70 border border-indigo-500/60 opacity-70 hover:opacity-90",
-  },
-  weekend: {
-    0: "bg-weekend border border-transparent opacity-40 hover:opacity-60",
-    0.5: "border border-indigo-500/60 opacity-70 hover:opacity-90",
-    1: "bg-indigo-600/70 border border-indigo-500/60 opacity-70 hover:opacity-90",
-  },
-  normal: {
-    0: "bg-elevated border border-edge hover:bg-inset hover:border-edge-strong",
-    0.5: "border border-indigo-500 hover:border-indigo-400",
-    1: "bg-indigo-600 border border-indigo-500 hover:bg-indigo-500",
-  },
-};
+function getContainerStyle(kind: DayKind, value: DayValue, c: CalendarColors): string {
+  if (kind === "holiday") {
+    if (value === 0) return "bg-holiday border border-edge opacity-50 hover:opacity-70";
+    if (value === 0.5) return `border ${c.borderMuted} opacity-70 hover:opacity-90`;
+    return `${c.solidMuted} border ${c.borderMuted} opacity-70 hover:opacity-90`;
+  }
+  if (kind === "weekend") {
+    if (value === 0) return "bg-weekend border border-transparent opacity-40 hover:opacity-60";
+    if (value === 0.5) return `border ${c.borderMuted} opacity-70 hover:opacity-90`;
+    return `${c.solidMuted} border ${c.borderMuted} opacity-70 hover:opacity-90`;
+  }
+  // normal
+  if (value === 0) return "bg-elevated border border-edge hover:bg-inset hover:border-edge-strong";
+  if (value === 0.5) return `border ${c.border} ${c.hoverBorder}`;
+  return `${c.solid} border ${c.border} ${c.hoverBg}`;
+}
 
 const dayNumberStyles: Record<DayKind, Record<DayValue, string>> = {
   holiday: { 0: "text-faint", 0.5: "text-white", 1: "text-white" },
@@ -45,13 +46,15 @@ const dayNumberStyles: Record<DayKind, Record<DayValue, string>> = {
   normal: { 0: "text-body", 0.5: "text-white", 1: "text-white" },
 };
 
-const dayNameStyles: Record<DayKind, Record<DayValue, string>> = {
-  holiday: { 0: "text-faint", 0.5: "text-faint", 1: "text-faint" },
-  weekend: { 0: "text-faint", 0.5: "text-faint", 1: "text-faint" },
-  normal: { 0: "text-muted", 0.5: "text-muted", 1: "text-indigo-200" },
-};
+function getDayNameStyle(kind: DayKind, value: DayValue, c: CalendarColors): string {
+  if (kind !== "normal") {
+    return "text-faint";
+  }
+  if (value === 1) return c.textLight;
+  return "text-muted";
+}
 
-export function CalendarDay({ entry, dayNumber, dayName, selected, onToggle, onSelect }: CalendarDayProps) {
+export function CalendarDay({ entry, dayNumber, dayName, colors, selected, onToggle, onSelect }: CalendarDayProps) {
   const { t } = useT();
   const kind = getDayKind(entry);
   const value: DayValue = entry.value === 1 ? 1 : entry.value === 0.5 ? 0.5 : 0;
@@ -68,7 +71,7 @@ export function CalendarDay({ entry, dayNumber, dayName, selected, onToggle, onS
       className={cn(
         "relative flex flex-col items-center justify-center rounded-lg h-12 sm:h-16 transition-all duration-100 select-none overflow-hidden",
         onToggle ? "cursor-pointer active:scale-[0.97]" : "cursor-default",
-        containerStyles[kind][value],
+        getContainerStyle(kind, value, colors),
         selected && "ring-2 ring-accent ring-offset-1 ring-offset-panel",
       )}
       onClick={handleClick}
@@ -77,7 +80,7 @@ export function CalendarDay({ entry, dayNumber, dayName, selected, onToggle, onS
       {/* Half-day diagonal split */}
       {entry.value === 0.5 && (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-indigo-600" style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
+          <div className={cn("absolute inset-0", colors.solid)} style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
           <div className="absolute inset-0 bg-elevated" style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} />
         </div>
       )}
@@ -88,13 +91,20 @@ export function CalendarDay({ entry, dayNumber, dayName, selected, onToggle, onS
       </span>
 
       {/* Day name */}
-      <span className={cn("relative z-10 text-[9px] sm:text-[11px] leading-tight mt-0.5", dayNameStyles[kind][value])}>
+      <span
+        className={cn(
+          "relative z-10 text-[9px] sm:text-[11px] leading-tight mt-0.5",
+          getDayNameStyle(kind, value, colors),
+        )}
+      >
         {dayName}
       </span>
 
       {/* Half-day badge */}
       {entry.value === 0.5 && (
-        <span className="absolute bottom-0.5 right-1.5 z-10 text-[10px] font-bold text-indigo-300">&frac12;</span>
+        <span className={cn("absolute bottom-0.5 right-1.5 z-10 text-[10px] font-bold", colors.textBadge)}>
+          &frac12;
+        </span>
       )}
 
       {/* Task indicator */}

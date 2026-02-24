@@ -1,5 +1,7 @@
 import type { Mission } from "@presto/shared";
+import { Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -88,7 +90,19 @@ export function Missions() {
       variant: "danger",
     });
     if (!ok) return;
-    await deleteMission.mutateAsync(id);
+    try {
+      await deleteMission.mutateAsync(id);
+    } catch (err) {
+      if (err instanceof ApiError && err.code === "FK_CONSTRAINT") {
+        await confirm({
+          title: t("common.deleteErrorTitle"),
+          message: t("missions.deleteError", { count: err.dependentCount ?? 0 }),
+          confirmLabel: t("common.ok"),
+        });
+      } else {
+        throw err;
+      }
+    }
   };
 
   const handleToggleActive = async (mission: Mission) => {
@@ -167,13 +181,15 @@ export function Missions() {
               className: "text-right",
               render: (m) => (
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(m.id);
                   }}
-                  className="text-xs text-faint hover:text-red-500 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-md text-faint hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                  title={t("common.delete")}
                 >
-                  {t("common.delete")}
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               ),
             },

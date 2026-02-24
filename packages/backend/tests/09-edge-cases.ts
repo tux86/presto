@@ -130,13 +130,21 @@ describe("Edge Cases", () => {
 });
 
 describe("Foreign Key Constraints", () => {
-  test("DELETE /missions/:id with reports → 409", async () => {
+  test("DELETE /missions/:id with reports → 409 with structured body", async () => {
     const res = await api("DELETE", `/missions/${state.missionId}`);
     expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.code).toBe("FK_CONSTRAINT");
+    expect(body.entity).toBe("activity-reports");
+    expect(body.dependentCount).toBeGreaterThan(0);
   });
 
-  test("DELETE /clients/:id with missions → 409", async () => {
+  test("DELETE /clients/:id with missions → 409 with structured body", async () => {
     const res = await api("DELETE", `/clients/${state.clientId}`);
     expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.code).toBe("FK_CONSTRAINT");
+    expect(body.entity).toBe("missions");
+    expect(body.dependentCount).toBeGreaterThan(0);
   });
 });

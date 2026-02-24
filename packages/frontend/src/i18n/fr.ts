@@ -44,6 +44,7 @@ export const fr: Record<TranslationKey, string> = {
   "clients.color": "Couleur",
   "clients.deleteMessage":
     "Ce client ne peut \u00eatre supprim\u00e9 que s'il n'a aucune mission. Supprimez d'abord toutes les missions.",
+  "clients.deleteError": "Ce client a {count} mission(s). Supprimez-les avant de supprimer le client.",
 
   // Missions
   "missions.title": "Missions",
@@ -63,6 +64,8 @@ export const fr: Record<TranslationKey, string> = {
   "missions.deleteTitle": "Supprimer cette mission",
   "missions.deleteMessage":
     "Cette mission ne peut \u00eatre supprim\u00e9e que si elle n'a aucun compte-rendu d'activit\u00e9. Supprimez d'abord tous les rapports.",
+  "missions.deleteError":
+    "Cette mission a {count} compte-rendu(s) d'activit\u00e9. Supprimez-les avant de supprimer la mission.",
 
   // Activity (timesheet)
   "activity.validated": "Valid\u00e9",
@@ -77,6 +80,8 @@ export const fr: Record<TranslationKey, string> = {
   "activity.backToDraft": "Repasser en brouillon",
   "activity.validate": "Valider",
   "activity.notFound": "Activit\u00e9 introuvable",
+  "activity.revertTitle": "Repasser en brouillon",
+  "activity.revertMessage": "Ce rapport est valid\u00e9. \u00cates-vous s\u00fbr de vouloir le repasser en brouillon ?",
   "activity.deleteTitle": "Supprimer cette activit\u00e9",
   "activity.deleteMessage": "Cette action est irr\u00e9versible. Toutes les saisies seront perdues.",
   "activity.holidayTitle": "Jour f\u00e9ri\u00e9 \u2014 {name}",
@@ -141,7 +146,9 @@ export const fr: Record<TranslationKey, string> = {
   "common.edit": "Modifier",
   "common.cancel": "Annuler",
   "common.delete": "Supprimer",
+  "common.ok": "OK",
   "common.confirm": "Confirmer",
+  "common.deleteErrorTitle": "Suppression impossible",
   "common.back": "Retour",
   "common.search": "Rechercher...",
   "common.noResults": "Aucun r\u00e9sultat",

@@ -1,5 +1,5 @@
 import { getMonthName } from "@presto/shared";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +19,12 @@ export function Dashboard() {
   const [newReportYear, setNewReportYear] = useState(new Date().getFullYear());
   const [newReportMissionId, setNewReportMissionId] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
+
+  const currentMonth = useMemo(() => new Date().getMonth() + 1, []);
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollAssigned = useRef(false);
+  const initialYear = useRef(selectedYear);
 
   const { data: reports, isLoading } = useActivityReports({ year: selectedYear });
   const { data: missions } = useMissions();
@@ -51,6 +57,14 @@ export function Dashboard() {
       }));
   }, [reports]);
 
+  const isCurrentYear = selectedYear === currentYear;
+
+  useEffect(() => {
+    if (!isLoading && isCurrentYear && initialYear.current === currentYear && scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [isLoading, isCurrentYear, currentYear]);
+
   const visibleGroups = filterClientId
     ? clientGroupedReports.filter((g) => g.id === filterClientId)
     : clientGroupedReports;
@@ -64,6 +78,8 @@ export function Dashboard() {
       /* handled by mutation */
     }
   };
+
+  scrollAssigned.current = false;
 
   return (
     <div>
@@ -121,9 +137,16 @@ export function Dashboard() {
                   <span className="text-xs text-faint">({group.reports.length})</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {group.reports.map((report) => (
-                    <ActivityReportCard key={report.id} report={report} locale={locale} />
-                  ))}
+                  {group.reports.map((report) => {
+                    const isCurrent = isCurrentYear && report.month === currentMonth && report.year === currentYear;
+                    const needsRef = isCurrent && !scrollAssigned.current;
+                    if (needsRef) scrollAssigned.current = true;
+                    return (
+                      <div key={report.id} ref={needsRef ? scrollRef : undefined}>
+                        <ActivityReportCard report={report} locale={locale} isCurrent={isCurrent} />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );

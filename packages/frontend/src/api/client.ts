@@ -3,6 +3,22 @@ import { useConfigStore } from "../stores/config.store";
 
 const API_BASE = "/api";
 
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  entity?: string;
+  dependentCount?: number;
+
+  constructor(message: string, status: number, body?: Record<string, unknown>) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = body?.code as string | undefined;
+    this.entity = body?.entity as string | undefined;
+    this.dependentCount = body?.dependentCount as number | undefined;
+  }
+}
+
 function extractZodMessages(issues: { message?: string }[]): string {
   return issues.map((i) => i.message || "Validation error").join(". ");
 }
@@ -52,7 +68,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(extractErrorMessage(body, res.status));
+    throw new ApiError(extractErrorMessage(body, res.status), res.status, body);
   }
 
   if (res.status === 204) return undefined as T;
@@ -73,7 +89,7 @@ async function requestBlob(path: string, options: RequestInit = {}): Promise<Res
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(extractErrorMessage(body, res.status));
+    throw new ApiError(extractErrorMessage(body, res.status), res.status, body);
   }
 
   return res;

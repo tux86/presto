@@ -1,6 +1,6 @@
 import type { ReportEntry } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
@@ -83,8 +83,18 @@ export function ActivityReportEditor() {
     [id, updateEntries],
   );
 
-  const handleToggleStatus = () => {
+  const handleToggleStatus = async () => {
     if (!report || !id) return;
+    if (report.status === "COMPLETED") {
+      const ok = await confirm({
+        title: t("activity.revertTitle"),
+        message: t("activity.revertMessage"),
+        confirmLabel: t("activity.backToDraft"),
+        cancelLabel: t("common.cancel"),
+        variant: "danger",
+      });
+      if (!ok) return;
+    }
     updateReport.mutate({ id, status: report.status === "COMPLETED" ? "DRAFT" : "COMPLETED" });
   };
 
@@ -133,7 +143,7 @@ export function ActivityReportEditor() {
               <ArrowLeft className="h-4 w-4" /> {t("common.back")}
             </Button>
             <Button variant="danger" size="sm" onClick={handleDelete}>
-              {t("common.delete")}
+              <Trash2 className="h-3.5 w-3.5" /> {t("common.delete")}
             </Button>
           </div>
         }

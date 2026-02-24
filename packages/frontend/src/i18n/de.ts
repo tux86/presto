@@ -44,6 +44,7 @@ export const de: Record<TranslationKey, string> = {
   "clients.color": "Farbe",
   "clients.deleteMessage":
     "Dieser Kunde kann nur gel\u00f6scht werden, wenn er keine Auftr\u00e4ge hat. Entfernen Sie zuerst alle Auftr\u00e4ge.",
+  "clients.deleteError": "Dieser Kunde hat {count} Auftrag/Auftr\u00e4ge. Entfernen Sie diese vor dem L\u00f6schen.",
 
   // Missions
   "missions.title": "Auftr\u00e4ge",
@@ -62,6 +63,8 @@ export const de: Record<TranslationKey, string> = {
   "missions.deleteTitle": "Diesen Auftrag l\u00f6schen",
   "missions.deleteMessage":
     "Dieser Auftrag kann nur gel\u00f6scht werden, wenn er keine T\u00e4tigkeitsberichte hat. Entfernen Sie zuerst alle Berichte.",
+  "missions.deleteError":
+    "Dieser Auftrag hat {count} T\u00e4tigkeitsbericht(e). Entfernen Sie diese vor dem L\u00f6schen.",
 
   // Activity (timesheet)
   "activity.validated": "Best\u00e4tigt",
@@ -76,6 +79,9 @@ export const de: Record<TranslationKey, string> = {
   "activity.backToDraft": "Zur\u00fcck zum Entwurf",
   "activity.validate": "Best\u00e4tigen",
   "activity.notFound": "Aktivit\u00e4t nicht gefunden",
+  "activity.revertTitle": "Zur\u00fcck zum Entwurf",
+  "activity.revertMessage":
+    "Dieser Bericht ist best\u00e4tigt. M\u00f6chten Sie ihn wirklich zur\u00fcck zum Entwurf setzen?",
   "activity.deleteTitle": "Diese Aktivit\u00e4t l\u00f6schen",
   "activity.deleteMessage": "Diese Aktion ist unwiderruflich. Alle Eintr\u00e4ge gehen verloren.",
   "activity.holidayTitle": "Feiertag \u2014 {name}",
@@ -140,7 +146,9 @@ export const de: Record<TranslationKey, string> = {
   "common.edit": "Bearbeiten",
   "common.cancel": "Abbrechen",
   "common.delete": "L\u00f6schen",
+  "common.ok": "OK",
   "common.confirm": "Best\u00e4tigen",
+  "common.deleteErrorTitle": "L\u00f6schen nicht m\u00f6glich",
   "common.back": "Zur\u00fcck",
   "common.search": "Suchen...",
   "common.noResults": "Keine Ergebnisse",

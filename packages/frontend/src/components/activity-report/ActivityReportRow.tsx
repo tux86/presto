@@ -8,9 +8,10 @@ import { Badge } from "../ui/Badge";
 interface ActivityReportCardProps {
   report: ActivityReport;
   locale: string;
+  isCurrent?: boolean;
 }
 
-export function ActivityReportCard({ report, locale }: ActivityReportCardProps) {
+export function ActivityReportCard({ report, locale, isCurrent }: ActivityReportCardProps) {
   const navigate = useNavigate();
   const { t } = useT();
   const entries = report.entries ?? [];
@@ -25,7 +26,10 @@ export function ActivityReportCard({ report, locale }: ActivityReportCardProps) 
 
   return (
     <div
-      className="rounded-xl border border-edge bg-panel p-4 cursor-pointer transition-all hover:shadow-md hover:border-accent/30"
+      className={cn(
+        "rounded-xl border bg-panel p-4 cursor-pointer transition-all hover:shadow-md hover:border-accent/30",
+        isCurrent ? "ring-2 ring-accent/40 border-accent/30" : "border-edge",
+      )}
       onClick={() => navigate(`/activity/${report.id}`)}
     >
       {/* Header: month + badge */}

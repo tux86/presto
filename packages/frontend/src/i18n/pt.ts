@@ -44,6 +44,7 @@ export const pt: Record<TranslationKey, string> = {
   "clients.color": "Cor",
   "clients.deleteMessage":
     "Este cliente s\u00f3 pode ser eliminado se n\u00e3o tiver miss\u00f5es. Elimine primeiro todas as miss\u00f5es.",
+  "clients.deleteError": "Este cliente tem {count} miss\u00e3o(\u00f5es). Elimine-as antes de eliminar o cliente.",
 
   // Missions
   "missions.title": "Miss\u00f5es",
@@ -63,6 +64,8 @@ export const pt: Record<TranslationKey, string> = {
   "missions.deleteTitle": "Eliminar esta miss\u00e3o",
   "missions.deleteMessage":
     "Esta miss\u00e3o s\u00f3 pode ser eliminada se n\u00e3o tiver relat\u00f3rios de atividade. Elimine primeiro todos os relat\u00f3rios.",
+  "missions.deleteError":
+    "Esta miss\u00e3o tem {count} relat\u00f3rio(s) de atividade. Elimine-os antes de eliminar a miss\u00e3o.",
 
   // Activity (timesheet)
   "activity.validated": "Validado",
@@ -77,6 +80,9 @@ export const pt: Record<TranslationKey, string> = {
   "activity.backToDraft": "Voltar a rascunho",
   "activity.validate": "Validar",
   "activity.notFound": "Atividade n\u00e3o encontrada",
+  "activity.revertTitle": "Voltar a rascunho",
+  "activity.revertMessage":
+    "Este relat\u00f3rio est\u00e1 validado. Tem a certeza de que deseja revert\u00ea-lo para rascunho?",
   "activity.deleteTitle": "Eliminar esta atividade",
   "activity.deleteMessage": "Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel. Todas as entradas ser\u00e3o perdidas.",
   "activity.holidayTitle": "Feriado \u2014 {name}",
@@ -141,7 +147,9 @@ export const pt: Record<TranslationKey, string> = {
   "common.edit": "Editar",
   "common.cancel": "Cancelar",
   "common.delete": "Eliminar",
+  "common.ok": "OK",
   "common.confirm": "Confirmar",
+  "common.deleteErrorTitle": "N\u00e3o \u00e9 poss\u00edvel eliminar",
   "common.back": "Voltar",
   "common.search": "Pesquisar...",
   "common.noResults": "Sem resultados",

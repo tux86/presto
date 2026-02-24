@@ -41,6 +41,7 @@ export const en = {
   "clients.selectHolidayCountry": "Select a country",
   "clients.color": "Color",
   "clients.deleteMessage": "This client can only be deleted if it has no missions. Remove all missions first.",
+  "clients.deleteError": "This client has {count} mission(s). Remove them before deleting.",
 
   // Missions
   "missions.title": "Missions",
@@ -58,6 +59,7 @@ export const en = {
   "missions.inactive": "Inactive",
   "missions.deleteTitle": "Delete this mission",
   "missions.deleteMessage": "This mission can only be deleted if it has no activity reports. Remove all reports first.",
+  "missions.deleteError": "This mission has {count} activity report(s). Remove them before deleting.",
 
   // Activity (timesheet)
   "activity.validated": "Validated",
@@ -72,6 +74,8 @@ export const en = {
   "activity.backToDraft": "Revert to draft",
   "activity.validate": "Validate",
   "activity.notFound": "Activity not found",
+  "activity.revertTitle": "Revert to draft",
+  "activity.revertMessage": "This report is validated. Are you sure you want to revert it to draft?",
   "activity.deleteTitle": "Delete this activity",
   "activity.deleteMessage": "This action is irreversible. All entries will be lost.",
   "activity.holidayTitle": "Public holiday \u2014 {name}",
@@ -136,7 +140,9 @@ export const en = {
   "common.edit": "Edit",
   "common.cancel": "Cancel",
   "common.delete": "Delete",
+  "common.ok": "OK",
   "common.confirm": "Confirm",
+  "common.deleteErrorTitle": "Cannot delete",
   "common.back": "Back",
   "common.search": "Search...",
   "common.noResults": "No results",

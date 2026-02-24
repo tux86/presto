@@ -23,17 +23,11 @@ Changed cycle in both `CalendarDay.tsx` and `ListDayRow.tsx` from `0 → 1 → 0
 
 ## P0 — Remaining Anomalies
 
-### #1. No daily rate on Client entity
+### ~~#4. COMPLETED → DRAFT revert has no safeguard~~ DONE
 
-Missions have an optional `dailyRate`, but clients don't. Freelancers often have a standard rate per client that applies across all missions. Currently, the rate must be set on every mission individually.
+~~A completed (validated) report can be silently reverted to draft. Once a report is sent to a client, reverting should require confirmation.~~
 
-**Plan:** Add optional `defaultDailyRate` field to Client schema. When creating a mission, pre-fill the rate from the client. Existing mission-level override stays as-is.
-
-### #4. COMPLETED → DRAFT revert has no safeguard
-
-A completed (validated) report can be silently reverted to draft. Once a report is sent to a client, reverting should require confirmation.
-
-**Plan:** Add a confirmation dialog on the frontend when clicking "Revert to draft" on a completed report. No backend changes needed — the guard is purely UX.
+Clicking the "Draft" toggle on a validated report now shows a danger confirmation dialog before reverting. All 5 locales updated.
 
 ### #7. No startDate/endDate enforcement on missions
 
@@ -45,23 +39,19 @@ Mission date range fields exist but are purely informational. Nothing prevents c
 
 ## P1 — Must-Have Features
 
-### #8. Duplicate/Clone report
+### ~~#8. Duplicate/Clone report~~ WONTFIX
 
-Freelancers with stable schedules need to clone last month's report as a starting point.
+~~Freelancers with stable schedules need to clone last month's report as a starting point.~~
 
-**Plan:** Add `POST /api/activity-reports/:id/clone` endpoint that copies entry values/notes to a new month. Add "Clone to next month" button in the report editor info panel. Validate no duplicate exists for the target month.
+**Rejected:** Each month has different weekends, public holidays, and working day counts. Cloning entry grids between months would produce incorrect data. The existing "Fill working days" button already provides a one-click way to populate a new report correctly.
 
-### #11. Dashboard "current month" shortcut
+### ~~#11. Dashboard "current month" shortcut~~ DONE
 
-No quick way to jump to or highlight the current month's report.
+Current month's report card is highlighted with an accent ring (`ring-2 ring-accent/40`) on the dashboard. Auto-scrolls to the first current-month card on initial page load. Only active when viewing the current year.
 
-**Plan:** Auto-scroll to current month section on dashboard load. Add a visual highlight (e.g. "Current" badge) on the current month's report card. Add a floating "Today" button when scrolled away.
+### ~~#14. Better deletion error UX~~ DONE
 
-### #14. Better deletion error UX
-
-When deletion is blocked by FK RESTRICT, the user gets a generic 409 error.
-
-**Plan:** Backend: return structured error with `reason` and `dependentCount` in the 409 response. Frontend: show a specific error message like "Cannot delete — this client has 3 missions. Remove them first." with a link to navigate to the dependent records.
+Backend pre-delete checks count dependent records and return structured 409 with `code`, `entity`, `dependentCount`. Frontend `ApiError` class carries these fields. Clients and Missions pages catch FK errors and show a clear error dialog with the dependent count. All 5 locales updated.
 
 ### #15. Data export (CSV/Excel)
 
@@ -91,11 +81,11 @@ Inactive missions still clutter the mission list.
 
 **Plan:** Add `isArchived` boolean to Mission schema (default false). Archived missions hidden by default with a "Show archived" toggle. Archived missions cannot have new reports created against them.
 
-### #20. Unfilled month indicators
+### ~~#20. Unfilled month indicators~~ WONTFIX
 
-No mechanism to alert users about missing or incomplete reports.
+~~No mechanism to alert users about missing or incomplete reports.~~
 
-**Plan:** On the dashboard, for each active mission, compute which months in the current year have no report or have a report with 0 days. Show a warning indicator (e.g. amber dot + tooltip "3 months without reports for Mission X").
+**Rejected:** Users should be free to decide when and whether to create reports. Forcing indicators for "missing" months adds noise without value — some months may legitimately have no activity.
 
 ---
 
@@ -145,6 +135,12 @@ No mechanism to alert users about missing or incomplete reports.
 
 **Plan:** Arrow keys to navigate between days, Enter/Space to cycle value, Tab to focus note input, Escape to deselect. Use a `useCalendarKeyboard` hook with `useEffect` keydown listener.
 
+### #26. Pre-fill daily rate from last mission
+
+When creating a new mission for a client, pre-fill the `dailyRate` field with the rate from the client's most recent mission. Saves repetitive input for freelancers who bill the same rate per client.
+
+**Plan:** Frontend-only change in the mission creation modal — when a client is selected, fetch the latest mission for that client and pre-fill the daily rate field. No schema changes needed.
+
 ---
 
 ## Priority Matrix
@@ -154,17 +150,16 @@ No mechanism to alert users about missing or incomplete reports.
 | **P0 — Fix** | #2 Misleading delete message | DONE | Low | Low |
 | **P0 — Fix** | #3 Entry cycle order | DONE | Medium | Low |
 | **P0 — Fix** | #6 Utilization ignores holidays | DONE | Medium | Low |
-| **P0 — Fix** | #1 Default daily rate on Client | TODO | Medium | Low |
-| **P0 — Fix** | #4 Revert-to-draft safeguard | TODO | Low | Low |
+| **P0 — Fix** | #4 Revert-to-draft safeguard | DONE | Low | Low |
 | **P0 — Fix** | #7 Mission date range enforcement | TODO | Low | Low |
-| **P1 — Must-have** | #8 Duplicate/clone report | TODO | High | Low |
-| **P1 — Must-have** | #11 Current month shortcut | TODO | High | Low |
-| **P1 — Must-have** | #14 Better deletion error UX | TODO | Medium | Low |
+| **P1 — Must-have** | #8 Duplicate/clone report | WONTFIX | High | Low |
+| **P1 — Must-have** | #11 Current month shortcut | DONE | High | Low |
+| **P1 — Must-have** | #14 Better deletion error UX | DONE | Medium | Low |
 | **P1 — Must-have** | #15 CSV/Excel export | TODO | High | Medium |
 | **P2 — Should-have** | #5 Exchange rate fallback | TODO | Medium | Medium |
 | **P2 — Should-have** | #10 Invoice generation | TODO | Very High | High |
 | **P2 — Should-have** | #13 Mission archive | TODO | Medium | Low |
-| **P2 — Should-have** | #20 Unfilled month indicators | TODO | High | Medium |
+| **P2 — Should-have** | #20 Unfilled month indicators | WONTFIX | High | Medium |
 | **P3 — Nice-to-have** | #9 Bulk report creation | TODO | Medium | Low |
 | **P3 — Nice-to-have** | #12 Notes on dashboard cards | TODO | Low | Low |
 | **P3 — Nice-to-have** | #16 Recurring/template reports | TODO | Medium | Medium |
@@ -176,6 +171,7 @@ No mechanism to alert users about missing or incomplete reports.
 | **P3 — Nice-to-have** | #23 Client-facing share link | TODO | High | Medium |
 | **P3 — Nice-to-have** | #24 Backup/restore | TODO | Medium | Medium |
 | **P3 — Nice-to-have** | #25 Keyboard shortcuts | TODO | Medium | Medium |
+| **P3 — Nice-to-have** | #26 Pre-fill daily rate from last mission | TODO | Low | Low |
 
 ---
 
@@ -183,10 +179,9 @@ No mechanism to alert users about missing or incomplete reports.
 
 **Sprint 1 — Quick wins (P0 remaining + P1 low-effort)**
 1. #4 Revert-to-draft confirmation dialog
-2. #1 Default daily rate on Client
-3. #7 Mission date range enforcement
-4. #8 Duplicate/clone report
-5. #11 Current month dashboard shortcut
+2. #7 Mission date range enforcement
+3. #8 Duplicate/clone report
+4. #11 Current month dashboard shortcut
 
 **Sprint 2 — Core value (P1 remaining + P2 low-effort)**
 6. #14 Better deletion error UX
@@ -196,9 +191,8 @@ No mechanism to alert users about missing or incomplete reports.
 
 **Sprint 3 — Reliability & reporting**
 10. #5 Exchange rate fallback
-11. #20 Unfilled month indicators
-12. #18 Annual summary PDF
-13. #9 Bulk report creation
+11. #18 Annual summary PDF
+12. #9 Bulk report creation
 
 **Sprint 4 — Invoicing**
 14. #10 Invoice generation (full feature)

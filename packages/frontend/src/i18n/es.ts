@@ -44,6 +44,7 @@ export const es: Record<TranslationKey, string> = {
   "clients.color": "Color",
   "clients.deleteMessage":
     "Este cliente solo se puede eliminar si no tiene misiones. Elimine primero todas las misiones.",
+  "clients.deleteError": "Este cliente tiene {count} misi\u00f3n(es). Elim\u00ednelas antes de eliminar el cliente.",
 
   // Missions
   "missions.title": "Misiones",
@@ -62,6 +63,8 @@ export const es: Record<TranslationKey, string> = {
   "missions.deleteTitle": "Eliminar esta misi\u00f3n",
   "missions.deleteMessage":
     "Esta misi\u00f3n solo se puede eliminar si no tiene informes de actividad. Elimine primero todos los informes.",
+  "missions.deleteError":
+    "Esta misi\u00f3n tiene {count} informe(s) de actividad. Elim\u00ednelos antes de eliminar la misi\u00f3n.",
 
   // Activity (timesheet)
   "activity.validated": "Validado",
@@ -76,6 +79,9 @@ export const es: Record<TranslationKey, string> = {
   "activity.backToDraft": "Volver a borrador",
   "activity.validate": "Validar",
   "activity.notFound": "Actividad no encontrada",
+  "activity.revertTitle": "Volver a borrador",
+  "activity.revertMessage":
+    "Este informe est\u00e1 validado. \u00bfEst\u00e1 seguro de que desea revertirlo a borrador?",
   "activity.deleteTitle": "Eliminar esta actividad",
   "activity.deleteMessage": "Esta acci\u00f3n es irreversible. Todas las entradas se perder\u00e1n.",
   "activity.holidayTitle": "Festivo \u2014 {name}",
@@ -140,7 +146,9 @@ export const es: Record<TranslationKey, string> = {
   "common.edit": "Editar",
   "common.cancel": "Cancelar",
   "common.delete": "Eliminar",
+  "common.ok": "OK",
   "common.confirm": "Confirmar",
+  "common.deleteErrorTitle": "No se puede eliminar",
   "common.back": "Volver",
   "common.search": "Buscar...",
   "common.noResults": "Sin resultados",

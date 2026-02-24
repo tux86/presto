@@ -7,7 +7,9 @@ import {
   getCurrencySymbol,
   HOLIDAY_COUNTRIES,
 } from "@presto/shared";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -96,7 +98,19 @@ export function Clients() {
       variant: "danger",
     });
     if (!ok) return;
-    await deleteClient.mutateAsync(id);
+    try {
+      await deleteClient.mutateAsync(id);
+    } catch (err) {
+      if (err instanceof ApiError && err.code === "FK_CONSTRAINT") {
+        await confirm({
+          title: t("common.deleteErrorTitle"),
+          message: t("clients.deleteError", { count: err.dependentCount ?? 0 }),
+          confirmLabel: t("common.ok"),
+        });
+      } else {
+        throw err;
+      }
+    }
   };
 
   return (
@@ -159,13 +173,15 @@ export function Clients() {
               className: "text-right",
               render: (c) => (
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(c.id);
                   }}
-                  className="text-xs text-faint hover:text-red-500 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-md text-faint hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                  title={t("common.delete")}
                 >
-                  {t("common.delete")}
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               ),
             },

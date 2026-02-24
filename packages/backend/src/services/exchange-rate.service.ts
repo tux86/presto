@@ -1,11 +1,8 @@
-const STALE_MS = 24 * 60 * 60 * 1000; // 24 hours
+const REFRESH_MS = 60 * 60 * 1000; // 1 hour
 
-/** In-memory cache — refreshed from API every 24h */
-let cache: { rates: Record<string, number>; fetchedAt: number } | null = null;
+let cache: Record<string, number> | null = null;
+let timer: Timer | null = null;
 
-/**
- * Fetches USD-based rates from frankfurter.app.
- */
 async function fetchRates(): Promise<Record<string, number>> {
   const res = await fetch("https://api.frankfurter.app/latest?base=USD");
   if (!res.ok) throw new Error(`Frankfurter API returned ${res.status}`);
@@ -13,37 +10,42 @@ async function fetchRates(): Promise<Record<string, number>> {
   return { USD: 1, ...data.rates };
 }
 
-/**
- * Returns USD-based exchange rates from in-memory cache.
- * Fetches from API on first call or when cache is stale (>24h).
- * Throws if the API is unreachable and no cached rates exist.
- */
-async function getRates(): Promise<Record<string, number>> {
-  if (cache && Date.now() - cache.fetchedAt < STALE_MS) {
-    return cache.rates;
-  }
-
+async function refreshLoop() {
   try {
-    const rates = await fetchRates();
-    cache = { rates, fetchedAt: Date.now() };
-    return rates;
-  } catch {
-    if (cache) return cache.rates;
-    throw new Error("Exchange rates unavailable: API unreachable and no cached rates");
+    cache = await fetchRates();
+  } catch (e) {
+    console.error("Exchange rate refresh failed:", e instanceof Error ? e.message : e);
   }
+  timer = setTimeout(refreshLoop, REFRESH_MS);
+}
+
+/** Fetch rates eagerly at startup. Call once before accepting requests. */
+export async function initExchangeRates(): Promise<void> {
+  try {
+    cache = await fetchRates();
+  } catch (e) {
+    console.warn("Exchange rates unavailable at startup:", e instanceof Error ? e.message : e);
+  }
+  timer = setTimeout(refreshLoop, REFRESH_MS);
+}
+
+/** Clear the background refresh timer for clean shutdown. */
+export function stopExchangeRates(): void {
+  if (timer) clearTimeout(timer);
+  timer = null;
 }
 
 /**
  * Convert an amount from one currency to another using USD as the pivot.
- * Formula: amount * (usdToTarget / usdToSource)
  * Throws if exchange rates are unavailable — never returns unconverted amounts silently.
  */
-export async function convertAmount(amount: number, from: string, to: string): Promise<number> {
+export function convertAmount(amount: number, from: string, to: string): number {
   if (from === to || amount === 0) return amount;
 
-  const rates = await getRates();
-  const usdToSource = from === "USD" ? 1 : rates[from];
-  const usdToTarget = to === "USD" ? 1 : rates[to];
+  if (!cache) throw new Error("Exchange rates unavailable: not yet initialized");
+
+  const usdToSource = from === "USD" ? 1 : cache[from];
+  const usdToTarget = to === "USD" ? 1 : cache[to];
 
   if (!usdToSource) throw new Error(`Exchange rate unavailable for currency: ${from}`);
   if (!usdToTarget) throw new Error(`Exchange rate unavailable for currency: ${to}`);

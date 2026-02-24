@@ -26,15 +26,13 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
     }),
   ]);
 
-  // Convert all currencies in parallel (current + previous year)
+  // Convert all currencies (synchronous — rates pre-loaded at startup)
   const allReports = [...reports, ...prevReports];
-  const conversions = await Promise.all(
-    allReports.map((r) => {
-      const rate = r.dailyRate ?? r.mission.dailyRate ?? 0;
-      const revenue = r.totalDays * rate;
-      return convertAmount(revenue, r.mission.client.currency, baseCurrency);
-    }),
-  );
+  const conversions = allReports.map((r) => {
+    const rate = r.dailyRate ?? r.mission.dailyRate ?? 0;
+    const revenue = r.totalDays * rate;
+    return convertAmount(revenue, r.mission.client.currency, baseCurrency);
+  });
 
   // --- Current year aggregation ---
   let totalDays = 0;

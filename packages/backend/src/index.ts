@@ -1,8 +1,10 @@
 import { closeDb } from "./db/index.js";
 import { runMigrations } from "./db/migrate.js";
 import { config } from "./lib/config.js";
+import { initExchangeRates, stopExchangeRates } from "./services/exchange-rate.service.js";
 
 await runMigrations();
+await initExchangeRates();
 
 const { default: app } = await import("./app.js");
 
@@ -15,6 +17,7 @@ const server = Bun.serve({
 
 const shutdown = async () => {
   console.log("Shutting down gracefully...");
+  stopExchangeRates();
   server.stop();
   await closeDb();
   process.exit(0);

@@ -10,6 +10,10 @@ import { authMiddleware } from "../middleware/auth.js";
 const missionsRouter = new Hono<AppEnv>();
 missionsRouter.use("*", authMiddleware);
 
+async function fetchMissionWithClient(id: string) {
+  return db.query.missions.findFirst({ where: eq(missions.id, id), with: MISSION_WITH });
+}
+
 missionsRouter.get("/", async (c) => {
   const userId = c.get("userId");
   const list = await db.query.missions.findMany({
@@ -35,14 +39,8 @@ missionsRouter.post("/", zValidator("json", createMissionSchema), async (c) => {
     endDate: endDate ? new Date(endDate) : null,
   });
 
-  // Fetch with client relation for response
-  const result = await db.query.missions.findFirst({
-    where: eq(missions.id, mission.id),
-    with: MISSION_WITH,
-  });
-
   c.header("Location", `/api/missions/${mission.id}`);
-  return c.json(result, 201);
+  return c.json(await fetchMissionWithClient(mission.id), 201);
 });
 
 missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
@@ -55,21 +53,15 @@ missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) 
     await findOwned("client", data.clientId, userId);
   }
 
+  const { startDate, endDate, ...rest } = data;
   await updateReturning(missions, id, {
-    name: data.name,
-    clientId: data.clientId,
-    dailyRate: data.dailyRate,
-    startDate: data.startDate !== undefined ? (data.startDate ? new Date(data.startDate) : null) : undefined,
-    endDate: data.endDate !== undefined ? (data.endDate ? new Date(data.endDate) : null) : undefined,
-    isActive: data.isActive,
+    ...rest,
+    ...(startDate !== undefined && { startDate: startDate ? new Date(startDate) : null }),
+    ...(endDate !== undefined && { endDate: endDate ? new Date(endDate) : null }),
     updatedAt: new Date(),
   });
 
-  const result = await db.query.missions.findFirst({
-    where: eq(missions.id, id),
-    with: MISSION_WITH,
-  });
-  return c.json(result);
+  return c.json(await fetchMissionWithClient(id));
 });
 
 missionsRouter.delete("/:id", async (c) => {

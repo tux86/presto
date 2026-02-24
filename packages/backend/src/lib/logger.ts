@@ -1,0 +1,10 @@
+import { createConsola } from "consola";
+
+export const logger = createConsola({
+  formatOptions: {
+    date: true,
+    colors: true,
+    compact: false,
+    columns: 80,
+  },
+});

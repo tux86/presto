@@ -5,9 +5,10 @@ import { bodyLimit } from "hono/body-limit";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { logger } from "hono/logger";
+import { logger as honoLogger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { config, getPublicConfig } from "./lib/config.js";
+import { logger } from "./lib/logger.js";
 import activityReports from "./routes/activity-reports.js";
 import auth from "./routes/auth.js";
 import clients from "./routes/clients.js";
@@ -17,7 +18,10 @@ import settings from "./routes/settings.js";
 
 const app = new Hono();
 
-app.use("*", logger());
+app.use(
+  "*",
+  honoLogger((msg) => logger.info(msg)),
+);
 app.use(
   "*",
   secureHeaders({
@@ -41,34 +45,31 @@ app.use(
   }),
 );
 
-/** Detect FK constraint errors (PostgreSQL error code 23503). */
-function isForeignKeyViolation(e: Record<string, unknown>): boolean {
-  return e.code === "23503";
-}
-
-/** Detect FK constraint errors, including Drizzle-wrapped errors. */
+/** Detect FK constraint errors (PostgreSQL code 23503), including Drizzle-wrapped errors. */
 function isForeignKeyError(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
   const e = err as Record<string, unknown>;
-  if (isForeignKeyViolation(e)) return true;
-  // Drizzle wraps driver errors in DrizzleQueryError with a .cause property
-  if (e.cause && typeof e.cause === "object") {
-    return isForeignKeyViolation(e.cause as Record<string, unknown>);
-  }
+  if (e.code === "23503") return true;
+  if (e.cause && typeof e.cause === "object") return (e.cause as Record<string, unknown>).code === "23503";
   return false;
 }
 
 // Global error handler
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
+    if (err.status >= 500) logger.error(`${c.req.method} ${c.req.path}:`, err.message);
     return c.json({ error: err.message }, err.status);
   }
 
   if (isForeignKeyError(err)) {
+    logger.warn(`FK constraint: ${c.req.method} ${c.req.path}`);
     return c.json({ error: "Cannot delete: record has associated data" }, 409);
   }
 
-  console.error("Unhandled error:", err instanceof Error ? err.message : String(err));
+  logger.error(
+    `Unhandled error: ${c.req.method} ${c.req.path}:`,
+    err instanceof Error ? (err.stack ?? err.message) : String(err),
+  );
   return c.json({ error: "Internal server error" }, 500);
 });
 

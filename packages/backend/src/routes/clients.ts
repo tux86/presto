@@ -45,17 +45,7 @@ clientsRouter.patch("/:id", zValidator("json", updateClientSchema), async (c) =>
 
   await findOwned("client", id, userId);
 
-  const client = await updateReturning(clients, id, {
-    name: data.name,
-    email: data.email,
-    phone: data.phone,
-    address: data.address,
-    businessId: data.businessId,
-    color: data.color,
-    currency: data.currency,
-    holidayCountry: data.holidayCountry,
-    updatedAt: new Date(),
-  });
+  const client = await updateReturning(clients, id, { ...data, updatedAt: new Date() });
   return c.json(client);
 });
 

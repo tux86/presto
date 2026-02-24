@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { db, userSettings } from "../db/index.js";
 import { config } from "../lib/config.js";
+import { logger } from "../lib/logger.js";
 import { updateSettingsSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -22,7 +23,10 @@ async function getOrCreateSettings(userId: string) {
   const created = await db.query.userSettings.findFirst({
     where: eq(userSettings.userId, userId),
   });
-  if (!created) throw new HTTPException(500, { message: "Failed to create settings" });
+  if (!created) {
+    logger.error("Failed to create user settings for", userId);
+    throw new HTTPException(500, { message: "Failed to create settings" });
+  }
   return created;
 }
 
@@ -47,6 +51,7 @@ settings.patch("/", zValidator("json", updateSettingsSchema), async (c) => {
   const updated = await db.query.userSettings.findFirst({
     where: eq(userSettings.userId, userId),
   });
+  if (!updated) throw new HTTPException(500, { message: "Failed to update settings" });
   return c.json(updated);
 });
 

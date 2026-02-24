@@ -40,8 +40,11 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
 
   const monthlyMap = new Map<number, { days: number; revenue: number }>();
   const monthlyClientMap = new Map<
-    string,
-    { clientId: string; clientName: string; clientColor: ClientColorKey | null; days: number; revenue: number }
+    number,
+    Map<
+      string,
+      { clientId: string; clientName: string; clientColor: ClientColorKey | null; days: number; revenue: number }
+    >
   >();
   const clientMap = new Map<
     string,
@@ -75,15 +78,20 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
     });
 
     // Monthly per-client data
-    const mck = `${report.month}-${report.mission.client.id}`;
-    const mcExisting = monthlyClientMap.get(mck) ?? {
+    if (!monthlyClientMap.has(report.month)) monthlyClientMap.set(report.month, new Map());
+    const monthClients = monthlyClientMap.get(report.month)!;
+    const mcExisting = monthClients.get(report.mission.client.id) ?? {
       clientId: report.mission.client.id,
       clientName: report.mission.client.name,
       clientColor: (report.mission.client.color as ClientColorKey) ?? null,
       days: 0,
       revenue: 0,
     };
-    monthlyClientMap.set(mck, { ...mcExisting, days: mcExisting.days + days, revenue: mcExisting.revenue + converted });
+    monthClients.set(report.mission.client.id, {
+      ...mcExisting,
+      days: mcExisting.days + days,
+      revenue: mcExisting.revenue + converted,
+    });
 
     // Client aggregate
     const clientKey = report.mission.client.id;
@@ -133,18 +141,7 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
   // Build monthly client revenue for all 12 months
   const monthlyClientRevenue = Array.from({ length: 12 }, (_, i) => {
     const month = i + 1;
-    const clients: {
-      clientId: string;
-      clientName: string;
-      clientColor: ClientColorKey | null;
-      days: number;
-      revenue: number;
-    }[] = [];
-    for (const [key, value] of monthlyClientMap) {
-      if (key.startsWith(`${month}-`)) {
-        clients.push(value);
-      }
-    }
+    const clients = Array.from(monthlyClientMap.get(month)?.values() ?? []);
     return { month, clients };
   });
 

@@ -9,6 +9,7 @@ import { insertReturning, updateReturning } from "../db/helpers.js";
 import { db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
+import { logger } from "../lib/logger.js";
 import { loginSchema, registerSchema, updateProfileSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -51,6 +52,7 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (existing) {
+    logger.debug("Registration rejected: email already exists", email);
     throw new HTTPException(409, { message: "Email already registered" });
   }
 
@@ -69,6 +71,7 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
 
   const { password: _, ...safeUser } = user;
   const token = await createToken(user.id, user.email);
+  logger.info("User registered:", email);
   return c.json({ token, user: safeUser }, 201);
 });
 
@@ -78,16 +81,19 @@ auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
 
   const user = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (!user) {
+    logger.debug("Login failed: unknown email", email);
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
   const valid = await Bun.password.verify(password, user.password);
   if (!valid) {
+    logger.debug("Login failed: wrong password for", email);
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
   const { password: _, ...safeUser } = user;
   const token = await createToken(user.id, user.email);
+  logger.debug("Login successful:", email);
   return c.json({ token, user: safeUser });
 });
 

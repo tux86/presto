@@ -1,4 +1,5 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
+import { logger } from "../lib/logger.js";
 import { createId } from "./id.js";
 import { activityReports, clients, closeDb, db, missions, reportEntries, userSettings, users } from "./index.js";
 
@@ -337,13 +338,13 @@ async function main() {
   await db.insert(activityReports).values(reportRows);
   await db.insert(reportEntries).values(entryRows);
 
-  console.log(
+  logger.success(
     `Seed completed: demo@presto.dev / demo1234 — ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
   );
   await closeDb();
 }
 
 await main().catch((err) => {
-  console.error("Seed failed:", err);
+  logger.error("Seed failed:", err);
   process.exit(1);
 });

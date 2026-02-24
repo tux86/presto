@@ -30,6 +30,7 @@ export const config = {
   app: {
     name: env("APP_NAME", "Presto"),
     port: envInt("PORT", 3001),
+    logLevel: env("LOG_LEVEL", "info"),
   },
   defaults: {
     theme: env("DEFAULT_THEME", "dark") as "light" | "dark" | "auto",

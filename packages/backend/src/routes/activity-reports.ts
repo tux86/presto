@@ -5,6 +5,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { findOwned, REPORT_WITH, REPORT_WITH_PDF, updateReturning } from "../db/helpers.js";
 import { activityReports, clients, db, reportEntries } from "../db/index.js";
+import { logger } from "../lib/logger.js";
 import { createReportSchema, updateEntriesSchema, updateReportSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { ensureDraft, parseIntParam, slugify } from "../lib/utils.js";
@@ -71,6 +72,7 @@ activityReportsRouter.post("/", zValidator("json", createReportSchema), async (c
     ),
   });
   if (existing) {
+    logger.debug(`Report creation rejected: duplicate for mission ${missionId} ${year}-${month}`);
     throw new HTTPException(409, { message: "Report already exists for this mission/month/year" });
   }
 
@@ -90,6 +92,7 @@ activityReportsRouter.post("/", zValidator("json", createReportSchema), async (c
     client.holidayCountry,
     mission.dailyRate,
   );
+  logger.debug(`Report created: ${report.id} for mission ${missionId} ${year}-${month}`);
   c.header("Location", `/api/activity-reports/${report.id}`);
   return c.json(report, 201);
 });
@@ -116,6 +119,7 @@ activityReportsRouter.patch("/:id", zValidator("json", updateReportSchema), asyn
 
   // Allow status changes (including revert to draft), but block note edits on completed reports
   if (existing.status === "COMPLETED" && data.note !== undefined && data.status !== "DRAFT") {
+    logger.debug(`Report update rejected: cannot modify completed report ${id}`);
     throw new HTTPException(400, { message: "Cannot modify a completed report" });
   }
 
@@ -212,9 +216,11 @@ activityReportsRouter.get("/:id/pdf", async (c) => {
     throw new HTTPException(404, { message: "Report not found" });
   }
   if (report.status === "DRAFT") {
+    logger.debug(`PDF export rejected: report ${id} is still a draft`);
     throw new HTTPException(400, { message: "Cannot export a draft report. Mark it as completed first." });
   }
 
+  logger.debug(`Generating PDF for report ${id} (locale: ${locale})`);
   const pdfBuffer = await generateReportPdf(enrichReport(report, locale), locale);
 
   const filename = `activity-report-${slugify(report.mission.client.name)}-${slugify(report.mission.name)}-${report.year}-${String(report.month).padStart(2, "0")}.pdf`;

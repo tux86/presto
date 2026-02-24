@@ -5,6 +5,7 @@ import { insertReturning } from "../db/helpers.js";
 import { db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { verifyToken } from "../lib/jwt.js";
+import { logger } from "../lib/logger.js";
 
 type AuthEnv = {
   Variables: {
@@ -40,6 +41,7 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
 
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
+    logger.debug("Auth rejected: missing or invalid Authorization header");
     throw new HTTPException(401, { message: "Missing or invalid token" });
   }
 
@@ -48,6 +50,7 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
   try {
     payload = await verifyToken(token);
   } catch {
+    logger.debug("Auth rejected: invalid or expired token");
     throw new HTTPException(401, { message: "Invalid or expired token" });
   }
 
@@ -56,6 +59,7 @@ export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
     columns: { id: true },
   });
   if (!user) {
+    logger.warn("Auth rejected: user no longer exists", payload.sub);
     throw new HTTPException(401, { message: "User no longer exists" });
   }
 

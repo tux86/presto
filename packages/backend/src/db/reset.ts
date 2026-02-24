@@ -1,3 +1,4 @@
+import { logger } from "../lib/logger.js";
 import { activityReports, clients, closeDb, db, missions, reportEntries, userSettings, users } from "./index.js";
 
 async function main() {
@@ -5,11 +6,11 @@ async function main() {
 
   for (const table of tables) await db.delete(table);
 
-  console.log("Database reset");
+  logger.success("Database reset");
   await closeDb();
 }
 
 await main().catch((err) => {
-  console.error("Reset failed:", err);
+  logger.error("Reset failed:", err);
   process.exit(1);
 });

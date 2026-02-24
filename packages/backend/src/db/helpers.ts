@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { HTTPException } from "hono/http-exception";
 import { activityReports, clients, db, missions } from "./index.js";
@@ -66,7 +66,8 @@ export const MISSION_WITH = {
   client: { columns: { id: true, name: true, color: true, currency: true } },
 } as const;
 
-const ENTRIES_ORDERED = { orderBy: (e: any, { asc }: any) => [asc(e.date)] };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Drizzle relational orderBy callback types are unresolvable without `any`
+const ENTRIES_ORDERED = { orderBy: (e: any, _: any) => [asc(e.date)] };
 
 /** Relational include: standard activity report with entries + mission. */
 export const REPORT_WITH = {

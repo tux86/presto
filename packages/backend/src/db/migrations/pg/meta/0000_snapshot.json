@@ -1,5 +1,5 @@
 {
-  "id": "a68706e6-0e3f-4fab-a67a-c660973f7482",
+  "id": "3db2e0a6-ea10-4cdc-b65a-2b728d80573f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -266,37 +266,6 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.ExchangeRate": {
-      "name": "ExchangeRate",
-      "schema": "",
-      "columns": {
-        "currency": {
-          "name": "currency",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "rate": {
-          "name": "rate",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp (3)",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

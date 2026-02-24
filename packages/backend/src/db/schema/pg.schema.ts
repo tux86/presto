@@ -58,14 +58,6 @@ export const userSettings = pgTable("UserSettings", {
   updatedAt: updatedAt(),
 });
 
-export const exchangeRates = pgTable("ExchangeRate", {
-  currency: text("currency").primaryKey(),
-  rate: doublePrecision("rate").notNull(),
-  updatedAt: timestamp("updatedAt", { precision: 3, mode: "date" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-});
-
 export const clients = pgTable(
   "Client",
   {

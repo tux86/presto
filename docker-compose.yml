@@ -3,7 +3,7 @@
 # For production deployment, use docker-compose.production.yml instead.
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     container_name: presto-postgres
     restart: unless-stopped
     environment:

@@ -1,7 +1,5 @@
 import type { Locale } from "@presto/shared";
 
-export type DbProvider = "postgresql" | "mysql" | "sqlite";
-
 function env(key: string, fallback: string): string {
   return process.env[key] ?? fallback;
 }
@@ -51,21 +49,6 @@ export const config = {
   },
   database: {
     url: envRequired("DATABASE_URL"),
-    provider: (() => {
-      const explicit = process.env.DB_PROVIDER;
-      if (explicit) {
-        const valid: DbProvider[] = ["postgresql", "mysql", "sqlite"];
-        if (!valid.includes(explicit as DbProvider)) {
-          throw new Error(`Invalid DB_PROVIDER: "${explicit}". Must be one of: ${valid.join(", ")}`);
-        }
-        return explicit as DbProvider;
-      }
-      const url = process.env.DATABASE_URL ?? "";
-      if (url.startsWith("postgresql://") || url.startsWith("postgres://")) return "postgresql";
-      if (url.startsWith("mysql://")) return "mysql";
-      if (url.startsWith("file:") || url.endsWith(".db") || url.endsWith(".sqlite")) return "sqlite";
-      return "postgresql";
-    })() as DbProvider,
   },
   jwt: {
     secret: (() => {

@@ -41,18 +41,12 @@ app.use(
   }),
 );
 
-/** Detect FK constraint errors across all supported databases. */
+/** Detect FK constraint errors (PostgreSQL error code 23503). */
 function isForeignKeyViolation(e: Record<string, unknown>): boolean {
-  // PostgreSQL
-  if (e.code === "23503") return true;
-  // MySQL
-  if (e.code === "ER_ROW_IS_REFERENCED_2" || e.errno === 1451) return true;
-  // SQLite
-  if (typeof e.message === "string" && e.message.includes("FOREIGN KEY constraint failed")) return true;
-  return false;
+  return e.code === "23503";
 }
 
-/** Detect FK constraint errors across all supported databases, including Drizzle-wrapped errors. */
+/** Detect FK constraint errors, including Drizzle-wrapped errors. */
 function isForeignKeyError(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
   const e = err as Record<string, unknown>;

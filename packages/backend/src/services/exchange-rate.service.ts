@@ -1,80 +1,52 @@
-import { eq } from "drizzle-orm";
-import { db, exchangeRates } from "../db/index.js";
-
 const STALE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+/** In-memory cache — refreshed from API every 24h */
+let cache: { rates: Record<string, number>; fetchedAt: number } | null = null;
+
 /**
- * Fetches EUR-based rates from frankfurter.app and upserts them into the DB.
- * Returns a map of currency → rate (EUR = 1).
+ * Fetches USD-based rates from frankfurter.app.
  */
-async function fetchAndStoreRates(): Promise<Record<string, number>> {
-  const res = await fetch("https://api.frankfurter.app/latest?base=EUR");
+async function fetchRates(): Promise<Record<string, number>> {
+  const res = await fetch("https://api.frankfurter.app/latest?base=USD");
   if (!res.ok) throw new Error(`Frankfurter API returned ${res.status}`);
   const data = (await res.json()) as { rates: Record<string, number> };
-
-  const now = new Date();
-  const entries = Object.entries(data.rates);
-
-  // Upsert each rate — use delete + insert (works on all dialects)
-  for (const [currency, rate] of entries) {
-    await db.delete(exchangeRates).where(eq(exchangeRates.currency, currency));
-    await db.insert(exchangeRates).values({ currency, rate, updatedAt: now });
-  }
-
-  return { EUR: 1, ...data.rates };
+  return { USD: 1, ...data.rates };
 }
 
 /**
- * Loads rates from DB. Returns null if no rates exist.
- */
-async function loadRatesFromDb(): Promise<{ rates: Record<string, number>; stale: boolean } | null> {
-  const rows = await db.query.exchangeRates.findMany();
-  if (rows.length === 0) return null;
-
-  const rates: Record<string, number> = { EUR: 1 };
-  let oldestUpdate = Date.now();
-
-  for (const row of rows) {
-    rates[row.currency] = row.rate;
-    const ts = row.updatedAt instanceof Date ? row.updatedAt.getTime() : Number(row.updatedAt);
-    if (ts < oldestUpdate) oldestUpdate = ts;
-  }
-
-  return { rates, stale: Date.now() - oldestUpdate > STALE_MS };
-}
-
-/**
- * Returns EUR-based exchange rates. Fetches from API only if DB rates are missing or stale (>24h).
+ * Returns USD-based exchange rates from in-memory cache.
+ * Fetches from API on first call or when cache is stale (>24h).
+ * Throws if the API is unreachable and no cached rates exist.
  */
 async function getRates(): Promise<Record<string, number>> {
-  const cached = await loadRatesFromDb();
-
-  if (cached && !cached.stale) {
-    return cached.rates;
+  if (cache && Date.now() - cache.fetchedAt < STALE_MS) {
+    return cache.rates;
   }
 
   try {
-    return await fetchAndStoreRates();
+    const rates = await fetchRates();
+    cache = { rates, fetchedAt: Date.now() };
+    return rates;
   } catch {
-    // API failed — use stale DB rates if available
-    if (cached) return cached.rates;
-    // No rates at all — return EUR-only (no conversion possible)
-    return { EUR: 1 };
+    if (cache) return cache.rates;
+    throw new Error("Exchange rates unavailable: API unreachable and no cached rates");
   }
 }
 
 /**
- * Convert an amount from one currency to another using EUR as the pivot.
- * Formula: amount * (eurToTarget / eurToSource)
+ * Convert an amount from one currency to another using USD as the pivot.
+ * Formula: amount * (usdToTarget / usdToSource)
+ * Throws if exchange rates are unavailable — never returns unconverted amounts silently.
  */
 export async function convertAmount(amount: number, from: string, to: string): Promise<number> {
   if (from === to || amount === 0) return amount;
 
   const rates = await getRates();
-  const eurToSource = from === "EUR" ? 1 : rates[from];
-  const eurToTarget = to === "EUR" ? 1 : rates[to];
+  const usdToSource = from === "USD" ? 1 : rates[from];
+  const usdToTarget = to === "USD" ? 1 : rates[to];
 
-  if (!eurToSource || !eurToTarget) return amount; // Unknown currency — return as-is
+  if (!usdToSource) throw new Error(`Exchange rate unavailable for currency: ${from}`);
+  if (!usdToTarget) throw new Error(`Exchange rate unavailable for currency: ${to}`);
 
-  return amount * (eurToTarget / eurToSource);
+  return amount * (usdToTarget / usdToSource);
 }

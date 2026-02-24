@@ -1,7 +1,6 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
 import { createId } from "./id.js";
-import { activityReports, clients, db, missions, reportEntries, userSettings, users } from "./index.js";
-import { runMigrations } from "./migrate.js";
+import { activityReports, clients, closeDb, db, missions, reportEntries, userSettings, users } from "./index.js";
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -76,8 +75,6 @@ function monthRange(
 }
 
 async function main() {
-  await runMigrations();
-
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
@@ -338,15 +335,12 @@ async function main() {
   // Bulk inserts
   await db.insert(missions).values(missionRows);
   await db.insert(activityReports).values(reportRows);
-  // SQLite has a variable limit (~999), chunk entries to stay under the limit
-  const CHUNK = 100;
-  for (let i = 0; i < entryRows.length; i += CHUNK) {
-    await db.insert(reportEntries).values(entryRows.slice(i, i + CHUNK));
-  }
+  await db.insert(reportEntries).values(entryRows);
 
   console.log(
     `Seed completed: demo@presto.dev / demo1234 — ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
   );
+  await closeDb();
 }
 
 await main().catch((err) => {

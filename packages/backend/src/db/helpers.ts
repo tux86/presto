@@ -1,7 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { HTTPException } from "hono/http-exception";
-import { config } from "../lib/config.js";
 import { activityReports, clients, db, missions } from "./index.js";
 
 type OwnedModel = "activityReport" | "client" | "mission";
@@ -28,7 +27,7 @@ export async function findOwned(model: OwnedModel, id: string, userId: string) {
 }
 
 /**
- * Insert a row and return it. Handles MySQL's lack of RETURNING clause.
+ * Insert a row and return it.
  * Accepts an optional transaction handle; defaults to the module-level `db`.
  */
 export async function insertReturning<T extends PgTable>(
@@ -37,16 +36,6 @@ export async function insertReturning<T extends PgTable>(
   trx?: typeof db,
 ): Promise<T["$inferSelect"]> {
   const d = trx ?? db;
-  if (config.database.provider === "mysql") {
-    await d.insert(table).values(values as any);
-    const id = (values as Record<string, unknown>).id;
-    const [row] = await d
-      .select()
-      .from(table as any)
-      .where(eq((table as Record<string, any>).id, id))
-      .limit(1);
-    return row as T["$inferSelect"];
-  }
   const [row] = await d
     .insert(table)
     .values(values as any)
@@ -55,7 +44,7 @@ export async function insertReturning<T extends PgTable>(
 }
 
 /**
- * Update a row by id and return it. Handles MySQL's lack of RETURNING clause.
+ * Update a row by id and return it.
  */
 export async function updateReturning<T extends PgTable>(
   table: T,
@@ -63,19 +52,6 @@ export async function updateReturning<T extends PgTable>(
   values: Partial<T["$inferInsert"]>,
 ): Promise<T["$inferSelect"]> {
   const idCol = (table as Record<string, any>).id;
-  if (config.database.provider === "mysql") {
-    await db
-      .update(table)
-      .set(values as any)
-      .where(eq(idCol, id));
-    const [row] = await db
-      .select()
-      .from(table as any)
-      .where(eq(idCol, id))
-      .limit(1);
-    if (!row) throw new HTTPException(404, { message: "Record not found" });
-    return row as T["$inferSelect"];
-  }
   const rows = (await db
     .update(table)
     .set(values as any)

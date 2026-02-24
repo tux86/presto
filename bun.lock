@@ -25,7 +25,7 @@
     },
     "packages/backend": {
       "name": "@presto/backend",
-      "version": "1.12.1",
+      "version": "1.13.0",
       "dependencies": {
         "@hono/zod-validator": "^0.7.6",
         "@presto/shared": "workspace:*",
@@ -33,7 +33,6 @@
         "drizzle-orm": "^0.44.0",
         "hono": "^4.7.0",
         "hono-rate-limiter": "^0.5.3",
-        "mysql2": "^3.14.0",
         "nanoid": "^5.1.6",
         "pg": "^8.18.0",
         "react": "^19.0.0",
@@ -49,7 +48,7 @@
     },
     "packages/frontend": {
       "name": "@presto/frontend",
-      "version": "1.12.1",
+      "version": "1.13.0",
       "dependencies": {
         "@presto/shared": "workspace:*",
         "@tanstack/react-query": "^5.66.0",
@@ -73,7 +72,7 @@
     },
     "packages/shared": {
       "name": "@presto/shared",
-      "version": "1.12.1",
+      "version": "1.13.0",
       "dependencies": {
         "date-holidays": "^3.26.8",
       },

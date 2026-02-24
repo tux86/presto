@@ -25,9 +25,9 @@ RUN addgroup -S -g 1001 presto && \
 
 WORKDIR /app
 
-# Install runtime DB drivers. The bundled dist/index.js is self-contained
-# but needs native driver packages available at runtime.
-RUN echo '{"dependencies":{"pg":"^8.18.0","mysql2":"^3.14.0"}}' > package.json && \
+# Install runtime DB driver. The bundled dist/index.js is self-contained
+# but needs the native pg driver package available at runtime.
+RUN echo '{"dependencies":{"pg":"^8.18.0"}}' > package.json && \
     bun install --production && \
     rm package.json
 

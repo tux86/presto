@@ -85,7 +85,7 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 - **Single Docker image** — backend + frontend served together
 - Auto-runs database migrations on startup
 - Built-in health check endpoint (`/api/health`)
-- **Multi-database** — PostgreSQL (default), MySQL / MariaDB, and SQLite via runtime dialect switching (Drizzle ORM)
+- **PostgreSQL** — powered by Drizzle ORM with auto-migrations at startup
 
 ## Quick Start
 
@@ -110,7 +110,7 @@ See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environme
 | **Runtime** | [Bun](https://bun.sh/) |
 | **Frontend** | React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts |
 | **Backend** | Hono 4, Drizzle ORM, @react-pdf/renderer |
-| **Database** | PostgreSQL, MySQL/MariaDB, SQLite |
+| **Database** | PostgreSQL |
 | **Language** | TypeScript 5.7 (strict mode) |
 | **Testing** | Bun test runner, Hono `app.request()` (101 E2E tests) |
 | **CI/CD** | GitHub Actions (lint, typecheck, build, test), semantic-release |
@@ -138,7 +138,7 @@ flowchart LR
         end
     end
 
-    DB[("PostgreSQL<br/>MySQL / MariaDB<br/>SQLite")]
+    DB[("PostgreSQL")]
 
     Static -.->|"HTML · JS · CSS"| SPA
     SPA -->|"REST /api"| MW
@@ -168,7 +168,6 @@ Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The
 | Single Docker image | ✅ | ❌ | ✅ | ✅ |
 | Monthly activity reports | ✅ | ❌ | ❌ | ❌ |
 | PDF export | ✅ | ✅ | ❌ | ❌ |
-| Multi-database | ✅ | ❌ | ❌ | ✅ |
 | Optional auth (single-user) | ✅ | ❌ | ❌ | ❌ |
 | i18n (5 languages) | ✅ | ✅ | ❌ | ❌ |
 | Client/mission tracking | ✅ | ✅ | ❌ | ❌ |

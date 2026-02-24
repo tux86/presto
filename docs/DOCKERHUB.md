@@ -14,7 +14,7 @@ A self-hosted time-tracking application for freelancers and consultants. Generat
 - Multilingual interface (EN, FR, DE, ES, PT)
 - Dark mode
 - Optional authentication (single-user friendly)
-- Multi-database: PostgreSQL, MySQL/MariaDB, SQLite
+- PostgreSQL database with auto-migrations
 
 ## Quick Start
 
@@ -30,23 +30,12 @@ docker compose -f docker-compose.production.yml up -d
 
 Open [http://localhost:8080](http://localhost:8080).
 
-## Quick Start (SQLite — no external DB)
-
-```bash
-docker run -d \
-  -p 8080:8080 \
-  -v presto-data:/data \
-  -e DATABASE_URL="file:/data/presto.db" \
-  -e JWT_SECRET="$(openssl rand -base64 48)" \
-  axforge/presto:latest
-```
-
 ## Docker Compose
 
 ```yaml
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: presto
@@ -96,7 +85,6 @@ docker run -d \
 | `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
 | `AUTH_DISABLED` | `false` | Set `true` to disable authentication (single-user mode) |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
-| `DB_PROVIDER` | *(auto-detected)* | Force database dialect: `postgresql`, `mysql`, or `sqlite` |
 | `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
 | `DEFAULT_LOCALE` | `en` | Default locale for new users: `en`, `fr`, `de`, `es`, `pt` |
 | `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency for new users (ISO 4217) |
@@ -105,15 +93,11 @@ docker run -d \
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
 | `PORT` | `8080` | HTTP port inside the container |
 
-### DATABASE_URL examples
+### DATABASE_URL format
 
-| Database | URL format |
-|---|---|
-| PostgreSQL | `postgresql://user:pass@host:5432/presto` |
-| MySQL/MariaDB | `mysql://user:pass@host:3306/presto` |
-| SQLite | `file:/data/presto.db` |
-
-The database provider is auto-detected from the URL prefix. Use `DB_PROVIDER` to override.
+```
+postgresql://user:pass@host:5432/presto
+```
 
 ## Ports
 

@@ -7,7 +7,7 @@ Activity report time-tracking app. Monorepo with 3 packages.
 - **Runtime:** Bun
 - **Frontend:** React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts
 - **Backend:** Hono 4, Drizzle ORM, @react-pdf/renderer
-- **Database:** PostgreSQL, MySQL/MariaDB, SQLite — runtime dialect switching via `DB_PROVIDER` env var or auto-detected from `DATABASE_URL`
+- **Database:** PostgreSQL (Drizzle ORM)
 - **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
 - **Testing:** Bun test runner, Hono `app.request()` (109 API E2E tests)
 - **Language:** TypeScript 5.7, strict mode
@@ -32,8 +32,8 @@ bun run build              # Build all packages
 bun run typecheck          # Type-check all packages
 bun run lint               # Lint + format check (Biome)
 bun run lint:fix           # Auto-fix lint + format issues
-bun run test               # Run API E2E tests (in-memory SQLite, no DB needed)
-bun run db:generate        # Generate Drizzle migrations (uses DB_DIALECT env var)
+bun run test               # Run API E2E tests (requires presto_test PostgreSQL DB)
+bun run db:generate        # Generate Drizzle migrations
 bun run db:migrate         # Apply migrations programmatically
 bun run db:reset           # Wipe all data (for dev)
 bun run db:seed            # Seed sample data (run db:reset first)
@@ -55,15 +55,15 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 - **Routes:** all prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `settings`, `health`, `config`
 - **Errors:** throw `HTTPException` from `hono/http-exception` — don't use `c.json()` with error status codes
-- **ORM:** Drizzle ORM with runtime dialect factory in `src/db/index.ts` — exports `db`, table references, and relations
-- **Schemas:** per-dialect schema files in `src/db/schema/{pg,mysql,sqlite}.schema.ts`
+- **ORM:** Drizzle ORM with PostgreSQL in `src/db/index.ts` — exports `db`, table references, and relations
+- **Schema:** `src/db/schema/pg.schema.ts` — single schema file
 - **Ownership checks:** use `findOwned(model, id, userId)` from `db/helpers.ts` — returns the record, throws 404
 - **Status guards:** use `ensureDraft(report)` from `lib/helpers.ts` — throws 400 if report is completed
 - **Utilities:** `slugify()` in `lib/helpers.ts` for filename-safe strings
-- **Query helpers:** `insertReturning()`, `updateReturning()` in `db/helpers.ts` — handle MySQL's lack of RETURNING
+- **Query helpers:** `insertReturning()`, `updateReturning()` in `db/helpers.ts` — use PostgreSQL RETURNING clause
 - **Relational includes:** use `REPORT_WITH` / `REPORT_WITH_PDF` constants from `db/helpers.ts`
 - **Config:** all env vars accessed via `lib/config.ts` — never read `process.env` directly in routes
-- **IDs:** CUID2 generated in JS via `@paralleldrive/cuid2` — works on all dialects
+- **IDs:** nanoid (21-char alphanumeric) generated in JS via `db/id.ts`
 
 ## Frontend Patterns
 
@@ -79,11 +79,11 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 - **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
 - **Location:** `packages/backend/tests/` — 10 test suites, 109 tests
-- **Database:** in-memory SQLite (`DATABASE_URL=file::memory:`) — fresh each run, no external DB needed
+- **Database:** PostgreSQL test database (`presto_test`) — fresh migrations each run
 - **Setup:** preload script (`setup.ts`) runs Drizzle migrations before tests
 - **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)
 - **Config:** `bunfig.toml` configures preload, `--env-file .env.test` loads test env vars
-- **CI:** dedicated `test` job in CI workflow (SQLite in-memory, no service container needed)
+- **CI:** dedicated `test` job in CI workflow with PostgreSQL service container
 
 ## Code Quality
 
@@ -94,7 +94,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 
 ## CI/CD
 
-- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → typecheck → build) + `test` (SQLite in-memory) on PR/push to `main`
+- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → typecheck → build) + `test` (PostgreSQL service container) on PR/push to `main`
 - **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
 - **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR on release
 
@@ -113,7 +113,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 ## Environment
 
 - **`.env`** (root) — dev config: database, JWT, app settings. All `dev`, `db:*` scripts load from here.
-- **`packages/backend/.env.test`** — test config: in-memory SQLite. Used only by `bun run test`.
+- **`packages/backend/.env.test`** — test config: PostgreSQL test database. Used only by `bun run test`.
 - **`.env.example`** (root) — template with all available env vars.
 
 ## Key Conventions
@@ -123,5 +123,5 @@ docker compose up -d       # Start PostgreSQL (dev)
 - Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
 - `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup
 - Registration password requires min 8 chars + uppercase + lowercase + digit
-- Drizzle schemas use dialect-specific constructors — one schema file per database (pg, mysql, sqlite)
+- Drizzle schema in `src/db/schema/pg.schema.ts` — PostgreSQL only
 - Completed reports are read-only — no entry editing, auto-fill, or clear. Only PDF export is allowed.

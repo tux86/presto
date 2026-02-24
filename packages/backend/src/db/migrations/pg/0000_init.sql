@@ -30,12 +30,6 @@ CREATE TABLE "Client" (
 	"updatedAt" timestamp (3) NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "ExchangeRate" (
-	"currency" text PRIMARY KEY NOT NULL,
-	"rate" double precision NOT NULL,
-	"updatedAt" timestamp (3) NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "Mission" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,

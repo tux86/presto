@@ -53,6 +53,21 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: presto
+          POSTGRES_PASSWORD: presto_ci_password
+          POSTGRES_DB: presto_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U presto -d presto_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,7 +88,7 @@ jobs:
       - name: Create .env.test
         run: |
           cat > packages/backend/.env.test << 'EOF'
-          DATABASE_URL=file::memory:
+          DATABASE_URL=postgresql://presto:presto_ci_password@localhost:5432/presto_test
           JWT_SECRET=test-jwt-secret-for-ci-minimum-32-characters-long
           REGISTRATION_ENABLED=true
           RATE_LIMIT_MAX=0

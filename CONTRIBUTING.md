@@ -37,7 +37,7 @@ bun run db:generate      # Generate Drizzle migration SQL from schema changes
 bun run db:migrate       # Apply pending migrations (programmatic, runs at startup too)
 bun run db:studio        # Open Drizzle Studio (DB explorer)
 bun run db:seed          # Seed sample data
-bun run test             # Run API E2E tests (requires presto_test DB)
+bun run test             # Run API E2E tests (requires presto_test PostgreSQL DB)
 ```
 
 ## Testing
@@ -75,9 +75,9 @@ packages/
 │   │   ├── index.ts          # Server entry point
 │   │   ├── lib/config.ts     # Environment variable configuration
 │   │   └── routes/           # auth, clients, missions, activity-reports, reporting
-│   │   └── db/               # Drizzle ORM schemas, migrations, helpers
-│   │       ├── schema/       # pg.schema.ts, mysql.schema.ts, sqlite.schema.ts
-│   │       └── migrations/   # pg/, mysql/, sqlite/ migration SQL
+│   │   └── db/               # Drizzle ORM schema, migrations, helpers
+│   │       ├── schema/       # pg.schema.ts
+│   │       └── migrations/   # pg/ migration SQL
 ├── frontend/                 # @presto/frontend — React SPA
 │   └── src/
 │       ├── App.tsx           # Route definitions
@@ -147,14 +147,6 @@ All routes are prefixed with `/api`.
 | `/api/settings` | User preferences (theme, locale, baseCurrency) |
 
 Authentication uses JWT bearer tokens. When `AUTH_DISABLED=true`, all protected endpoints are accessible without a token.
-
-## Switching Databases
-
-Presto uses Drizzle ORM with runtime dialect switching. Set `DB_PROVIDER` (or let it auto-detect from your `DATABASE_URL` prefix) and provide the appropriate connection string.
-
-Supported: `postgresql` (default), `mysql` / `mariadb`, `sqlite`.
-
-> **Note:** MariaDB is fully compatible with the MySQL dialect — use `mysql://` as the `DATABASE_URL` prefix.
 
 ## Branch Strategy
 

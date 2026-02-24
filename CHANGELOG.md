@@ -1,3 +1,19 @@
+## [1.15.0](https://github.com/tux86/presto/compare/v1.14.0...v1.15.0) (2026-02-24)
+
+### Features
+
+* add deletion safeguards, revert-to-draft confirmation, and UI improvements ([77928a3](https://github.com/tux86/presto/commit/77928a362ccf9557ca5b97043cdaabd2102a1013)), closes [#4](https://github.com/tux86/presto/issues/4) [#11](https://github.com/tux86/presto/issues/11)
+
+### Bug Fixes
+
+* correct delete messages, entry cycle order, and utilization calculation ([fd17453](https://github.com/tux86/presto/commit/fd17453b0261ac54dcf301d02703def43f2419db))
+
+### Refactoring
+
+* add structured logging with consola and improve code quality ([0f04b73](https://github.com/tux86/presto/commit/0f04b73e0aea5c1ff7dd7804428e3c2234ba4e85))
+* decouple exchange rate fetching from API requests ([a45be83](https://github.com/tux86/presto/commit/a45be83ac2058ecc625f9c15d265fd9ae43fb4d6))
+* remove MySQL/SQLite support, keep PostgreSQL only ([ff0fe95](https://github.com/tux86/presto/commit/ff0fe95d13eedee2608335698fc17c699aeb2647))
+
 ## [1.14.0](https://github.com/tux86/presto/compare/v1.13.0...v1.14.0) (2026-02-23)
 
 ### Features

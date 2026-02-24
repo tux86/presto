@@ -42,7 +42,8 @@ export const de: Record<TranslationKey, string> = {
   "clients.holidayCountryHint": "Feiertage f\u00fcr T\u00e4tigkeitsberichte",
   "clients.selectHolidayCountry": "Land ausw\u00e4hlen",
   "clients.color": "Farbe",
-  "clients.deleteMessage": "Dieser Kunde und seine Daten werden gel\u00f6scht. Diese Aktion ist unwiderruflich.",
+  "clients.deleteMessage":
+    "Dieser Kunde kann nur gel\u00f6scht werden, wenn er keine Auftr\u00e4ge hat. Entfernen Sie zuerst alle Auftr\u00e4ge.",
 
   // Missions
   "missions.title": "Auftr\u00e4ge",
@@ -60,7 +61,7 @@ export const de: Record<TranslationKey, string> = {
   "missions.inactive": "Inaktiv",
   "missions.deleteTitle": "Diesen Auftrag l\u00f6schen",
   "missions.deleteMessage":
-    "Dieser Auftrag und die zugeh\u00f6rigen Aktivit\u00e4ten werden gel\u00f6scht. Diese Aktion ist unwiderruflich.",
+    "Dieser Auftrag kann nur gel\u00f6scht werden, wenn er keine T\u00e4tigkeitsberichte hat. Entfernen Sie zuerst alle Berichte.",
 
   // Activity (timesheet)
   "activity.validated": "Best\u00e4tigt",

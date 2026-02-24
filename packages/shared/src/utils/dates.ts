@@ -65,15 +65,20 @@ export function getDayNameFull(date: Date, locale?: string): string {
 }
 
 /**
- * Count weekdays (Mon-Fri) in a given year.
+ * Count working days (Mon-Fri minus public holidays) in a given year.
+ * If no country is provided, counts weekdays only (no holiday subtraction).
+ * Accepts an optional isHoliday predicate to avoid coupling to the date-holidays library.
  */
-export function getWorkingDaysInYear(year: number): number {
+export function getWorkingDaysInYear(year: number, isHoliday?: (date: Date) => boolean): number {
   let count = 0;
   for (let m = 0; m < 12; m++) {
     const daysInMonth = new Date(year, m + 1, 0).getDate();
     for (let d = 1; d <= daysInMonth; d++) {
-      const day = new Date(year, m, d).getDay();
-      if (day !== 0 && day !== 6) count++;
+      const date = new Date(year, m, d);
+      const day = date.getDay();
+      if (day === 0 || day === 6) continue;
+      if (isHoliday?.(date)) continue;
+      count++;
     }
   }
   return count;

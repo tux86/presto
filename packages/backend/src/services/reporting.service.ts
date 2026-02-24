@@ -1,5 +1,5 @@
 import type { ClientColorKey, CurrencyCode, ReportingData } from "@presto/shared";
-import { getWorkingDaysInYear } from "@presto/shared";
+import { getHolidayName, getWorkingDaysInYear } from "@presto/shared";
 import { and, eq } from "drizzle-orm";
 import { MISSION_WITH } from "../db/helpers.js";
 import { activityReports, db } from "../db/index.js";
@@ -151,10 +151,29 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
     totalDays,
     totalRevenue,
     averageDailyRate: totalDays > 0 ? totalRevenue / totalDays : 0,
-    workingDaysInYear: getWorkingDaysInYear(year),
+    workingDaysInYear: getWorkingDaysInYear(year, buildHolidayPredicate(reports)),
     previousYear,
     monthlyData,
     monthlyClientRevenue,
     clientData: Array.from(clientMap.values()),
   };
+}
+
+/** Build a holiday predicate from the most common holiday country across reports. */
+function buildHolidayPredicate(reports: { holidayCountry: string }[]): ((date: Date) => boolean) | undefined {
+  if (reports.length === 0) return undefined;
+  const counts = new Map<string, number>();
+  for (const r of reports) {
+    counts.set(r.holidayCountry, (counts.get(r.holidayCountry) ?? 0) + 1);
+  }
+  let best = "";
+  let max = 0;
+  for (const [country, count] of counts) {
+    if (count > max) {
+      best = country;
+      max = count;
+    }
+  }
+  if (!best) return undefined;
+  return (date: Date) => getHolidayName(date, best) !== null;
 }

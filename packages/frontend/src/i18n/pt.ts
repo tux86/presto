@@ -43,7 +43,7 @@ export const pt: Record<TranslationKey, string> = {
   "clients.selectHolidayCountry": "Selecionar um pa\u00eds",
   "clients.color": "Cor",
   "clients.deleteMessage":
-    "Este cliente e os seus dados ser\u00e3o eliminados. Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel.",
+    "Este cliente s\u00f3 pode ser eliminado se n\u00e3o tiver miss\u00f5es. Elimine primeiro todas as miss\u00f5es.",
 
   // Missions
   "missions.title": "Miss\u00f5es",
@@ -62,7 +62,7 @@ export const pt: Record<TranslationKey, string> = {
   "missions.inactive": "Inativa",
   "missions.deleteTitle": "Eliminar esta miss\u00e3o",
   "missions.deleteMessage":
-    "Esta miss\u00e3o e as atividades associadas ser\u00e3o eliminadas. Esta a\u00e7\u00e3o \u00e9 irrevers\u00edvel.",
+    "Esta miss\u00e3o s\u00f3 pode ser eliminada se n\u00e3o tiver relat\u00f3rios de atividade. Elimine primeiro todos os relat\u00f3rios.",
 
   // Activity (timesheet)
   "activity.validated": "Validado",

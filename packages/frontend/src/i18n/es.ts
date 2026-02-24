@@ -42,7 +42,8 @@ export const es: Record<TranslationKey, string> = {
   "clients.holidayCountryHint": "Festivos aplicados a los informes de actividad",
   "clients.selectHolidayCountry": "Seleccionar un pa\u00eds",
   "clients.color": "Color",
-  "clients.deleteMessage": "Este cliente y sus datos ser\u00e1n eliminados. Esta acci\u00f3n es irreversible.",
+  "clients.deleteMessage":
+    "Este cliente solo se puede eliminar si no tiene misiones. Elimine primero todas las misiones.",
 
   // Missions
   "missions.title": "Misiones",
@@ -60,7 +61,7 @@ export const es: Record<TranslationKey, string> = {
   "missions.inactive": "Inactiva",
   "missions.deleteTitle": "Eliminar esta misi\u00f3n",
   "missions.deleteMessage":
-    "Esta misi\u00f3n y sus actividades asociadas ser\u00e1n eliminadas. Esta acci\u00f3n es irreversible.",
+    "Esta misi\u00f3n solo se puede eliminar si no tiene informes de actividad. Elimine primero todos los informes.",
 
   // Activity (timesheet)
   "activity.validated": "Validado",

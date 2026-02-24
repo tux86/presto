@@ -40,7 +40,7 @@ export const en = {
   "clients.holidayCountryHint": "Public holidays for activity reports",
   "clients.selectHolidayCountry": "Select a country",
   "clients.color": "Color",
-  "clients.deleteMessage": "This client and its data will be deleted. This action is irreversible.",
+  "clients.deleteMessage": "This client can only be deleted if it has no missions. Remove all missions first.",
 
   // Missions
   "missions.title": "Missions",
@@ -57,7 +57,7 @@ export const en = {
   "missions.active": "Active",
   "missions.inactive": "Inactive",
   "missions.deleteTitle": "Delete this mission",
-  "missions.deleteMessage": "This mission and its associated activities will be deleted. This action is irreversible.",
+  "missions.deleteMessage": "This mission can only be deleted if it has no activity reports. Remove all reports first.",
 
   // Activity (timesheet)
   "activity.validated": "Validated",

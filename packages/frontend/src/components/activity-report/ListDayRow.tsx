@@ -18,7 +18,7 @@ export function ListDayRow({ entry, colors, onToggle, onTaskChange }: ListDayRow
 
   const handleToggle = () => {
     if (!onToggle) return;
-    const next = entry.value === 0 ? 1 : entry.value === 1 ? 0.5 : 0;
+    const next = entry.value === 0 ? 0.5 : entry.value === 0.5 ? 1 : 0;
     onToggle(entry.id, next);
   };
 

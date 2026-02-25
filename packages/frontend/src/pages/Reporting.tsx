@@ -7,7 +7,7 @@ import { ClientDonutChart } from "@/components/reporting/ClientDonutChart";
 import { KpiCard } from "@/components/reporting/KpiCard";
 import { MonthlyChart } from "@/components/reporting/MonthlyChart";
 import { RevenueAreaChart } from "@/components/reporting/RevenueAreaChart";
-import { ClientFilterChips } from "@/components/ui/ClientFilterChips";
+import { FilterChips } from "@/components/ui/FilterChips";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useT } from "@/i18n";
@@ -29,11 +29,13 @@ function computeDelta(
 export function Reporting() {
   const [year, setYearRaw] = useState(new Date().getFullYear());
   const [filterClientId, setFilterClientId] = useState("");
+  const [filterCompanyId, setFilterCompanyId] = useState("");
   const { t } = useT();
 
   const setYear = useCallback((y: number) => {
     setYearRaw(y);
     setFilterClientId("");
+    setFilterCompanyId("");
   }, []);
 
   const { data: fullReport, isLoading } = useQuery({
@@ -43,18 +45,25 @@ export function Reporting() {
 
   // Derive filtered view client-side from the single API response
   const report = useMemo(() => {
-    if (!fullReport || !filterClientId) return fullReport ?? null;
-    const clientData = fullReport.clientData.filter((c) => c.clientId === filterClientId);
+    if (!fullReport || (!filterClientId && !filterCompanyId)) return fullReport ?? null;
+    const clientData = fullReport.clientData.filter(
+      (c) =>
+        (!filterClientId || c.clientId === filterClientId) && (!filterCompanyId || c.companyId === filterCompanyId),
+    );
     const totalDays = clientData.reduce((sum, c) => sum + c.days, 0);
     const totalRevenue = clientData.reduce((sum, c) => sum + c.convertedRevenue, 0);
     const filteredMonthlyClient = fullReport.monthlyClientRevenue.map((m) => ({
       ...m,
-      clients: m.clients.filter((c) => c.clientId === filterClientId),
+      clients: m.clients.filter(
+        (c) =>
+          (!filterClientId || c.clientId === filterClientId) && (!filterCompanyId || c.companyId === filterCompanyId),
+      ),
     }));
-    const monthlyData = filteredMonthlyClient.map((m) => {
-      const c = m.clients[0];
-      return { month: m.month, days: c?.days ?? 0, revenue: c?.revenue ?? 0 };
-    });
+    const monthlyData = filteredMonthlyClient.map((m) => ({
+      month: m.month,
+      days: m.clients.reduce((s, c) => s + c.days, 0),
+      revenue: m.clients.reduce((s, c) => s + c.revenue, 0),
+    }));
     return {
       ...fullReport,
       totalDays,
@@ -64,18 +73,20 @@ export function Reporting() {
       monthlyData,
       monthlyClientRevenue: filteredMonthlyClient,
     };
-  }, [fullReport, filterClientId]);
+  }, [fullReport, filterClientId, filterCompanyId]);
+
+  const hasFilter = !!(filterClientId || filterCompanyId);
 
   // Client list for area chart
   const clientIds = useMemo(() => {
-    const src = filterClientId ? report : fullReport;
+    const src = hasFilter ? report : fullReport;
     if (!src) return [];
     return src.clientData.map((c) => ({
       clientId: c.clientId,
       clientName: c.clientName,
       clientColor: c.clientColor,
     }));
-  }, [fullReport, report, filterClientId]);
+  }, [fullReport, report, hasFilter]);
 
   // Utilization percentage
   const utilization = report
@@ -102,15 +113,31 @@ export function Reporting() {
       />
 
       {!isLoading && fullReport && (
-        <ClientFilterChips
-          clients={fullReport.clientData.map((c) => ({
-            id: c.clientId,
-            name: c.clientName,
-            color: c.clientColor,
-          }))}
-          value={filterClientId}
-          onChange={setFilterClientId}
-        />
+        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-5">
+          <FilterChips
+            items={fullReport.companyData.map((c) => ({
+              id: c.companyId,
+              name: c.companyName,
+            }))}
+            value={filterCompanyId}
+            onChange={setFilterCompanyId}
+            allLabel={t("reporting.allCompanies")}
+            label={t("reporting.filterCompany")}
+          />
+          {fullReport.companyData.length >= 2 && fullReport.clientData.length >= 2 && (
+            <div className="hidden md:block h-5 w-px bg-edge shrink-0" />
+          )}
+          <FilterChips
+            items={fullReport.clientData.map((c) => ({
+              id: c.clientId,
+              name: c.clientName,
+              color: c.clientColor,
+            }))}
+            value={filterClientId}
+            onChange={setFilterClientId}
+            label={t("reporting.filterClient")}
+          />
+        </div>
       )}
 
       {isLoading ? (
@@ -118,7 +145,7 @@ export function Reporting() {
       ) : report ? (
         <div className="space-y-6">
           {/* KPIs row */}
-          <div className={cn("grid grid-cols-1 gap-4", filterClientId ? "md:grid-cols-3" : "md:grid-cols-4")}>
+          <div className={cn("grid grid-cols-1 gap-4", hasFilter ? "md:grid-cols-3" : "md:grid-cols-4")}>
             <KpiCard
               label={t("reporting.daysWorked")}
               value={formatNumber(report.totalDays)}
@@ -137,7 +164,7 @@ export function Reporting() {
               sparkData={revenueSpark}
               sparkColor="#10b981"
             />
-            {!filterClientId && (
+            {!hasFilter && (
               <KpiCard
                 label={t("reporting.activeClients")}
                 value={String(report.clientData.length)}
@@ -178,7 +205,7 @@ export function Reporting() {
           </div>
 
           {/* Charts */}
-          {!filterClientId && clientIds.length > 1 ? (
+          {!hasFilter && clientIds.length > 1 ? (
             <>
               {/* Multi-client: stacked area (3/5) + donut (2/5) */}
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">

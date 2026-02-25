@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
-import { ClientFilterChips } from "@/components/ui/ClientFilterChips";
+import { FilterChips } from "@/components/ui/FilterChips";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
 import { YearNavigator } from "@/components/ui/YearNavigator";
@@ -20,6 +20,7 @@ export function Dashboard() {
   const [newReportYear, setNewReportYear] = useState(new Date().getFullYear());
   const [newReportMissionId, setNewReportMissionId] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
+  const [filterCompanyId, setFilterCompanyId] = useState("");
 
   const currentMonth = useMemo(() => new Date().getMonth() + 1, []);
   const currentYear = useMemo(() => new Date().getFullYear(), []);
@@ -32,10 +33,27 @@ export function Dashboard() {
   const createReport = useCreateActivityReport();
   const { t, locale } = useT();
 
+  const companyList = useMemo(() => {
+    if (!reports) return [];
+    const map = new Map<string, { id: string; name: string; count: number }>();
+    for (const r of reports) {
+      const co = r.mission?.company;
+      if (!co?.id) continue;
+      const existing = map.get(co.id);
+      if (existing) {
+        existing.count++;
+      } else {
+        map.set(co.id, { id: co.id, name: co.name, count: 1 });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [reports]);
+
   const clientGroupedReports = useMemo(() => {
     if (!reports) return [];
+    const filtered = filterCompanyId ? reports.filter((r) => r.mission?.company?.id === filterCompanyId) : reports;
     const groups = new Map<string, { name: string; color: string | null; reports: typeof reports }>();
-    for (const r of reports) {
+    for (const r of filtered) {
       const clientId = r.mission?.client?.id ?? "unknown";
       const group = groups.get(clientId) ?? {
         name: r.mission?.client?.name ?? "",
@@ -56,7 +74,7 @@ export function Dashboard() {
           return kb.localeCompare(ka);
         }),
       }));
-  }, [reports]);
+  }, [reports, filterCompanyId]);
 
   const isCurrentYear = selectedYear === currentYear;
 
@@ -96,16 +114,29 @@ export function Dashboard() {
       />
 
       {!isLoading && (
-        <ClientFilterChips
-          clients={clientGroupedReports.map((g) => ({
-            id: g.id,
-            name: g.name,
-            color: g.color,
-            count: g.reports.length,
-          }))}
-          value={filterClientId}
-          onChange={setFilterClientId}
-        />
+        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-5">
+          <FilterChips
+            items={companyList}
+            value={filterCompanyId}
+            onChange={setFilterCompanyId}
+            allLabel={t("reporting.allCompanies")}
+            label={t("reporting.filterCompany")}
+          />
+          {companyList.length >= 2 && clientGroupedReports.length >= 2 && (
+            <div className="hidden md:block h-5 w-px bg-edge shrink-0" />
+          )}
+          <FilterChips
+            items={clientGroupedReports.map((g) => ({
+              id: g.id,
+              name: g.name,
+              color: g.color,
+              count: g.reports.length,
+            }))}
+            value={filterClientId}
+            onChange={setFilterClientId}
+            label={t("reporting.filterClient")}
+          />
+        </div>
       )}
 
       {isLoading ? (

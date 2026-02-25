@@ -57,7 +57,7 @@ export const fr: Record<TranslationKey, string> = {
   "missions.missionName": "Nom de la mission",
   "missions.client": "Client",
   "missions.selectClient": "S\u00e9lectionner un client",
-  "missions.dailyRate": "Taux journalier",
+  "missions.dailyRate": "Taux journalier (HT)",
   "missions.dailyRateHint":
     "Appliqu\u00e9 aux nouveaux rapports uniquement. Les rapports existants conservent leur taux journalier.",
   "missions.status": "Statut",
@@ -98,7 +98,7 @@ export const fr: Record<TranslationKey, string> = {
   "activity.clearAll": "Tout effacer",
   "activity.exportPdf": "Exporter PDF",
   "activity.daysWorked": "Jours travaill\u00e9s",
-  "activity.amount": "Montant",
+  "activity.amount": "Montant (HT)",
   "activity.backToDraft": "Repasser en brouillon",
   "activity.validate": "Valider",
   "activity.notFound": "Activit\u00e9 introuvable",
@@ -124,8 +124,8 @@ export const fr: Record<TranslationKey, string> = {
   "reporting.title": "Reporting",
   "reporting.subtitle": "Statistiques {year}",
   "reporting.daysWorked": "Jours travaill\u00e9s",
-  "reporting.revenue": "Chiffre d'affaires",
-  "reporting.avgDailyRate": "Taux journalier moyen : {value}",
+  "reporting.revenue": "Chiffre d'affaires (HT)",
+  "reporting.avgDailyRate": "TJM moyen (HT) : {value}",
   "reporting.activeClients": "Clients actifs",
   "reporting.onYear": "sur {year}",
   "reporting.none": "Aucun",
@@ -136,6 +136,9 @@ export const fr: Record<TranslationKey, string> = {
   "reporting.workingDays": "{worked} / {total} jours ouvr\u00e9s",
   "reporting.vsYear": "vs {year}",
   "reporting.revenueByClient": "Revenus par client",
+  "reporting.allCompanies": "Toutes",
+  "reporting.filterCompany": "Société",
+  "reporting.filterClient": "Client",
 
   // Login / Auth
   "auth.login": "Connexion",

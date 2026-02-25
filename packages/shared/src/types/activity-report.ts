@@ -41,6 +41,10 @@ export interface ActivityReport {
       currency: CurrencyCode;
       holidayCountry: HolidayCountryCode;
     };
+    company: {
+      id: string;
+      name: string;
+    };
   };
 }
 
@@ -87,6 +91,8 @@ export interface ReportingData {
       clientId: string;
       clientName: string;
       clientColor: ClientColorKey | null;
+      companyId: string;
+      companyName: string;
       days: number;
       revenue: number;
     }[];
@@ -95,9 +101,17 @@ export interface ReportingData {
     clientId: string;
     clientName: string;
     clientColor: ClientColorKey | null;
+    companyId: string;
+    companyName: string;
     currency: CurrencyCode;
     days: number;
     revenue: number;
+    convertedRevenue: number;
+  }[];
+  companyData: {
+    companyId: string;
+    companyName: string;
+    days: number;
     convertedRevenue: number;
   }[];
 }

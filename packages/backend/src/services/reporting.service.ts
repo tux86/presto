@@ -43,7 +43,15 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
     number,
     Map<
       string,
-      { clientId: string; clientName: string; clientColor: ClientColorKey | null; days: number; revenue: number }
+      {
+        clientId: string;
+        clientName: string;
+        clientColor: ClientColorKey | null;
+        companyId: string;
+        companyName: string;
+        days: number;
+        revenue: number;
+      }
     >
   >();
   const clientMap = new Map<
@@ -52,9 +60,20 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
       clientId: string;
       clientName: string;
       clientColor: ClientColorKey | null;
+      companyId: string;
+      companyName: string;
       currency: CurrencyCode;
       days: number;
       revenue: number;
+      convertedRevenue: number;
+    }
+  >();
+  const companyMap = new Map<
+    string,
+    {
+      companyId: string;
+      companyName: string;
+      days: number;
       convertedRevenue: number;
     }
   >();
@@ -77,28 +96,36 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
       revenue: existing.revenue + converted,
     });
 
-    // Monthly per-client data
+    const compId = report.mission.company.id;
+    const compName = report.mission.company.name;
+
+    // Monthly per-(client, company) data
     if (!monthlyClientMap.has(report.month)) monthlyClientMap.set(report.month, new Map());
     const monthClients = monthlyClientMap.get(report.month)!;
-    const mcExisting = monthClients.get(report.mission.client.id) ?? {
+    const mcKey = `${report.mission.client.id}|${compId}`;
+    const mcExisting = monthClients.get(mcKey) ?? {
       clientId: report.mission.client.id,
       clientName: report.mission.client.name,
       clientColor: (report.mission.client.color as ClientColorKey) ?? null,
+      companyId: compId,
+      companyName: compName,
       days: 0,
       revenue: 0,
     };
-    monthClients.set(report.mission.client.id, {
+    monthClients.set(mcKey, {
       ...mcExisting,
       days: mcExisting.days + days,
       revenue: mcExisting.revenue + converted,
     });
 
-    // Client aggregate
-    const clientKey = report.mission.client.id;
+    // Client aggregate (keyed by client+company)
+    const clientKey = mcKey;
     const clientExisting = clientMap.get(clientKey) ?? {
       clientId: report.mission.client.id,
       clientName: report.mission.client.name,
       clientColor: (report.mission.client.color as ClientColorKey) ?? null,
+      companyId: compId,
+      companyName: compName,
       currency: clientCurrency,
       days: 0,
       revenue: 0,
@@ -109,6 +136,19 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
       days: clientExisting.days + days,
       revenue: clientExisting.revenue + revenue,
       convertedRevenue: clientExisting.convertedRevenue + converted,
+    });
+
+    // Company aggregate
+    const compExisting = companyMap.get(compId) ?? {
+      companyId: compId,
+      companyName: compName,
+      days: 0,
+      convertedRevenue: 0,
+    };
+    companyMap.set(compId, {
+      ...compExisting,
+      days: compExisting.days + days,
+      convertedRevenue: compExisting.convertedRevenue + converted,
     });
   }
 
@@ -156,6 +196,7 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
     monthlyData,
     monthlyClientRevenue,
     clientData: Array.from(clientMap.values()),
+    companyData: Array.from(companyMap.values()),
   };
 }
 

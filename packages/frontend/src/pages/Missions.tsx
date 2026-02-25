@@ -5,7 +5,7 @@ import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { ClientFilterChips } from "@/components/ui/ClientFilterChips";
+import { FilterChips } from "@/components/ui/FilterChips";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
@@ -26,6 +26,7 @@ export function Missions() {
   const [companyId, setCompanyId] = useState("");
   const [dailyRate, setDailyRate] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
+  const [filterCompanyId, setFilterCompanyId] = useState("");
 
   const { data: missions, isLoading } = useMissions();
   const { data: clients } = useClients();
@@ -36,20 +37,40 @@ export function Missions() {
   const { confirm, dialog } = useConfirm();
   const { t } = useT();
 
-  const clientList = useMemo(() => {
+  const companyList = useMemo(() => {
     if (!missions) return [];
-    const map = new Map<string, { id: string; name: string; color: string | null }>();
+    const map = new Map<string, { id: string; name: string; count: number }>();
     for (const m of missions) {
-      if (m.client?.id && !map.has(m.client.id)) {
-        map.set(m.client.id, { id: m.client.id, name: m.client.name, color: m.client.color ?? null });
+      if (!m.company?.id) continue;
+      const existing = map.get(m.company.id);
+      if (existing) {
+        existing.count++;
+      } else {
+        map.set(m.company.id, { id: m.company.id, name: m.company.name, count: 1 });
       }
     }
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [missions]);
 
-  const filteredMissions = filterClientId
-    ? (missions ?? []).filter((m) => m.client?.id === filterClientId)
-    : (missions ?? []);
+  const clientList = useMemo(() => {
+    if (!missions) return [];
+    const map = new Map<string, { id: string; name: string; color: string | null; count: number }>();
+    for (const m of missions) {
+      if (!m.client?.id) continue;
+      const existing = map.get(m.client.id);
+      if (existing) {
+        existing.count++;
+      } else {
+        map.set(m.client.id, { id: m.client.id, name: m.client.name, color: m.client.color ?? null, count: 1 });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [missions]);
+
+  const filteredMissions = (missions ?? []).filter(
+    (m) =>
+      (!filterClientId || m.client?.id === filterClientId) && (!filterCompanyId || m.companyId === filterCompanyId),
+  );
 
   const defaultCompanyId = companiesList?.find((c) => c.isDefault)?.id ?? companiesList?.[0]?.id ?? "";
 
@@ -129,14 +150,24 @@ export function Missions() {
       />
 
       {!isLoading && (
-        <ClientFilterChips
-          clients={clientList.map((c) => ({
-            ...c,
-            count: (missions ?? []).filter((m) => m.client?.id === c.id).length,
-          }))}
-          value={filterClientId}
-          onChange={setFilterClientId}
-        />
+        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-5">
+          <FilterChips
+            items={companyList}
+            value={filterCompanyId}
+            onChange={setFilterCompanyId}
+            allLabel={t("reporting.allCompanies")}
+            label={t("reporting.filterCompany")}
+          />
+          {companyList.length >= 2 && clientList.length >= 2 && (
+            <div className="hidden md:block h-5 w-px bg-edge shrink-0" />
+          )}
+          <FilterChips
+            items={clientList}
+            value={filterClientId}
+            onChange={setFilterClientId}
+            label={t("reporting.filterClient")}
+          />
+        </div>
       )}
 
       {isLoading ? (
@@ -283,6 +314,7 @@ export function Missions() {
             value={dailyRate}
             onChange={(e) => setDailyRate(e.target.value)}
             placeholder="550"
+            suffix={clients?.find((c) => c.id === clientId)?.currency}
             optional
           />
           <div className="flex justify-end gap-3 pt-2">

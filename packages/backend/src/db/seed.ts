@@ -103,12 +103,21 @@ async function main() {
   });
 
   const companyId = createId();
-  await db.insert(companies).values({
-    id: companyId,
-    name: "Korvalis",
-    isDefault: true,
-    userId,
-  });
+  const companyId2 = createId();
+  await db.insert(companies).values([
+    {
+      id: companyId,
+      name: "Korvalis",
+      isDefault: true,
+      userId,
+    },
+    {
+      id: companyId2,
+      name: "Synthor Consulting",
+      isDefault: false,
+      userId,
+    },
+  ]);
 
   await db.insert(userSettings).values({
     userId,
@@ -178,6 +187,15 @@ async function main() {
     return { id, ...def, userId };
   });
   await db.insert(clients).values(clientRows);
+
+  // Company assignment: Korvalis for SocGen, BNP, Swisscom; Synthor for Zalando, Deloitte
+  const companyForClient: Record<string, string> = {
+    "Société Générale": companyId,
+    "BNP Paribas": companyId,
+    "Swisscom AG": companyId,
+    "Zalando SE": companyId2,
+    "Deloitte Luxembourg": companyId2,
+  };
 
   // --- Missions ---
   // Realistic freelancer timeline: max 2 concurrent missions, fillRate controls time split.
@@ -297,7 +315,7 @@ async function main() {
         id: missionId,
         name: mDef.name,
         clientId: client.id,
-        companyId,
+        companyId: companyForClient[clientName],
         userId,
         dailyRate: mDef.dailyRate,
         isActive: mDef.isActive,
@@ -357,7 +375,7 @@ async function main() {
   await db.insert(reportEntries).values(entryRows);
 
   logger.success(
-    `Seed completed: demo@presto.dev / demo1234 — ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
+    `Seed completed: demo@presto.dev / demo1234 — 2 companies, ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
   );
   await closeDb();
 }

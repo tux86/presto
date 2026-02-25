@@ -57,7 +57,7 @@ export const pt: Record<TranslationKey, string> = {
   "missions.missionName": "Nome da miss\u00e3o",
   "missions.client": "Cliente",
   "missions.selectClient": "Selecionar um cliente",
-  "missions.dailyRate": "Taxa di\u00e1ria",
+  "missions.dailyRate": "Taxa di\u00e1ria (sem IVA)",
   "missions.dailyRateHint":
     "Aplicada apenas aos novos relat\u00f3rios. Os relat\u00f3rios existentes mant\u00eam a sua taxa di\u00e1ria.",
   "missions.status": "Estado",
@@ -97,7 +97,7 @@ export const pt: Record<TranslationKey, string> = {
   "activity.clearAll": "Limpar tudo",
   "activity.exportPdf": "Exportar PDF",
   "activity.daysWorked": "Dias trabalhados",
-  "activity.amount": "Montante",
+  "activity.amount": "Montante (sem IVA)",
   "activity.backToDraft": "Voltar a rascunho",
   "activity.validate": "Validar",
   "activity.notFound": "Atividade n\u00e3o encontrada",
@@ -124,8 +124,8 @@ export const pt: Record<TranslationKey, string> = {
   "reporting.title": "Relat\u00f3rios",
   "reporting.subtitle": "Estat\u00edsticas {year}",
   "reporting.daysWorked": "Dias trabalhados",
-  "reporting.revenue": "Receita",
-  "reporting.avgDailyRate": "Taxa di\u00e1ria m\u00e9dia: {value}",
+  "reporting.revenue": "Receita (sem IVA)",
+  "reporting.avgDailyRate": "Taxa di\u00e1ria m\u00e9dia (sem IVA): {value}",
   "reporting.activeClients": "Clientes ativos",
   "reporting.onYear": "em {year}",
   "reporting.none": "Nenhum",
@@ -136,6 +136,9 @@ export const pt: Record<TranslationKey, string> = {
   "reporting.workingDays": "{worked} / {total} dias \u00fateis",
   "reporting.vsYear": "vs {year}",
   "reporting.revenueByClient": "Receita por cliente",
+  "reporting.allCompanies": "Todas",
+  "reporting.filterCompany": "Empresa",
+  "reporting.filterClient": "Cliente",
 
   // Login / Auth
   "auth.login": "Entrar",

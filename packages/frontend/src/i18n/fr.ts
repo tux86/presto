@@ -167,4 +167,5 @@ export const fr: Record<TranslationKey, string> = {
   "preferences.theme": "Th\u00e8me",
   "preferences.language": "Langue",
   "preferences.baseCurrency": "Devise de r\u00e9f\u00e9rence",
+  "preferences.baseCurrencyHint": "Utilis\u00e9e pour convertir les revenus dans les totaux du tableau de bord",
 };

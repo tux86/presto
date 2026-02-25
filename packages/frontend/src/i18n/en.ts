@@ -161,6 +161,7 @@ export const en = {
   "preferences.theme": "Theme",
   "preferences.language": "Language",
   "preferences.baseCurrency": "Base currency",
+  "preferences.baseCurrencyHint": "Used to convert revenues in dashboard totals",
 } as const;
 
 export type TranslationKey = keyof typeof en;

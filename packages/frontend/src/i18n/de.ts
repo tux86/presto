@@ -167,4 +167,5 @@ export const de: Record<TranslationKey, string> = {
   "preferences.theme": "Design",
   "preferences.language": "Sprache",
   "preferences.baseCurrency": "Basisw\u00e4hrung",
+  "preferences.baseCurrencyHint": "Zur Umrechnung der Einnahmen in den Dashboard-Summen",
 };

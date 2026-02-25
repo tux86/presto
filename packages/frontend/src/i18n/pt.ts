@@ -168,4 +168,5 @@ export const pt: Record<TranslationKey, string> = {
   "preferences.theme": "Tema",
   "preferences.language": "Idioma",
   "preferences.baseCurrency": "Moeda base",
+  "preferences.baseCurrencyHint": "Usada para converter receitas nos totais do painel",
 };

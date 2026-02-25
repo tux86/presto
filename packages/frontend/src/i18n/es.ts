@@ -167,4 +167,5 @@ export const es: Record<TranslationKey, string> = {
   "preferences.theme": "Tema",
   "preferences.language": "Idioma",
   "preferences.baseCurrency": "Moneda base",
+  "preferences.baseCurrencyHint": "Usada para convertir ingresos en los totales del panel",
 };

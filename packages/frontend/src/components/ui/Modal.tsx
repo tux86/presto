@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 const SIZE_MAP = {
@@ -30,7 +31,7 @@ export function Modal({ open, onClose, title, children, className, size = "md" }
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-overlay"
@@ -48,6 +49,7 @@ export function Modal({ open, onClose, title, children, className, size = "md" }
         {title && <h2 className="text-lg font-semibold text-heading mb-4">{title}</h2>}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

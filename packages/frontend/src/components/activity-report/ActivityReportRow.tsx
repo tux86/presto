@@ -44,7 +44,7 @@ export function ActivityReportCard({ report, locale, isCurrent }: ActivityReport
       <p className="text-xs text-muted truncate mb-3">{report.mission?.name}</p>
 
       {/* Dot heatmap */}
-      <div className="flex flex-wrap gap-[3px] mb-3">
+      <div className="flex flex-wrap gap-1 mb-3">
         {entries.map((entry) => {
           const isOff = entry.isWeekend || entry.isHoliday;
           const isHalf = !isOff && entry.value === 0.5;
@@ -52,7 +52,7 @@ export function ActivityReportCard({ report, locale, isCurrent }: ActivityReport
             <div
               key={entry.id}
               className={cn(
-                "w-2 h-2 rounded-sm overflow-hidden relative",
+                "w-2.5 h-2.5 rounded-sm overflow-hidden relative",
                 isOff ? "bg-elevated" : entry.value === 1 ? color.dot : "bg-inset",
               )}
             >

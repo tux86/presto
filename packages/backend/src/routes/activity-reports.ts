@@ -223,7 +223,7 @@ activityReportsRouter.get("/:id/pdf", async (c) => {
   logger.debug(`Generating PDF for report ${id} (locale: ${locale})`);
   const pdfBuffer = await generateReportPdf(enrichReport(report, locale), locale);
 
-  const filename = `activity-report-${slugify(report.mission.client.name)}-${slugify(report.mission.name)}-${report.year}-${String(report.month).padStart(2, "0")}.pdf`;
+  const filename = `report-${slugify(report.mission.client.name)}-${report.year}-${String(report.month).padStart(2, "0")}.pdf`;
 
   return new Response(new Uint8Array(pdfBuffer), {
     headers: {

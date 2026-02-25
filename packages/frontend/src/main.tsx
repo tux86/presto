@@ -1,3 +1,4 @@
+import "@fontsource-variable/inter";
 import "flag-icons/css/flag-icons.min.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";

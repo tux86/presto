@@ -38,6 +38,7 @@ RUN echo '{"dependencies":{"pg":"^8.18.0"}}' > package.json && \
 COPY --from=builder --link /app/packages/backend/dist dist
 COPY --from=builder --link /app/packages/frontend/dist public
 COPY --from=builder --link /app/packages/backend/src/db/migrations dist/migrations
+COPY --from=builder --link /app/packages/backend/src/assets assets
 
 ENV PORT=8080
 USER presto

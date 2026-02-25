@@ -1,8 +1,19 @@
 // @ts-nocheck - React PDF uses JSX patterns that conflict with strict TS in Bun backend context
 
+import { join } from "node:path";
 import { getDayName, getMonthName, type Locale } from "@presto/shared";
-import { Document, Page, renderToBuffer, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Page, renderToBuffer, StyleSheet, Text, View } from "@react-pdf/renderer";
 import React from "react";
+
+const fontsDir = join(import.meta.dir, "../assets/fonts");
+
+Font.register({
+  family: "Inter",
+  fonts: [
+    { src: join(fontsDir, "Inter-Regular.ttf"), fontWeight: 400 },
+    { src: join(fontsDir, "Inter-Bold.ttf"), fontWeight: 700 },
+  ],
+});
 
 const h = React.createElement;
 
@@ -17,13 +28,13 @@ const colors = {
 };
 
 const styles = StyleSheet.create({
-  page: { padding: 36, fontSize: 10, fontFamily: "Helvetica", color: colors.text },
+  page: { padding: 36, fontSize: 10, fontFamily: "Inter", color: colors.text },
 
   // Header
   header: { marginBottom: 14 },
   titleRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 2 },
   titleBar: { width: 3, height: 22, backgroundColor: colors.accent, marginRight: 8, borderRadius: 1 },
-  titleText: { fontSize: 18, fontFamily: "Helvetica-Bold", color: colors.text },
+  titleText: { fontSize: 18, fontFamily: "Inter", fontWeight: 700, color: colors.text },
   subtitle: { fontSize: 11, color: colors.muted, textTransform: "uppercase", letterSpacing: 1, marginLeft: 11 },
 
   // Info cards
@@ -31,19 +42,20 @@ const styles = StyleSheet.create({
   infoCard: { flex: 1, backgroundColor: colors.lighterBg, borderRadius: 4, padding: 8 },
   infoLabel: {
     fontSize: 9,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "Inter",
+    fontWeight: 700,
     color: colors.muted,
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 2,
   },
-  infoValue: { fontSize: 11, fontFamily: "Helvetica-Bold", color: colors.text },
+  infoValue: { fontSize: 11, fontFamily: "Inter", fontWeight: 700, color: colors.text },
   infoSub: { fontSize: 10, color: colors.muted, marginTop: 1 },
 
   // Table
   table: { marginTop: 12 },
   tableHeader: { flexDirection: "row", backgroundColor: colors.accent, paddingVertical: 5, paddingHorizontal: 6 },
-  thText: { color: colors.white, fontFamily: "Helvetica-Bold", fontSize: 10 },
+  thText: { color: colors.white, fontFamily: "Inter", fontWeight: 700, fontSize: 10 },
   row: {
     flexDirection: "row",
     paddingVertical: 3.5,
@@ -59,7 +71,7 @@ const styles = StyleSheet.create({
 
   // Note
   note: { marginTop: 12, padding: 8, backgroundColor: colors.lightBg, borderRadius: 4 },
-  noteLabel: { fontSize: 9, fontFamily: "Helvetica-Bold", color: colors.muted, marginBottom: 3 },
+  noteLabel: { fontSize: 9, fontFamily: "Inter", fontWeight: 700, color: colors.muted, marginBottom: 3 },
 
   // Footer
   footer: {
@@ -73,7 +85,7 @@ const styles = StyleSheet.create({
     borderTop: `1px solid ${colors.border}`,
     paddingTop: 8,
   },
-  total: { fontSize: 12, fontFamily: "Helvetica-Bold", color: colors.accent },
+  total: { fontSize: 12, fontFamily: "Inter", fontWeight: 700, color: colors.accent },
   pageNum: { fontSize: 9, color: colors.muted },
 });
 

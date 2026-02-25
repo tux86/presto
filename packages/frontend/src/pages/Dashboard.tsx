@@ -140,7 +140,7 @@ export function Dashboard() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 6 }, (_, i) => (
             <div key={i} className="rounded-xl border border-edge bg-panel p-4">
               <div className="h-5 w-32 bg-elevated rounded animate-pulse mb-3" />
@@ -168,7 +168,7 @@ export function Dashboard() {
                   <h3 className="text-sm font-semibold text-heading">{group.name}</h3>
                   <span className="text-xs text-faint">({group.reports.length})</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {group.reports.map((report) => {
                     const isCurrent = isCurrentYear && report.month === currentMonth && report.year === currentYear;
                     const needsRef = isCurrent && !scrollAssigned.current;

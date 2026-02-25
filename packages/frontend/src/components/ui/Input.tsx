@@ -7,10 +7,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
   error?: string;
   optional?: boolean;
+  suffix?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, hint, error, optional, className, id, ...props }, ref) => {
+  ({ label, hint, error, optional, suffix, className, id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
     const { t } = useT();
     return (
@@ -24,16 +25,24 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {hint && <p className="text-xs text-faint mt-0.5">{hint}</p>}
           </div>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={cn(
-            "w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading placeholder:text-placeholder outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:bg-inset disabled:text-muted disabled:opacity-100",
-            error && "border-error focus:border-error focus:ring-error",
-            className,
+        <div className="relative">
+          <input
+            ref={ref}
+            id={inputId}
+            className={cn(
+              "w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading placeholder:text-placeholder outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:bg-inset disabled:text-muted disabled:opacity-100",
+              error && "border-error focus:border-error focus:ring-error",
+              suffix && "pr-14",
+              className,
+            )}
+            {...props}
+          />
+          {suffix && (
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-faint pointer-events-none">
+              {suffix}
+            </span>
           )}
-          {...props}
-        />
+        </div>
         {error && <p className="text-xs text-error">{error}</p>}
       </div>
     );

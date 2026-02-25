@@ -3,6 +3,8 @@ import { create } from "zustand";
 import { api } from "../api/client";
 import { queryClient } from "../lib/query-client";
 
+const STORAGE_KEY = "presto-preferences";
+
 interface PreferencesState {
   theme: ThemeMode;
   locale: Locale;
@@ -24,26 +26,56 @@ function applyTheme(mode: ThemeMode) {
   }
 }
 
+function persistToStorage(prefs: { theme: ThemeMode; locale: Locale; baseCurrency: string }) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+  } catch {}
+}
+
+function readFromStorage(): { theme?: ThemeMode; locale?: Locale; baseCurrency?: string } {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {};
+}
+
+// Hydrate initial state from localStorage (instant, no flash)
+const stored = readFromStorage();
+const initialTheme = stored.theme ?? "dark";
+const initialLocale = stored.locale ?? "en";
+const initialCurrency = stored.baseCurrency ?? "EUR";
+
+// Apply theme and locale immediately to avoid flash
+applyTheme(initialTheme);
+document.documentElement.lang = initialLocale;
+
 export const usePreferencesStore = create<PreferencesState>()((set) => ({
-  theme: "dark",
-  locale: "en",
-  baseCurrency: "EUR",
-  loaded: false,
+  theme: initialTheme,
+  locale: initialLocale,
+  baseCurrency: initialCurrency,
+  loaded: !!stored.theme, // If localStorage has data, mark as loaded immediately
 
   setTheme: (theme) => {
+    const { locale, baseCurrency } = usePreferencesStore.getState();
     applyTheme(theme);
     set({ theme });
+    persistToStorage({ theme, locale, baseCurrency });
     api.patch("/settings", { theme }).catch(() => {});
   },
 
   setLocale: (locale) => {
+    const { theme, baseCurrency } = usePreferencesStore.getState();
     document.documentElement.lang = locale;
     set({ locale });
+    persistToStorage({ theme, locale, baseCurrency });
     api.patch("/settings", { locale }).catch(() => {});
   },
 
   setBaseCurrency: (baseCurrency) => {
+    const { theme, locale } = usePreferencesStore.getState();
     set({ baseCurrency });
+    persistToStorage({ theme, locale, baseCurrency });
     api.patch("/settings", { baseCurrency }).catch(() => {});
     queryClient.invalidateQueries({ queryKey: ["reporting"] });
   },
@@ -55,9 +87,9 @@ export const usePreferencesStore = create<PreferencesState>()((set) => ({
       const locale = settings.locale as Locale;
       applyTheme(theme);
       document.documentElement.lang = locale;
+      persistToStorage({ theme, locale, baseCurrency: settings.baseCurrency });
       set({ theme, locale, baseCurrency: settings.baseCurrency, loaded: true });
     } catch {
-      // Fallback: keep defaults, mark as loaded
       set({ loaded: true });
     }
   },

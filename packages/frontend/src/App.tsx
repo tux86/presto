@@ -35,11 +35,13 @@ export default function App() {
     fetchConfig();
   }, [fetchConfig]);
 
-  // Fetch user settings once auth is resolved
+  // Fetch user settings once auth is resolved; unauthenticated pages use localStorage (hydrated at store init)
   useEffect(() => {
     if (!configLoaded || !config) return;
     if (config.authDisabled || isAuthenticated) {
       fetchSettings();
+    } else {
+      usePreferencesStore.setState({ loaded: true });
     }
   }, [configLoaded, config, isAuthenticated, fetchSettings]);
 
@@ -50,7 +52,9 @@ export default function App() {
   useEffect(() => {
     if (!configLoaded) return;
     const authDisabled = config?.authDisabled ?? false;
-    if (!authDisabled && token && !isAuthenticated) {
+    if (authDisabled) {
+      fetchMe();
+    } else if (token && !isAuthenticated) {
       fetchMe();
     }
   }, [token, isAuthenticated, fetchMe, configLoaded, config]);

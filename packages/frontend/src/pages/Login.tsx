@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ApiError } from "@/api/client";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -34,7 +35,15 @@ export function Login() {
         await login(email, password);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("auth.genericError"));
+      if (err instanceof ApiError && err.status === 401) {
+        setError(t("auth.invalidCredentials"));
+      } else if (err instanceof ApiError && err.status === 409) {
+        setError(t("auth.emailAlreadyRegistered"));
+      } else if (err instanceof ApiError && err.status === 429) {
+        setError(t("auth.tooManyAttempts"));
+      } else {
+        setError(t("auth.genericError"));
+      }
     } finally {
       setLoading(false);
     }

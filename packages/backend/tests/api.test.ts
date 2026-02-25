@@ -12,3 +12,7 @@ import "./07-report-lifecycle";
 import "./08-reporting";
 import "./09-edge-cases";
 import "./10-settings";
+import "./11-auth-extended";
+import "./12-cross-user-isolation";
+import "./13-report-extended";
+import "./14-reporting-extended";

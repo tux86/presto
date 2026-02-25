@@ -146,26 +146,26 @@ export function Sidebar() {
                 </div>
 
                 {/* User + logout */}
-                {!authDisabled && (
-                  <div className="border-t border-edge pt-4 space-y-3">
-                    <p className="text-xs font-medium text-faint uppercase tracking-wider">{t("profile.title")}</p>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          openProfileModal();
-                        }}
-                        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
-                      >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
-                          {user?.firstName?.[0]}
-                          {user?.lastName?.[0]}
-                        </div>
-                        <p className="text-sm font-medium text-heading truncate">
-                          {user?.firstName} {user?.lastName}
-                        </p>
-                      </button>
+                <div className="border-t border-edge pt-4 space-y-3">
+                  <p className="text-xs font-medium text-faint uppercase tracking-wider">{t("profile.title")}</p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        openProfileModal();
+                      }}
+                      className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                    >
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
+                        {user?.firstName?.[0]}
+                        {user?.lastName?.[0]}
+                      </div>
+                      <p className="text-sm font-medium text-heading truncate">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                    </button>
+                    {!authDisabled && (
                       <button
                         type="button"
                         onClick={() => {
@@ -176,9 +176,9 @@ export function Sidebar() {
                       >
                         {t("common.logout")}
                       </button>
-                    </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </>
@@ -238,21 +238,21 @@ export function Sidebar() {
         </div>
 
         {/* User */}
-        {!authDisabled && (
-          <div className="border-t border-edge px-4 py-3 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={openProfileModal}
-              className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
-                {user?.firstName?.[0]}
-                {user?.lastName?.[0]}
-              </div>
-              <p className="text-sm font-medium text-heading truncate">
-                {user?.firstName} {user?.lastName}
-              </p>
-            </button>
+        <div className="border-t border-edge px-4 py-3 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={openProfileModal}
+            className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
+            </div>
+            <p className="text-sm font-medium text-heading truncate">
+              {user?.firstName} {user?.lastName}
+            </p>
+          </button>
+          {!authDisabled && (
             <button
               type="button"
               onClick={logout}
@@ -261,8 +261,8 @@ export function Sidebar() {
             >
               <LogOut className="h-4 w-4" strokeWidth={1.5} />
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </aside>
 
       {profileModal}

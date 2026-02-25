@@ -3,6 +3,7 @@ import { getDayName, getDayNameFull } from "@presto/shared";
 import { useCallback, useState } from "react";
 import { useT } from "@/i18n";
 import type { CalendarColors } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { CalendarDay } from "./CalendarDay";
 
 interface CalendarGridProps {
@@ -38,15 +39,38 @@ export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly
   });
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-5xl">
+      {/* Legend */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted mb-4">
+        <span className="flex items-center gap-1.5">
+          <div className={cn("w-4 h-4 rounded", colors.solid)} />
+          {t("activity.legendFull")}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <div className="relative w-4 h-4 rounded overflow-hidden border border-edge">
+            <div
+              className={cn("absolute inset-0", colors.solid)}
+              style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+            />
+            <div className="absolute inset-0 bg-elevated" style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} />
+          </div>
+          {t("activity.legendHalf")}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-warning/70" />
+          {t("activity.legendHoliday")}
+        </span>
+      </div>
+
       {/* Day headers */}
       <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-2">
         {dayHeaders.map((d, i) => (
           <div
             key={d}
-            className={`text-center text-[10px] sm:text-xs font-semibold py-1 sm:py-2 ${
-              i >= 5 ? "text-faint" : "text-muted"
-            }`}
+            className={cn(
+              "text-center text-[10px] sm:text-xs font-semibold py-2 sm:py-3",
+              i >= 5 ? "text-faint" : "text-body",
+            )}
           >
             {d}
           </div>
@@ -82,7 +106,7 @@ export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly
             <span className="text-sm font-bold text-heading">{new Date(selectedEntry.date).getDate()}</span>
             <span className="text-xs text-muted">{getDayNameFull(new Date(selectedEntry.date), locale)}</span>
             {selectedEntry.isHoliday && (
-              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+              <span className="text-xs font-medium text-warning">
                 — {selectedEntry.holidayName ?? t("activity.holiday")}
               </span>
             )}

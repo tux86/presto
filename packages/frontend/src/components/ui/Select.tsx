@@ -25,12 +25,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           className={cn(
             "w-full rounded-lg border border-edge bg-panel px-3.5 py-2 text-sm text-heading outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent",
-            error && "border-red-500 focus:border-red-500 focus:ring-red-500",
+            error && "border-error focus:border-error focus:ring-error",
             className,
           )}
           {...props}
         />
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {error && <p className="text-xs text-error">{error}</p>}
       </div>
     );
   },

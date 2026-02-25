@@ -20,6 +20,12 @@
   --th-accent-text: #4f46e5;
   --th-weekend: #f0f0f0;
   --th-holiday: #faf5e4;
+  --th-error: #ef4444;
+  --th-error-subtle: rgba(239, 68, 68, 0.1);
+  --th-success: #10b981;
+  --th-success-subtle: rgba(16, 185, 129, 0.1);
+  --th-warning: #f59e0b;
+  --th-warning-subtle: rgba(245, 158, 11, 0.1);
   --th-scrollbar: #d0d0d0;
   --th-scrollbar-hover: #b0b0b0;
   --th-overlay: rgba(0, 0, 0, 0.5);
@@ -43,6 +49,12 @@
   --th-accent-text: #a5b4fc;
   --th-weekend: rgba(24, 24, 27, 0.5);
   --th-holiday: rgba(39, 39, 42, 0.6);
+  --th-error: #f87171;
+  --th-error-subtle: rgba(248, 113, 113, 0.1);
+  --th-success: #34d399;
+  --th-success-subtle: rgba(52, 211, 153, 0.1);
+  --th-warning: #fbbf24;
+  --th-warning-subtle: rgba(251, 191, 36, 0.1);
   --th-scrollbar: #27272a;
   --th-scrollbar-hover: #3f3f46;
   --th-overlay: rgba(0, 0, 0, 0.6);
@@ -66,6 +78,12 @@
   --color-accent-hover: var(--th-accent-hover);
   --color-accent-subtle: var(--th-accent-subtle);
   --color-accent-text: var(--th-accent-text);
+  --color-error: var(--th-error);
+  --color-error-subtle: var(--th-error-subtle);
+  --color-success: var(--th-success);
+  --color-success-subtle: var(--th-success-subtle);
+  --color-warning: var(--th-warning);
+  --color-warning-subtle: var(--th-warning-subtle);
   --color-weekend: var(--th-weekend);
   --color-holiday: var(--th-holiday);
   --color-overlay: var(--th-overlay);

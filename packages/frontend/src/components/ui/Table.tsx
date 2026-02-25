@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 interface Column<T> {
@@ -12,13 +13,56 @@ interface TableProps<T> {
   columns: Column<T>[];
   onRowClick?: (item: T) => void;
   emptyMessage?: string;
+  emptyIcon?: React.ReactNode;
+  mobileRender?: (item: T) => React.ReactNode;
 }
 
-export function Table<T extends { id: string }>({ data, columns, onRowClick, emptyMessage = "" }: TableProps<T>) {
+export function Table<T extends { id: string }>({
+  data,
+  columns,
+  onRowClick,
+  emptyMessage = "",
+  emptyIcon,
+  mobileRender,
+}: TableProps<T>) {
+  const isMobile = useIsMobile();
+
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-edge bg-panel p-12 text-center">
+      <div className="rounded-lg border border-dashed border-edge bg-panel p-12 text-center">
+        {emptyIcon && <div className="flex justify-center mb-3">{emptyIcon}</div>}
         <p className="text-sm text-muted">{emptyMessage}</p>
+      </div>
+    );
+  }
+
+  if (isMobile && mobileRender) {
+    return (
+      <div className="space-y-3">
+        {data.map((item) => (
+          <div
+            key={item.id}
+            className={cn(
+              "rounded-xl border border-edge bg-panel p-4 space-y-1 transition-colors",
+              onRowClick &&
+                "cursor-pointer hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+            )}
+            tabIndex={onRowClick ? 0 : undefined}
+            onClick={() => onRowClick?.(item)}
+            onKeyDown={
+              onRowClick
+                ? (e: React.KeyboardEvent) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onRowClick(item);
+                    }
+                  }
+                : undefined
+            }
+          >
+            {mobileRender(item)}
+          </div>
+        ))}
       </div>
     );
   }
@@ -46,8 +90,23 @@ export function Table<T extends { id: string }>({ data, columns, onRowClick, emp
             {data.map((item) => (
               <tr
                 key={item.id}
-                className={cn("bg-panel transition-colors", onRowClick && "cursor-pointer hover:bg-elevated")}
+                className={cn(
+                  "bg-panel transition-colors group",
+                  onRowClick &&
+                    "cursor-pointer hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset",
+                )}
+                tabIndex={onRowClick ? 0 : undefined}
                 onClick={() => onRowClick?.(item)}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onRowClick(item);
+                        }
+                      }
+                    : undefined
+                }
               >
                 {columns.map((col) => (
                   <td key={col.key} className={cn("px-4 py-3 text-sm", col.className)}>

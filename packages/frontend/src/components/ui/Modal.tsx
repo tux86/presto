@@ -34,14 +34,14 @@ export function Modal({ open, onClose, title, children, className, size = "md" }
   return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-overlay"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-overlay animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose();
       }}
     >
       <div
         className={cn(
-          "w-full rounded-xl bg-panel border border-edge shadow-2xl p-6 max-h-[85vh] overflow-y-auto",
+          "w-full rounded-xl bg-panel border border-edge shadow-2xl p-6 max-h-[85vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150",
           SIZE_MAP[size],
           className,
         )}

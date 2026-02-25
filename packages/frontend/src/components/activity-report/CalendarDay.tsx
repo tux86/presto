@@ -69,7 +69,7 @@ export function CalendarDay({ entry, dayNumber, dayName, colors, selected, onTog
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center justify-center rounded-lg h-12 sm:h-16 transition-all duration-100 select-none overflow-hidden",
+        "relative flex flex-col items-center justify-center rounded-lg h-14 sm:h-16 transition-all duration-100 select-none overflow-hidden",
         onToggle ? "cursor-pointer active:scale-[0.97]" : "cursor-default",
         getContainerStyle(kind, value, colors),
         selected && "ring-2 ring-accent ring-offset-1 ring-offset-panel",
@@ -86,14 +86,14 @@ export function CalendarDay({ entry, dayNumber, dayName, colors, selected, onTog
       )}
 
       {/* Day number */}
-      <span className={cn("relative z-10 text-xs sm:text-base font-bold leading-tight", dayNumberStyles[kind][value])}>
+      <span className={cn("relative z-10 text-sm sm:text-base font-bold leading-tight", dayNumberStyles[kind][value])}>
         {dayNumber}
       </span>
 
       {/* Day name */}
       <span
         className={cn(
-          "relative z-10 text-[9px] sm:text-[11px] leading-tight mt-0.5",
+          "relative z-10 text-[10px] sm:text-[11px] leading-tight mt-0.5",
           getDayNameStyle(kind, value, colors),
         )}
       >
@@ -118,7 +118,7 @@ export function CalendarDay({ entry, dayNumber, dayName, colors, selected, onTog
       )}
 
       {/* Holiday indicator */}
-      {entry.isHoliday && <div className="absolute top-1 right-1.5 w-2 h-2 rounded-full bg-amber-500/70" />}
+      {entry.isHoliday && <div className="absolute top-1 right-1.5 w-2 h-2 rounded-full bg-warning/70" />}
     </div>
   );
 }

@@ -16,6 +16,7 @@ export const pt: Record<TranslationKey, string> = {
   "dashboard.subtitle": "Ano {year}",
   "dashboard.newActivity": "Nova atividade",
   "dashboard.noActivities": "Sem atividades para {year}",
+  "dashboard.noActivitiesHint": "Crie o seu primeiro relat\u00f3rio de atividade para come\u00e7ar.",
   "dashboard.createActivity": "Criar uma atividade",
   "dashboard.month": "M\u00eas",
   "dashboard.year": "Ano",
@@ -95,6 +96,9 @@ export const pt: Record<TranslationKey, string> = {
   "activity.worked": "trabalhado",
   "activity.weekendPlaceholder": "Fim de semana - Descri\u00e7\u00e3o...",
   "activity.notePlaceholder": "Descri\u00e7\u00e3o...",
+  "activity.legendFull": "Dia completo",
+  "activity.legendHalf": "Meio dia",
+  "activity.legendHoliday": "Feriado",
 
   // Reporting
   "reporting.title": "Relat\u00f3rios",

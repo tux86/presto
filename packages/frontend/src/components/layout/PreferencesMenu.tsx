@@ -2,7 +2,6 @@ import { CURRENCIES, getCurrencyName, getCurrencySymbol } from "@presto/shared";
 import type { LucideIcon } from "lucide-react";
 import { Monitor, Moon, Settings, Sun } from "lucide-react";
 import { useState } from "react";
-import { Modal } from "@/components/ui/Modal";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -93,7 +92,7 @@ export function PreferencesControls() {
                 locale === o.value ? "bg-elevated text-heading shadow-sm" : "text-muted hover:text-body",
               )}
             >
-              <span className={`fi fi-${o.flag} fis rounded-sm`} style={{ fontSize: "13px" }} />
+              <span className={`fi fi-${o.flag} rounded-sm shrink-0 !leading-none`} style={{ width: "1.5em" }} />
               {o.label}
             </button>
           ))}
@@ -125,10 +124,10 @@ export function PreferencesMenu() {
   const { t } = useT();
 
   return (
-    <>
+    <div className="relative">
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
         className="flex items-center gap-3 text-sm text-muted hover:text-body transition-colors w-full rounded-lg px-3 py-2 hover:bg-elevated/50 cursor-pointer"
         title={t("preferences.title")}
       >
@@ -136,9 +135,14 @@ export function PreferencesMenu() {
         <span>{t("preferences.title")}</span>
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title={t("preferences.title")} size="sm">
-        <PreferencesControls />
-      </Modal>
-    </>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
+          <div className="absolute bottom-full left-0 mb-2 z-40 w-80 rounded-xl border border-edge bg-panel shadow-lg p-5">
+            <PreferencesControls />
+          </div>
+        </>
+      )}
+    </div>
   );
 }

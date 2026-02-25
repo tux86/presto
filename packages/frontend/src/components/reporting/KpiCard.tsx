@@ -29,8 +29,8 @@ export function KpiCard({ label, value, subtitle, delta, sparkData, sparkColor }
             <span
               className={cn(
                 "text-xs font-medium pb-0.5",
-                delta.direction === "up" && "text-emerald-600 dark:text-emerald-400",
-                delta.direction === "down" && "text-rose-600 dark:text-rose-400",
+                delta.direction === "up" && "text-success",
+                delta.direction === "down" && "text-error",
                 delta.direction === "neutral" && "text-muted",
               )}
             >

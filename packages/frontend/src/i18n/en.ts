@@ -14,6 +14,7 @@ export const en = {
   "dashboard.subtitle": "Year {year}",
   "dashboard.newActivity": "New activity",
   "dashboard.noActivities": "No activities for {year}",
+  "dashboard.noActivitiesHint": "Create your first activity report to get started.",
   "dashboard.createActivity": "Create an activity",
   "dashboard.month": "Month",
   "dashboard.year": "Year",
@@ -88,6 +89,9 @@ export const en = {
   "activity.worked": "worked",
   "activity.weekendPlaceholder": "Weekend - Description...",
   "activity.notePlaceholder": "Description...",
+  "activity.legendFull": "Full day",
+  "activity.legendHalf": "Half day",
+  "activity.legendHoliday": "Holiday",
 
   // Reporting
   "reporting.title": "Reporting",

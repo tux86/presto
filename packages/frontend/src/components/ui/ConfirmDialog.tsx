@@ -1,5 +1,6 @@
 import { TriangleAlert } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useT } from "@/i18n";
 import { Button } from "./Button";
 
@@ -41,17 +42,17 @@ export function ConfirmDialog({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === overlayRef.current) onCancel();
       }}
     >
       <div className="w-full max-w-sm rounded-xl bg-panel border border-edge shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-start gap-3 mb-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-500">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warning-subtle text-warning">
             <TriangleAlert className="h-5 w-5" strokeWidth={2} />
           </div>
           <div>
@@ -68,6 +69,7 @@ export function ConfirmDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

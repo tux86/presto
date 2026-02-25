@@ -15,7 +15,7 @@ const variantStyles: Record<Variant, string> = {
   primary: "bg-accent text-white hover:bg-accent-hover active:opacity-90",
   secondary: "bg-elevated text-body hover:bg-inset border border-edge",
   ghost: "text-muted hover:text-body hover:bg-elevated",
-  danger: "bg-red-600/10 text-red-500 hover:bg-red-600/20 border border-red-600/20",
+  danger: "bg-error-subtle text-error hover:bg-error/20 border border-error/20",
 };
 
 const sizeStyles: Record<Size, string> = {

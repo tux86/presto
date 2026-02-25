@@ -11,7 +11,7 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         <h1 className="text-lg sm:text-xl font-semibold text-heading tracking-tight">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
       </div>
-      {actions && <div className="flex items-center gap-3">{actions}</div>}
+      {actions && <div className="flex items-center gap-2 flex-wrap">{actions}</div>}
     </div>
   );
 }

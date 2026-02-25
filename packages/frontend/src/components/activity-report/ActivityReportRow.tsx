@@ -27,7 +27,7 @@ export function ActivityReportCard({ report, locale, isCurrent }: ActivityReport
   return (
     <div
       className={cn(
-        "rounded-xl border bg-panel p-4 cursor-pointer transition-all hover:shadow-md hover:border-accent/30",
+        "rounded-xl border bg-panel p-4 cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-accent/30",
         isCurrent ? "ring-2 ring-accent/40 border-accent/30" : "border-edge",
       )}
       onClick={() => navigate(`/activity/${report.id}`)}
@@ -52,7 +52,7 @@ export function ActivityReportCard({ report, locale, isCurrent }: ActivityReport
             <div
               key={entry.id}
               className={cn(
-                "w-[7px] h-[7px] rounded-sm overflow-hidden relative",
+                "w-2 h-2 rounded-sm overflow-hidden relative",
                 isOff ? "bg-elevated" : entry.value === 1 ? color.dot : "bg-inset",
               )}
             >

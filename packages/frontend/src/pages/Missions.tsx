@@ -1,5 +1,5 @@
 import type { Mission } from "@presto/shared";
-import { Trash2 } from "lucide-react";
+import { Briefcase, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
@@ -137,7 +137,49 @@ export function Missions() {
         <Table
           data={filteredMissions}
           emptyMessage={t("missions.emptyMessage")}
+          emptyIcon={<Briefcase className="h-10 w-10 text-faint" strokeWidth={1.5} />}
           onRowClick={openEdit}
+          mobileRender={(m) => (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <span className="font-medium text-heading">{m.name}</span>
+                <div className="flex items-center gap-2 mt-1 text-xs text-muted">
+                  <span>{m.client?.name ?? "-"}</span>
+                  {m.dailyRate && (
+                    <>
+                      <span>&middot;</span>
+                      <span className="font-mono">{formatCurrency(m.dailyRate, m.client?.currency)}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleActive(m);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Badge variant={m.isActive ? "success" : "default"}>
+                    {m.isActive ? t("missions.active") : t("missions.inactive")}
+                  </Badge>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(m.id);
+                  }}
+                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
+                  title={t("common.delete")}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
           columns={[
             {
               key: "name",
@@ -186,7 +228,7 @@ export function Missions() {
                     e.stopPropagation();
                     handleDelete(m.id);
                   }}
-                  className="p-1.5 rounded-md text-faint hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
                   title={t("common.delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />

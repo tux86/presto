@@ -1,4 +1,5 @@
 import { getMonthName } from "@presto/shared";
+import { CalendarDays } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
@@ -115,7 +116,7 @@ export function Dashboard() {
               <div className="h-3 w-44 bg-elevated rounded animate-pulse mb-2" />
               <div className="flex flex-wrap gap-[3px] mb-2">
                 {Array.from({ length: 30 }, (_, j) => (
-                  <div key={j} className="w-[7px] h-[7px] rounded-sm bg-elevated animate-pulse" />
+                  <div key={j} className="w-2 h-2 rounded-sm bg-elevated animate-pulse" />
                 ))}
               </div>
               <div className="flex items-center justify-between">
@@ -154,7 +155,9 @@ export function Dashboard() {
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-edge p-12 text-center">
-          <p className="text-sm text-muted mb-4">{t("dashboard.noActivities", { year: selectedYear })}</p>
+          <CalendarDays className="h-10 w-10 text-faint mx-auto mb-3" strokeWidth={1.5} />
+          <p className="text-base font-medium text-muted mb-1">{t("dashboard.noActivities", { year: selectedYear })}</p>
+          <p className="text-sm text-faint mb-5">{t("dashboard.noActivitiesHint")}</p>
           <Button onClick={() => setShowCreateModal(true)}>{t("dashboard.createActivity")}</Button>
         </div>
       )}
@@ -202,7 +205,7 @@ export function Dashboard() {
               ))}
           </Select>
 
-          {createReport.error && <p className="text-sm text-red-500">{createReport.error.message}</p>}
+          {createReport.error && <p className="text-sm text-error">{createReport.error.message}</p>}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" onClick={() => setShowCreateModal(false)}>

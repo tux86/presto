@@ -25,7 +25,7 @@ export function ClientDonutChart({ data, baseCurrency, totalDays }: ClientDonutC
   return (
     <div className="rounded-xl border border-edge bg-panel p-5">
       <h3 className="text-sm font-medium text-body mb-4">{t("reporting.clientBreakdown")}</h3>
-      <div className="h-64 flex flex-col items-center justify-center gap-3">
+      <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
         {/* Donut */}
         <div className="w-32 h-32 flex-shrink-0">
           <ResponsiveContainer width="100%" height="100%">
@@ -61,7 +61,7 @@ export function ClientDonutChart({ data, baseCurrency, totalDays }: ClientDonutC
           </ResponsiveContainer>
         </div>
         {/* Legend */}
-        <div className="space-y-1.5 w-full min-w-0 overflow-y-auto">
+        <div className="space-y-1.5 flex-1 min-w-0">
           {sorted.map((client) => {
             const color = getClientColor(client.clientName, client.clientColor);
             const percent = totalDays > 0 ? (client.days / totalDays) * 100 : 0;

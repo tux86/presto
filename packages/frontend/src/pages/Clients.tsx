@@ -7,7 +7,7 @@ import {
   getCurrencySymbol,
   HOLIDAY_COUNTRIES,
 } from "@presto/shared";
-import { Trash2 } from "lucide-react";
+import { Trash2, Users as UsersIcon } from "lucide-react";
 import { useState } from "react";
 import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
@@ -127,7 +127,38 @@ export function Clients() {
         <Table
           data={clients ?? []}
           emptyMessage={t("clients.emptyMessage")}
+          emptyIcon={<UsersIcon className="h-10 w-10 text-faint" strokeWidth={1.5} />}
           onRowClick={openEdit}
+          mobileRender={(c) => (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <span className="font-medium text-heading inline-flex items-center gap-2">
+                  <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", getClientColor(c.name, c.color).dot)} />
+                  {c.name}
+                </span>
+                <div className="flex items-center gap-2 mt-1 text-xs text-muted">
+                  <span>
+                    {getCurrencySymbol(c.currency, locale)} {c.currency}
+                  </span>
+                  <span>&middot;</span>
+                  <span>
+                    <CountryFlag code={c.holidayCountry} /> {c.holidayCountry}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(c.id);
+                }}
+                className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
+                title={t("common.delete")}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
           columns={[
             {
               key: "name",
@@ -178,7 +209,7 @@ export function Clients() {
                     e.stopPropagation();
                     handleDelete(c.id);
                   }}
-                  className="p-1.5 rounded-md text-faint hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
                   title={t("common.delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />

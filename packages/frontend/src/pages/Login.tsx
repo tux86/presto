@@ -130,7 +130,7 @@ export function Login() {
               />
             )}
 
-            {error && <p className="text-sm text-red-500 bg-red-500/10 rounded-lg px-3 py-2">{error}</p>}
+            {error && <p className="text-sm text-error bg-error-subtle rounded-lg px-3 py-2">{error}</p>}
 
             <Button type="submit" size="lg" className="w-full" loading={loading}>
               {isRegister ? t("auth.submitRegister") : t("auth.submitLogin")}

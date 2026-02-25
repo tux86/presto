@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { PreferencesControls, PreferencesMenu } from "@/components/layout/PreferencesMenu";
+import { Button } from "@/components/ui/Button";
 import { triggerCommandPalette } from "@/components/ui/CommandPalette";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -78,20 +79,16 @@ export function Sidebar() {
           optional
         />
         <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => setProfileOpen(false)}
-            className="rounded-lg px-4 py-2 text-sm text-muted hover:text-body transition-colors cursor-pointer"
-          >
+          <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
             {t("common.cancel")}
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            disabled={profileSaving || !profileForm.firstName.trim() || !profileForm.lastName.trim()}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors disabled:opacity-50 cursor-pointer"
+            loading={profileSaving}
+            disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
           >
             {t("common.save")}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>
@@ -150,33 +147,36 @@ export function Sidebar() {
 
                 {/* User + logout */}
                 {!authDisabled && (
-                  <div className="border-t border-edge pt-4 flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        openProfileModal();
-                      }}
-                      className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
-                    >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
-                        {user?.firstName?.[0]}
-                        {user?.lastName?.[0]}
-                      </div>
-                      <p className="text-sm font-medium text-heading truncate">
-                        {user?.firstName} {user?.lastName}
-                      </p>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        logout();
-                      }}
-                      className="text-sm text-muted hover:text-body transition-colors cursor-pointer"
-                    >
-                      {t("common.logout")}
-                    </button>
+                  <div className="border-t border-edge pt-4 space-y-3">
+                    <p className="text-xs font-medium text-faint uppercase tracking-wider">{t("profile.title")}</p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          openProfileModal();
+                        }}
+                        className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-text text-xs font-medium">
+                          {user?.firstName?.[0]}
+                          {user?.lastName?.[0]}
+                        </div>
+                        <p className="text-sm font-medium text-heading truncate">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          logout();
+                        }}
+                        className="text-sm text-muted hover:text-body transition-colors cursor-pointer"
+                      >
+                        {t("common.logout")}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

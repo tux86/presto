@@ -1,3 +1,16 @@
+## [1.17.0](https://github.com/tux86/presto/compare/v1.16.0...v1.17.0) (2026-02-25)
+
+### Features
+
+* add company filter to Reporting, Dashboard, and Missions pages ([0295c70](https://github.com/tux86/presto/commit/0295c7079b4d1d1331374d2688804ba2079c2d21))
+* add suffix prop to Input component and widen dashboard grid at xl breakpoint ([aab8fdd](https://github.com/tux86/presto/commit/aab8fdd0f128bb034a740081b4ed111881f15cb4))
+* enlarge activity card dots and simplify PDF filename ([be1b409](https://github.com/tux86/presto/commit/be1b4094290f7257ad3649df5dc042cd2896d701))
+* expand command palette with actions, companies nav, and theme preferences ([bd04dd0](https://github.com/tux86/presto/commit/bd04dd0e5fc8eab3b2ef4ed4299ef002cc7826c7))
+* expand E2E test coverage, persist preferences in localStorage, and fix auth UX ([c9ba978](https://github.com/tux86/presto/commit/c9ba978a0a749a88c1a1c530fbe04a754b7131ca))
+* polish activity report editor UX and refine frontend UI ([6311577](https://github.com/tux86/presto/commit/631157711ff02239924cc47c7dc58cb5cea3f7f6))
+* replace user.company with Company entity linked to missions ([a28af8a](https://github.com/tux86/presto/commit/a28af8af73c163527f24e484c1b587115847208d))
+* use Inter font across frontend and PDF exports ([4a85ffd](https://github.com/tux86/presto/commit/4a85ffdaa67fd3fdf89d4ea4d832f1d28ed8d80f))
+
 ## [1.16.0](https://github.com/tux86/presto/compare/v1.15.0...v1.16.0) (2026-02-25)
 
 ### Features

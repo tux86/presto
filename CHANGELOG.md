@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/tux86/presto/compare/v1.15.0...v1.16.0) (2026-02-25)
+
+### Features
+
+* redesign preferences modal with polished layout and searchable currency picker ([ca96d6b](https://github.com/tux86/presto/commit/ca96d6bd82f4e8818740f5e804194db86a1ebf48))
+
 ## [1.15.0](https://github.com/tux86/presto/compare/v1.14.0...v1.15.0) (2026-02-24)
 
 ### Features

@@ -30,10 +30,22 @@ CREATE TABLE "Client" (
 	"updatedAt" timestamp (3) NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "Company" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"address" text,
+	"businessId" text,
+	"isDefault" boolean DEFAULT false NOT NULL,
+	"userId" text NOT NULL,
+	"createdAt" timestamp (3) NOT NULL,
+	"updatedAt" timestamp (3) NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "Mission" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"clientId" text NOT NULL,
+	"companyId" text NOT NULL,
 	"userId" text NOT NULL,
 	"dailyRate" double precision,
 	"startDate" timestamp (3),
@@ -69,7 +81,6 @@ CREATE TABLE "User" (
 	"password" text NOT NULL,
 	"firstName" text NOT NULL,
 	"lastName" text NOT NULL,
-	"company" text,
 	"createdAt" timestamp (3) NOT NULL,
 	"updatedAt" timestamp (3) NOT NULL,
 	CONSTRAINT "User_email_unique" UNIQUE("email")
@@ -78,11 +89,15 @@ CREATE TABLE "User" (
 ALTER TABLE "ActivityReport" ADD CONSTRAINT "ActivityReport_missionId_Mission_id_fk" FOREIGN KEY ("missionId") REFERENCES "public"."Mission"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ActivityReport" ADD CONSTRAINT "ActivityReport_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Client" ADD CONSTRAINT "Client_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Company" ADD CONSTRAINT "Company_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Mission" ADD CONSTRAINT "Mission_clientId_Client_id_fk" FOREIGN KEY ("clientId") REFERENCES "public"."Client"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Mission" ADD CONSTRAINT "Mission_companyId_Company_id_fk" FOREIGN KEY ("companyId") REFERENCES "public"."Company"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Mission" ADD CONSTRAINT "Mission_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ReportEntry" ADD CONSTRAINT "ReportEntry_reportId_ActivityReport_id_fk" FOREIGN KEY ("reportId") REFERENCES "public"."ActivityReport"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserSettings" ADD CONSTRAINT "UserSettings_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "ActivityReport_userId_year_month_idx" ON "ActivityReport" USING btree ("userId","year","month");--> statement-breakpoint
 CREATE INDEX "Client_userId_idx" ON "Client" USING btree ("userId");--> statement-breakpoint
+CREATE INDEX "Company_userId_idx" ON "Company" USING btree ("userId");--> statement-breakpoint
 CREATE INDEX "Mission_userId_idx" ON "Mission" USING btree ("userId");--> statement-breakpoint
-CREATE INDEX "Mission_clientId_idx" ON "Mission" USING btree ("clientId");
+CREATE INDEX "Mission_clientId_idx" ON "Mission" USING btree ("clientId");--> statement-breakpoint
+CREATE INDEX "Mission_companyId_idx" ON "Mission" USING btree ("companyId");

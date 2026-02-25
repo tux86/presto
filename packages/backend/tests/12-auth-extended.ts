@@ -21,33 +21,14 @@ describe("Auth — Profile", () => {
     expect(body.lastName).toBe("Martin");
   });
 
-  test("PATCH /auth/profile → set company", async () => {
-    const res = await api("PATCH", "/auth/profile", {
-      body: { company: "New Corp" },
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.company).toBe("New Corp");
-  });
-
-  test("PATCH /auth/profile → clear company to null", async () => {
-    const res = await api("PATCH", "/auth/profile", {
-      body: { company: null },
-    });
-    expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.company).toBeNull();
-  });
-
   test("PATCH /auth/profile → update all fields at once", async () => {
     const res = await api("PATCH", "/auth/profile", {
-      body: { firstName: "Alice", lastName: "Dupont", company: "Acme Corp" },
+      body: { firstName: "Alice", lastName: "Dupont" },
     });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.firstName).toBe("Alice");
     expect(body.lastName).toBe("Dupont");
-    expect(body.company).toBe("Acme Corp");
   });
 
   test("PATCH /auth/profile → password excluded from response", async () => {
@@ -73,7 +54,6 @@ describe("Auth — Profile", () => {
     const body = await res.json();
     expect(body.firstName).toBe("Alice");
     expect(body.lastName).toBe("Dupont");
-    expect(body.company).toBe("Acme Corp");
   });
 });
 

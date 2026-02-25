@@ -42,7 +42,6 @@ export const users = pgTable("User", {
   password: text("password").notNull(),
   firstName: text("firstName").notNull(),
   lastName: text("lastName").notNull(),
-  company: text("company"),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
@@ -57,6 +56,23 @@ export const userSettings = pgTable("UserSettings", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+export const companies = pgTable(
+  "Company",
+  {
+    id: cuid(),
+    name: text("name").notNull(),
+    address: text("address"),
+    businessId: text("businessId"),
+    isDefault: boolean("isDefault").notNull().default(false),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("Company_userId_idx").on(t.userId)],
+);
 
 export const clients = pgTable(
   "Client",
@@ -87,6 +103,9 @@ export const missions = pgTable(
     clientId: text("clientId")
       .notNull()
       .references(() => clients.id, { onDelete: "restrict" }),
+    companyId: text("companyId")
+      .notNull()
+      .references(() => companies.id, { onDelete: "restrict" }),
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -97,7 +116,11 @@ export const missions = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("Mission_userId_idx").on(t.userId), index("Mission_clientId_idx").on(t.clientId)],
+  (t) => [
+    index("Mission_userId_idx").on(t.userId),
+    index("Mission_clientId_idx").on(t.clientId),
+    index("Mission_companyId_idx").on(t.companyId),
+  ],
 );
 
 export const activityReports = pgTable(

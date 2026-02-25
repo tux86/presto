@@ -5,6 +5,7 @@ import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { useT } from "./i18n";
 import { ActivityReportEditor } from "./pages/ActivityReportEditor";
 import { Clients } from "./pages/Clients";
+import { Companies } from "./pages/Companies";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
 import { Missions } from "./pages/Missions";
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/activity/:id" element={<ActivityReportEditor />} />
           <Route path="/clients" element={<Clients />} />
+          <Route path="/companies" element={<Companies />} />
           <Route path="/missions" element={<Missions />} />
           <Route path="/reporting" element={<Reporting />} />
         </Route>

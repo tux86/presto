@@ -4,6 +4,7 @@ export * from "./currencies.js";
 export * from "./holidays/holidays.js";
 export * from "./types/activity-report.js";
 export * from "./types/client.js";
+export * from "./types/company.js";
 export * from "./types/mission.js";
 export * from "./types/user.js";
 export * from "./utils/dates.js";

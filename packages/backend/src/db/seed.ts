@@ -1,7 +1,17 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
 import { logger } from "../lib/logger.js";
 import { createId } from "./id.js";
-import { activityReports, clients, closeDb, db, missions, reportEntries, userSettings, users } from "./index.js";
+import {
+  activityReports,
+  clients,
+  closeDb,
+  companies,
+  db,
+  missions,
+  reportEntries,
+  userSettings,
+  users,
+} from "./index.js";
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -90,7 +100,14 @@ async function main() {
     password,
     firstName: "Vrael",
     lastName: "Synthor",
-    company: "Korvalis",
+  });
+
+  const companyId = createId();
+  await db.insert(companies).values({
+    id: companyId,
+    name: "Korvalis",
+    isDefault: true,
+    userId,
   });
 
   await db.insert(userSettings).values({
@@ -280,6 +297,7 @@ async function main() {
         id: missionId,
         name: mDef.name,
         clientId: client.id,
+        companyId,
         userId,
         dailyRate: mDef.dailyRate,
         isActive: mDef.isActive,

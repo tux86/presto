@@ -4,12 +4,13 @@ import { cn } from "@/lib/utils";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
+  hint?: string;
   error?: string;
   optional?: boolean;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, optional, className, id, ...props }, ref) => {
+  ({ label, hint, error, optional, className, id, ...props }, ref) => {
     const selectId = id || label?.toLowerCase().replace(/\s+/g, "-");
     const { t } = useT();
     return (
@@ -18,6 +19,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <label htmlFor={selectId} className="block text-sm font-medium text-muted">
             {label}
             {optional && <span className="ml-1 text-xs font-normal text-faint">({t("common.optional")})</span>}
+            {hint && <p className="text-xs text-faint mt-0.5 font-normal">{hint}</p>}
           </label>
         )}
         <select

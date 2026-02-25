@@ -1,13 +1,14 @@
 import { and, asc, eq } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { HTTPException } from "hono/http-exception";
-import { activityReports, clients, db, missions } from "./index.js";
+import { activityReports, clients, companies, db, missions } from "./index.js";
 
-type OwnedModel = "activityReport" | "client" | "mission";
+type OwnedModel = "activityReport" | "client" | "company" | "mission";
 
 const ownedModels = {
   activityReport: { query: "activityReports", table: activityReports, label: "Activity" },
   client: { query: "clients", table: clients, label: "Client" },
+  company: { query: "companies", table: companies, label: "Company" },
   mission: { query: "missions", table: missions, label: "Mission" },
 } as const;
 
@@ -61,9 +62,10 @@ export async function updateReturning<T extends PgTable>(
   return rows[0];
 }
 
-/** Relational include: mission with client summary. */
+/** Relational include: mission with client + company summary. */
 export const MISSION_WITH = {
   client: { columns: { id: true, name: true, color: true, currency: true } },
+  company: { columns: { id: true, name: true } },
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Drizzle relational orderBy callback types are unresolvable without `any`
@@ -80,6 +82,6 @@ export const REPORT_WITH = {
 /** Relational include: activity report for PDF export. */
 export const REPORT_WITH_PDF = {
   entries: ENTRIES_ORDERED,
-  mission: { with: { client: true } },
-  user: { columns: { firstName: true, lastName: true, company: true } },
+  mission: { with: { client: true, company: { columns: { name: true } } } },
+  user: { columns: { firstName: true, lastName: true } },
 } as const;

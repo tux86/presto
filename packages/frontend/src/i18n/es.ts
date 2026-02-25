@@ -8,6 +8,7 @@ export const es: Record<TranslationKey, string> = {
   "nav.activities": "Actividades",
   "nav.clients": "Clientes",
   "nav.missions": "Misiones",
+  "nav.companies": "Empresas",
   "nav.reporting": "Informes",
   "nav.more": "M\u00e1s",
 
@@ -66,6 +67,25 @@ export const es: Record<TranslationKey, string> = {
     "Esta misi\u00f3n solo se puede eliminar si no tiene informes de actividad. Elimine primero todos los informes.",
   "missions.deleteError":
     "Esta misi\u00f3n tiene {count} informe(s) de actividad. Elim\u00ednelos antes de eliminar la misi\u00f3n.",
+  "missions.company": "Empresa",
+  "missions.companyHint": "Su entidad de facturaci\u00f3n para esta misi\u00f3n",
+  "missions.selectCompany": "Seleccionar una empresa",
+
+  // Companies
+  "companies.title": "Empresas",
+  "companies.subtitle": "Sus entidades de facturaci\u00f3n",
+  "companies.newCompany": "Nueva empresa",
+  "companies.editCompany": "Editar empresa",
+  "companies.emptyMessage": "A\u00fan no hay empresas. Cree su primera empresa.",
+  "companies.name": "Nombre",
+  "companies.address": "Direcci\u00f3n",
+  "companies.businessId": "NIF / CIF",
+  "companies.isDefault": "Empresa por defecto",
+  "companies.isDefaultHint": "Pre-seleccionada al crear misiones",
+  "companies.deleteTitle": "Eliminar esta empresa",
+  "companies.deleteMessage":
+    "Esta empresa solo se puede eliminar si no tiene misiones. Elimine primero todas las misiones.",
+  "companies.deleteError": "Esta empresa tiene {count} misi\u00f3n(es). Elim\u00ednelas antes de eliminar la empresa.",
 
   // Activity (timesheet)
   "activity.validated": "Validado",
@@ -125,8 +145,6 @@ export const es: Record<TranslationKey, string> = {
   "auth.password": "Contrase\u00f1a",
   "auth.firstName": "Nombre",
   "auth.lastName": "Apellido",
-  "auth.company": "Empresa",
-  "auth.companyPlaceholder": "Mi Empresa S.L.",
   "auth.emailPlaceholder": "usuario@ejemplo.com",
   "auth.submitLogin": "Iniciar sesi\u00f3n",
   "auth.submitRegister": "Crear mi cuenta",
@@ -145,7 +163,6 @@ export const es: Record<TranslationKey, string> = {
   "profile.title": "Editar perfil",
   "profile.firstName": "Nombre",
   "profile.lastName": "Apellido",
-  "profile.company": "Empresa",
 
   // Common
   "common.save": "Guardar",
@@ -161,6 +178,7 @@ export const es: Record<TranslationKey, string> = {
   "common.noResults": "Sin resultados",
   "common.optional": "opcional",
   "common.auto": "Auto",
+  "common.default": "Por defecto",
   "common.navigation": "Navegaci\u00f3n",
   "common.logout": "Cerrar sesi\u00f3n",
 

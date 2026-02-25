@@ -8,6 +8,7 @@ export const pt: Record<TranslationKey, string> = {
   "nav.activities": "Atividades",
   "nav.clients": "Clientes",
   "nav.missions": "Miss\u00f5es",
+  "nav.companies": "Empresas",
   "nav.reporting": "Relat\u00f3rios",
   "nav.more": "Mais",
 
@@ -67,6 +68,25 @@ export const pt: Record<TranslationKey, string> = {
     "Esta miss\u00e3o s\u00f3 pode ser eliminada se n\u00e3o tiver relat\u00f3rios de atividade. Elimine primeiro todos os relat\u00f3rios.",
   "missions.deleteError":
     "Esta miss\u00e3o tem {count} relat\u00f3rio(s) de atividade. Elimine-os antes de eliminar a miss\u00e3o.",
+  "missions.company": "Empresa",
+  "missions.companyHint": "A sua entidade de fatura\u00e7\u00e3o para esta miss\u00e3o",
+  "missions.selectCompany": "Selecionar uma empresa",
+
+  // Companies
+  "companies.title": "Empresas",
+  "companies.subtitle": "As suas entidades de fatura\u00e7\u00e3o",
+  "companies.newCompany": "Nova empresa",
+  "companies.editCompany": "Editar empresa",
+  "companies.emptyMessage": "Ainda sem empresas. Crie a sua primeira empresa.",
+  "companies.name": "Nome",
+  "companies.address": "Morada",
+  "companies.businessId": "NIF / NIPC",
+  "companies.isDefault": "Empresa padr\u00e3o",
+  "companies.isDefaultHint": "Pr\u00e9-selecionada ao criar miss\u00f5es",
+  "companies.deleteTitle": "Eliminar esta empresa",
+  "companies.deleteMessage":
+    "Esta empresa s\u00f3 pode ser eliminada se n\u00e3o tiver miss\u00f5es. Elimine primeiro todas as miss\u00f5es.",
+  "companies.deleteError": "Esta empresa tem {count} miss\u00e3o(\u00f5es). Elimine-as antes de eliminar a empresa.",
 
   // Activity (timesheet)
   "activity.validated": "Validado",
@@ -126,8 +146,6 @@ export const pt: Record<TranslationKey, string> = {
   "auth.password": "Palavra-passe",
   "auth.firstName": "Nome",
   "auth.lastName": "Apelido",
-  "auth.company": "Empresa",
-  "auth.companyPlaceholder": "Minha Empresa Lda",
   "auth.emailPlaceholder": "utilizador@exemplo.pt",
   "auth.submitLogin": "Entrar",
   "auth.submitRegister": "Criar a minha conta",
@@ -146,7 +164,6 @@ export const pt: Record<TranslationKey, string> = {
   "profile.title": "Editar perfil",
   "profile.firstName": "Nome",
   "profile.lastName": "Apelido",
-  "profile.company": "Empresa",
 
   // Common
   "common.save": "Guardar",
@@ -162,6 +179,7 @@ export const pt: Record<TranslationKey, string> = {
   "common.noResults": "Sem resultados",
   "common.optional": "opcional",
   "common.auto": "Auto",
+  "common.default": "Padr\u00e3o",
   "common.navigation": "Navega\u00e7\u00e3o",
   "common.logout": "Sair",
 

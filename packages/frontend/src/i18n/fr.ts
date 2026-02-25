@@ -8,6 +8,7 @@ export const fr: Record<TranslationKey, string> = {
   "nav.activities": "Activit\u00e9s",
   "nav.clients": "Clients",
   "nav.missions": "Missions",
+  "nav.companies": "Soci\u00e9t\u00e9s",
   "nav.reporting": "Reporting",
   "nav.more": "Plus",
 
@@ -67,6 +68,26 @@ export const fr: Record<TranslationKey, string> = {
     "Cette mission ne peut \u00eatre supprim\u00e9e que si elle n'a aucun compte-rendu d'activit\u00e9. Supprimez d'abord tous les rapports.",
   "missions.deleteError":
     "Cette mission a {count} compte-rendu(s) d'activit\u00e9. Supprimez-les avant de supprimer la mission.",
+  "missions.company": "Soci\u00e9t\u00e9",
+  "missions.companyHint": "Votre entit\u00e9 de facturation pour cette mission",
+  "missions.selectCompany": "S\u00e9lectionner une soci\u00e9t\u00e9",
+
+  // Companies
+  "companies.title": "Soci\u00e9t\u00e9s",
+  "companies.subtitle": "Vos entit\u00e9s juridiques de facturation",
+  "companies.newCompany": "Nouvelle soci\u00e9t\u00e9",
+  "companies.editCompany": "Modifier la soci\u00e9t\u00e9",
+  "companies.emptyMessage": "Aucune soci\u00e9t\u00e9. Cr\u00e9ez votre premi\u00e8re soci\u00e9t\u00e9.",
+  "companies.name": "Nom",
+  "companies.address": "Adresse",
+  "companies.businessId": "SIRET",
+  "companies.isDefault": "Soci\u00e9t\u00e9 par d\u00e9faut",
+  "companies.isDefaultHint": "Pr\u00e9-s\u00e9lectionn\u00e9e lors de la cr\u00e9ation de missions",
+  "companies.deleteTitle": "Supprimer cette soci\u00e9t\u00e9",
+  "companies.deleteMessage":
+    "Cette soci\u00e9t\u00e9 ne peut \u00eatre supprim\u00e9e que si elle n'a aucune mission. Supprimez d'abord toutes les missions.",
+  "companies.deleteError":
+    "Cette soci\u00e9t\u00e9 a {count} mission(s). Supprimez-les avant de supprimer la soci\u00e9t\u00e9.",
 
   // Activity (timesheet)
   "activity.validated": "Valid\u00e9",
@@ -125,8 +146,6 @@ export const fr: Record<TranslationKey, string> = {
   "auth.password": "Mot de passe",
   "auth.firstName": "Pr\u00e9nom",
   "auth.lastName": "Nom",
-  "auth.company": "Soci\u00e9t\u00e9",
-  "auth.companyPlaceholder": "Ma Soci\u00e9t\u00e9 SARL",
   "auth.emailPlaceholder": "vous@exemple.com",
   "auth.submitLogin": "Se connecter",
   "auth.submitRegister": "Cr\u00e9er mon compte",
@@ -145,7 +164,6 @@ export const fr: Record<TranslationKey, string> = {
   "profile.title": "Modifier le profil",
   "profile.firstName": "Pr\u00e9nom",
   "profile.lastName": "Nom",
-  "profile.company": "Soci\u00e9t\u00e9",
 
   // Common
   "common.save": "Enregistrer",
@@ -161,6 +179,7 @@ export const fr: Record<TranslationKey, string> = {
   "common.noResults": "Aucun r\u00e9sultat",
   "common.optional": "optionnel",
   "common.auto": "Auto",
+  "common.default": "Par d\u00e9faut",
   "common.navigation": "Navigation",
   "common.logout": "D\u00e9connexion",
 

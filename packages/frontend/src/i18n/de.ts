@@ -8,6 +8,7 @@ export const de: Record<TranslationKey, string> = {
   "nav.activities": "Aktivit\u00e4ten",
   "nav.clients": "Kunden",
   "nav.missions": "Auftr\u00e4ge",
+  "nav.companies": "Unternehmen",
   "nav.reporting": "Berichte",
   "nav.more": "Mehr",
 
@@ -66,6 +67,26 @@ export const de: Record<TranslationKey, string> = {
     "Dieser Auftrag kann nur gel\u00f6scht werden, wenn er keine T\u00e4tigkeitsberichte hat. Entfernen Sie zuerst alle Berichte.",
   "missions.deleteError":
     "Dieser Auftrag hat {count} T\u00e4tigkeitsbericht(e). Entfernen Sie diese vor dem L\u00f6schen.",
+  "missions.company": "Unternehmen",
+  "missions.companyHint": "Ihre Abrechnungseinheit f\u00fcr diesen Auftrag",
+  "missions.selectCompany": "Unternehmen ausw\u00e4hlen",
+
+  // Companies
+  "companies.title": "Unternehmen",
+  "companies.subtitle": "Ihre Abrechnungseinheiten",
+  "companies.newCompany": "Neues Unternehmen",
+  "companies.editCompany": "Unternehmen bearbeiten",
+  "companies.emptyMessage": "Noch keine Unternehmen. Erstellen Sie Ihr erstes Unternehmen.",
+  "companies.name": "Name",
+  "companies.address": "Adresse",
+  "companies.businessId": "Handelsregister-Nr.",
+  "companies.isDefault": "Standard-Unternehmen",
+  "companies.isDefaultHint": "Vorausgew\u00e4hlt bei der Erstellung von Auftr\u00e4gen",
+  "companies.deleteTitle": "Dieses Unternehmen l\u00f6schen",
+  "companies.deleteMessage":
+    "Dieses Unternehmen kann nur gel\u00f6scht werden, wenn es keine Auftr\u00e4ge hat. Entfernen Sie zuerst alle Auftr\u00e4ge.",
+  "companies.deleteError":
+    "Dieses Unternehmen hat {count} Auftrag/Auftr\u00e4ge. Entfernen Sie diese vor dem L\u00f6schen.",
 
   // Activity (timesheet)
   "activity.validated": "Best\u00e4tigt",
@@ -125,8 +146,6 @@ export const de: Record<TranslationKey, string> = {
   "auth.password": "Passwort",
   "auth.firstName": "Vorname",
   "auth.lastName": "Nachname",
-  "auth.company": "Unternehmen",
-  "auth.companyPlaceholder": "Meine Firma GmbH",
   "auth.emailPlaceholder": "name@beispiel.de",
   "auth.submitLogin": "Anmelden",
   "auth.submitRegister": "Konto erstellen",
@@ -145,7 +164,6 @@ export const de: Record<TranslationKey, string> = {
   "profile.title": "Profil bearbeiten",
   "profile.firstName": "Vorname",
   "profile.lastName": "Nachname",
-  "profile.company": "Unternehmen",
 
   // Common
   "common.save": "Speichern",
@@ -161,6 +179,7 @@ export const de: Record<TranslationKey, string> = {
   "common.noResults": "Keine Ergebnisse",
   "common.optional": "optional",
   "common.auto": "Auto",
+  "common.default": "Standard",
   "common.navigation": "Navigation",
   "common.logout": "Abmelden",
 

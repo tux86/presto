@@ -14,7 +14,6 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [company, setCompany] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +29,7 @@ export function Login() {
 
     try {
       if (isRegister) {
-        await register({ email, password, firstName, lastName, company: company || undefined });
+        await register({ email, password, firstName, lastName });
       } else {
         await login(email, password);
       }
@@ -128,16 +127,6 @@ export function Login() {
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
               required
             />
-
-            {isRegister && (
-              <Input
-                label={t("auth.company")}
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder={t("auth.companyPlaceholder")}
-                optional
-              />
-            )}
 
             {error && <p className="text-sm text-error bg-error-subtle rounded-lg px-3 py-2">{error}</p>}
 

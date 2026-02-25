@@ -10,16 +10,24 @@ describe("Auth", () => {
         password: "SecurePass1",
         firstName: "Alice",
         lastName: "Dupont",
-        company: "Acme Corp",
       },
     });
     expect(res.status).toBe(201);
     const body = await res.json();
     expect(body.user.email).toBe("alice@example.com");
-    expect(body.user.company).toBe("Acme Corp");
     expect(body.token).toBeTruthy();
     state.token = body.token;
     state.userId = body.user.id;
+  });
+
+  test("GET /companies → default company auto-created on register", async () => {
+    const res = await api("GET", "/companies");
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.length).toBe(1);
+    expect(body[0].isDefault).toBe(true);
+    expect(body[0].name).toBe("Default");
+    state.companyId = body[0].id;
   });
 
   test("POST /auth/register duplicate email → 409", async () => {

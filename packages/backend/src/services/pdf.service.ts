@@ -213,11 +213,11 @@ interface PdfReport {
     name: string;
     dailyRate: number | null;
     client: { name: string; currency: string };
+    company?: { name: string } | null;
   };
   user: {
     firstName: string;
     lastName: string;
-    company: string | null;
   };
 }
 
@@ -262,7 +262,7 @@ function ReportDocument({ report, locale = "en" }: { report: PdfReport; locale?:
             { style: styles.infoCard },
             h(Text, { style: styles.infoLabel }, l.consultant),
             h(Text, { style: styles.infoValue }, `${report.user.firstName} ${report.user.lastName}`),
-            report.user.company && h(Text, { style: styles.infoSub }, report.user.company),
+            report.mission.company?.name && h(Text, { style: styles.infoSub }, report.mission.company.name),
           ),
           h(
             View,

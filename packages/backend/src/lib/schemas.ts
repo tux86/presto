@@ -20,18 +20,31 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, "Must contain a digit"),
   firstName: z.string().min(1).max(200),
   lastName: z.string().min(1).max(200),
-  company: z.string().max(200).optional(),
 });
 
 export const updateProfileSchema = z.object({
   firstName: z.string().min(1).max(200).optional(),
   lastName: z.string().min(1).max(200).optional(),
-  company: z.string().max(200).nullable().optional(),
 });
 
 export const loginSchema = z.object({
   email: z.string().email().max(254),
   password: z.string().min(1).max(128),
+});
+
+// Companies
+export const createCompanySchema = z.object({
+  name: z.string().min(1).max(200),
+  address: z.string().max(500).optional(),
+  businessId: z.string().max(100).optional(),
+  isDefault: z.boolean().optional(),
+});
+
+export const updateCompanySchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  address: z.string().max(500).nullable().optional(),
+  businessId: z.string().max(100).nullable().optional(),
+  isDefault: z.boolean().optional(),
 });
 
 // Clients
@@ -62,6 +75,7 @@ export const createMissionSchema = z
   .object({
     name: z.string().min(1).max(200),
     clientId: z.string().min(1),
+    companyId: z.string().min(1),
     dailyRate: z.number().min(0).optional(),
     startDate: dateString.optional(),
     endDate: dateString.optional(),
@@ -75,6 +89,7 @@ export const updateMissionSchema = z
   .object({
     name: z.string().min(1).max(200).optional(),
     clientId: z.string().min(1).optional(),
+    companyId: z.string().min(1).optional(),
     dailyRate: z.number().min(0).nullable().optional(),
     startDate: dateString.nullable().optional(),
     endDate: dateString.nullable().optional(),

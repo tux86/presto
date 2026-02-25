@@ -6,7 +6,7 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { rateLimiter } from "hono-rate-limiter";
 import { insertReturning, updateReturning } from "../db/helpers.js";
-import { db, users } from "../db/index.js";
+import { companies, db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
 import { logger } from "../lib/logger.js";
@@ -47,7 +47,7 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
     throw new HTTPException(403, { message: "Registration is disabled" });
   }
 
-  const { password, firstName, lastName, company } = c.req.valid("json");
+  const { password, firstName, lastName } = c.req.valid("json");
   const email = c.req.valid("json").email.toLowerCase();
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
@@ -61,12 +61,10 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
     cost: config.auth.bcryptCost,
   });
 
-  const user = await insertReturning(users, {
-    email,
-    password: hashedPassword,
-    firstName,
-    lastName,
-    company: company || null,
+  const user = await db.transaction(async (trx) => {
+    const u = await insertReturning(users, { email, password: hashedPassword, firstName, lastName }, trx as typeof db);
+    await insertReturning(companies, { name: "Default", isDefault: true, userId: u.id }, trx as typeof db);
+    return u;
   });
 
   const { password: _, ...safeUser } = user;
@@ -106,7 +104,6 @@ auth.get("/me", authMiddleware, async (c) => {
       email: true,
       firstName: true,
       lastName: true,
-      company: true,
       createdAt: true,
       updatedAt: true,
     },

@@ -14,7 +14,6 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  company: string | null;
   createdAt: string;
   updatedAt: string;
   settings?: UserSettings;
@@ -30,7 +29,6 @@ export interface RegisterRequest {
   password: string;
   firstName: string;
   lastName: string;
-  company?: string;
 }
 
 export interface AuthResponse {

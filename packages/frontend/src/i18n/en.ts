@@ -6,6 +6,7 @@ export const en = {
   "nav.activities": "Activities",
   "nav.clients": "Clients",
   "nav.missions": "Missions",
+  "nav.companies": "Companies",
   "nav.reporting": "Reporting",
   "nav.more": "More",
 
@@ -61,6 +62,24 @@ export const en = {
   "missions.deleteTitle": "Delete this mission",
   "missions.deleteMessage": "This mission can only be deleted if it has no activity reports. Remove all reports first.",
   "missions.deleteError": "This mission has {count} activity report(s). Remove them before deleting.",
+  "missions.company": "Company",
+  "missions.companyHint": "Your billing entity for this mission",
+  "missions.selectCompany": "Select a company",
+
+  // Companies
+  "companies.title": "Companies",
+  "companies.subtitle": "Your billing entities",
+  "companies.newCompany": "New company",
+  "companies.editCompany": "Edit company",
+  "companies.emptyMessage": "No companies yet. Create your first company.",
+  "companies.name": "Name",
+  "companies.address": "Address",
+  "companies.businessId": "Business ID",
+  "companies.isDefault": "Default company",
+  "companies.isDefaultHint": "Pre-selected when creating missions",
+  "companies.deleteTitle": "Delete this company",
+  "companies.deleteMessage": "This company can only be deleted if it has no missions. Remove all missions first.",
+  "companies.deleteError": "This company has {count} mission(s). Remove them before deleting.",
 
   // Activity (timesheet)
   "activity.validated": "Validated",
@@ -119,8 +138,6 @@ export const en = {
   "auth.password": "Password",
   "auth.firstName": "First name",
   "auth.lastName": "Last name",
-  "auth.company": "Company",
-  "auth.companyPlaceholder": "My Company Ltd",
   "auth.emailPlaceholder": "you@example.com",
   "auth.submitLogin": "Sign in",
   "auth.submitRegister": "Create my account",
@@ -139,7 +156,6 @@ export const en = {
   "profile.title": "Edit Profile",
   "profile.firstName": "First Name",
   "profile.lastName": "Last Name",
-  "profile.company": "Company",
 
   // Common
   "common.save": "Save",
@@ -155,6 +171,7 @@ export const en = {
   "common.noResults": "No results",
   "common.optional": "optional",
   "common.auto": "Auto",
+  "common.default": "Default",
   "common.navigation": "Navigation",
   "common.logout": "Sign out",
 

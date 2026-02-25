@@ -5,6 +5,7 @@ export interface Mission {
   id: string;
   name: string;
   clientId: string;
+  companyId: string;
   userId: string;
   dailyRate: number | null;
   startDate: string | null;
@@ -18,11 +19,16 @@ export interface Mission {
     color: ClientColorKey | null;
     currency: CurrencyCode;
   };
+  company?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface CreateMissionRequest {
   name: string;
   clientId: string;
+  companyId: string;
   dailyRate?: number;
   startDate?: string;
   endDate?: string;
@@ -31,6 +37,7 @@ export interface CreateMissionRequest {
 export interface UpdateMissionRequest {
   name?: string;
   clientId?: string;
+  companyId?: string;
   dailyRate?: number | null;
   startDate?: string | null;
   endDate?: string | null;

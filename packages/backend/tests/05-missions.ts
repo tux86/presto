@@ -7,6 +7,7 @@ describe("Missions", () => {
       body: {
         name: "Backend Development",
         clientId: state.clientId,
+        companyId: state.companyId,
         dailyRate: 650,
         startDate: "2026-01-01",
         endDate: "2026-12-31",
@@ -17,16 +18,24 @@ describe("Missions", () => {
     expect(body.name).toBe("Backend Development");
     expect(body.dailyRate).toBe(650);
     expect(body.client.name).toBeTruthy();
+    expect(body.company.name).toBeTruthy();
     state.missionId = body.id;
   });
 
   test("POST /missions minimal fields → 201", async () => {
     const res = await api("POST", "/missions", {
-      body: { name: "Consulting", clientId: state.clientId },
+      body: { name: "Consulting", clientId: state.clientId, companyId: state.companyId },
     });
     expect(res.status).toBe(201);
     const body = await res.json();
     state.missionId2 = body.id;
+  });
+
+  test("POST /missions without companyId → 400", async () => {
+    const res = await api("POST", "/missions", {
+      body: { name: "No Company", clientId: state.clientId },
+    });
+    expect(res.status).toBe(400);
   });
 
   test("POST /missions end date before start date → 400", async () => {
@@ -34,6 +43,7 @@ describe("Missions", () => {
       body: {
         name: "Invalid Dates",
         clientId: state.clientId,
+        companyId: state.companyId,
         startDate: "2026-06-01",
         endDate: "2026-01-01",
       },
@@ -43,7 +53,7 @@ describe("Missions", () => {
 
   test("POST /missions client not owned → 404", async () => {
     const res = await api("POST", "/missions", {
-      body: { name: "Unauthorized", clientId: "nonexistent-client-id" },
+      body: { name: "Unauthorized", clientId: "nonexistent-client-id", companyId: state.companyId },
     });
     expect(res.status).toBe(404);
   });
@@ -57,14 +67,14 @@ describe("Missions", () => {
 
   test("POST /missions negative daily rate → 400", async () => {
     const res = await api("POST", "/missions", {
-      body: { name: "Negative Rate", clientId: state.clientId, dailyRate: -100 },
+      body: { name: "Negative Rate", clientId: state.clientId, companyId: state.companyId, dailyRate: -100 },
     });
     expect(res.status).toBe(400);
   });
 
   test("POST /missions malformed date string → 400", async () => {
     const res = await api("POST", "/missions", {
-      body: { name: "Bad Date", clientId: state.clientId, startDate: "2026-1-1" },
+      body: { name: "Bad Date", clientId: state.clientId, companyId: state.companyId, startDate: "2026-1-1" },
     });
     expect(res.status).toBe(400);
   });
@@ -85,6 +95,20 @@ describe("Missions", () => {
     expect(body.name).toBe("Backend Dev (Updated)");
     expect(body.dailyRate).toBe(700);
     expect(body.isActive).toBe(false);
+  });
+
+  test("PATCH /missions/:id change companyId → 200", async () => {
+    const res = await api("PATCH", `/missions/${state.missionId}`, {
+      body: { companyId: state.companyId2 },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.company.id).toBe(state.companyId2);
+
+    // Revert
+    await api("PATCH", `/missions/${state.missionId}`, {
+      body: { companyId: state.companyId },
+    });
   });
 
   test("PATCH /missions/:id clear optional fields → 200", async () => {

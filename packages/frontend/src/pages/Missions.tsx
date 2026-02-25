@@ -12,6 +12,7 @@ import { Select } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients } from "@/hooks/use-clients";
+import { useCompanies } from "@/hooks/use-companies";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useCreateMission, useDeleteMission, useMissions, useUpdateMission } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
@@ -22,11 +23,13 @@ export function Missions() {
   const [editing, setEditing] = useState<Mission | null>(null);
   const [name, setName] = useState("");
   const [clientId, setClientId] = useState("");
+  const [companyId, setCompanyId] = useState("");
   const [dailyRate, setDailyRate] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
 
   const { data: missions, isLoading } = useMissions();
   const { data: clients } = useClients();
+  const { data: companiesList } = useCompanies();
   const createMission = useCreateMission();
   const updateMission = useUpdateMission();
   const deleteMission = useDeleteMission();
@@ -48,10 +51,13 @@ export function Missions() {
     ? (missions ?? []).filter((m) => m.client?.id === filterClientId)
     : (missions ?? []);
 
+  const defaultCompanyId = companiesList?.find((c) => c.isDefault)?.id ?? companiesList?.[0]?.id ?? "";
+
   const openCreate = () => {
     setEditing(null);
     setName("");
     setClientId("");
+    setCompanyId(defaultCompanyId);
     setDailyRate("");
     setShowModal(true);
   };
@@ -60,17 +66,19 @@ export function Missions() {
     setEditing(mission);
     setName(mission.name);
     setClientId(mission.clientId);
+    setCompanyId(mission.companyId);
     setDailyRate(mission.dailyRate?.toString() || "");
     setShowModal(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !clientId) return;
+    if (!name || !clientId || !companyId) return;
 
     const data = {
       name,
       clientId,
+      companyId,
       dailyRate: dailyRate ? parseFloat(dailyRate) : undefined,
     };
 
@@ -251,6 +259,20 @@ export function Missions() {
             {clients?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
+              </option>
+            ))}
+          </Select>
+          <Select
+            label={t("missions.company")}
+            hint={t("missions.companyHint")}
+            value={companyId}
+            onChange={(e) => setCompanyId(e.target.value)}
+            required
+          >
+            <option value="">{t("missions.selectCompany")}</option>
+            {companiesList?.map((co) => (
+              <option key={co.id} value={co.id}>
+                {co.name}
               </option>
             ))}
           </Select>

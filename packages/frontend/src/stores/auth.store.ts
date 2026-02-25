@@ -9,16 +9,10 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    company?: string;
-  }) => Promise<void>;
+  register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
   logout: () => void;
   fetchMe: () => Promise<void>;
-  updateProfile: (data: { firstName?: string; lastName?: string; company?: string | null }) => Promise<void>;
+  updateProfile: (data: { firstName?: string; lastName?: string }) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(

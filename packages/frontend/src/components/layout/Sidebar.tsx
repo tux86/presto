@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Briefcase, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
+import { BarChart3, Briefcase, Building2, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
@@ -20,14 +20,13 @@ export function Sidebar() {
   const { t } = useT();
   const isMobile = useIsMobile();
   const [profileOpen, setProfileOpen] = useState(false);
-  const [profileForm, setProfileForm] = useState({ firstName: "", lastName: "", company: "" });
+  const [profileForm, setProfileForm] = useState({ firstName: "", lastName: "" });
   const [profileSaving, setProfileSaving] = useState(false);
 
   const openProfileModal = () => {
     setProfileForm({
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
-      company: user?.company ?? "",
     });
     setProfileOpen(true);
   };
@@ -39,7 +38,6 @@ export function Sidebar() {
       await updateProfile({
         firstName: profileForm.firstName,
         lastName: profileForm.lastName,
-        company: profileForm.company || null,
       });
       setProfileOpen(false);
     } finally {
@@ -51,6 +49,7 @@ export function Sidebar() {
     { to: "/", label: t("nav.activities"), icon: Home },
     { to: "/clients", label: t("nav.clients"), icon: Users },
     { to: "/missions", label: t("nav.missions"), icon: Briefcase },
+    { to: "/companies", label: t("nav.companies"), icon: Building2 },
     { to: "/reporting", label: t("nav.reporting"), icon: BarChart3 },
   ];
 
@@ -71,12 +70,6 @@ export function Sidebar() {
           value={profileForm.lastName}
           onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
           required
-        />
-        <Input
-          label={t("profile.company")}
-          value={profileForm.company}
-          onChange={(e) => setProfileForm((f) => ({ ...f, company: e.target.value }))}
-          optional
         />
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>

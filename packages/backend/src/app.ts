@@ -12,6 +12,7 @@ import { logger } from "./lib/logger.js";
 import activityReports from "./routes/activity-reports.js";
 import auth from "./routes/auth.js";
 import clients from "./routes/clients.js";
+import companies from "./routes/companies.js";
 import missions from "./routes/missions.js";
 import reporting from "./routes/reporting.js";
 import settings from "./routes/settings.js";
@@ -76,6 +77,7 @@ app.onError((err, c) => {
 // API routes
 app.route("/api/auth", auth);
 app.route("/api/clients", clients);
+app.route("/api/companies", companies);
 app.route("/api/missions", missions);
 app.route("/api/activity-reports", activityReports);
 app.route("/api/reporting", reporting);

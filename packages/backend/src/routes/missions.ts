@@ -26,13 +26,15 @@ missionsRouter.get("/", async (c) => {
 
 missionsRouter.post("/", zValidator("json", createMissionSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, clientId, dailyRate, startDate, endDate } = c.req.valid("json");
+  const { name, clientId, companyId, dailyRate, startDate, endDate } = c.req.valid("json");
 
   await findOwned("client", clientId, userId);
+  await findOwned("company", companyId, userId);
 
   const mission = await insertReturning(missions, {
     name,
     clientId,
+    companyId,
     userId,
     dailyRate: dailyRate ?? null,
     startDate: startDate ? new Date(startDate) : null,
@@ -51,6 +53,9 @@ missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) 
   await findOwned("mission", id, userId);
   if (data.clientId) {
     await findOwned("client", data.clientId, userId);
+  }
+  if (data.companyId) {
+    await findOwned("company", data.companyId, userId);
   }
 
   const { startDate, endDate, ...rest } = data;

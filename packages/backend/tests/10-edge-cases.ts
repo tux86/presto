@@ -7,7 +7,7 @@ describe("Edge Cases", () => {
     // Bob creates a mission
     const bobMissionRes = await api("POST", "/missions", {
       token: state.token2,
-      body: { name: "Bob Mission", clientId: state.bobClientId },
+      body: { name: "Bob Mission", clientId: state.bobClientId, companyId: state.bobCompanyId },
     });
     const bobMissionBody = await bobMissionRes.json();
     state.bobMissionId = bobMissionBody.id;
@@ -141,6 +141,15 @@ describe("Foreign Key Constraints", () => {
 
   test("DELETE /clients/:id with missions → 409 with structured body", async () => {
     const res = await api("DELETE", `/clients/${state.clientId}`);
+    expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.code).toBe("FK_CONSTRAINT");
+    expect(body.entity).toBe("missions");
+    expect(body.dependentCount).toBeGreaterThan(0);
+  });
+
+  test("DELETE /companies/:id with missions → 409 with structured body", async () => {
+    const res = await api("DELETE", `/companies/${state.companyId}`);
     expect(res.status).toBe(409);
     const body = await res.json();
     expect(body.code).toBe("FK_CONSTRAINT");

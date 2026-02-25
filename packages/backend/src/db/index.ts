@@ -6,11 +6,12 @@ import pg from "pg";
 import { config } from "../lib/config.js";
 import * as schema from "./schema/pg.schema.js";
 
-export const { users, userSettings, clients, missions, activityReports, reportEntries } = schema;
+export const { users, userSettings, companies, clients, missions, activityReports, reportEntries } = schema;
 
 // Relations (defined once using the schema tables)
 export const usersRelations = relations(users, ({ one, many }) => ({
   settings: one(userSettings),
+  companies: many(companies),
   clients: many(clients),
   missions: many(missions),
   activityReports: many(activityReports),
@@ -20,6 +21,11 @@ export const userSettingsRelations = relations(userSettings, ({ one }) => ({
   user: one(users, { fields: [userSettings.userId], references: [users.id] }),
 }));
 
+export const companiesRelations = relations(companies, ({ one, many }) => ({
+  user: one(users, { fields: [companies.userId], references: [users.id] }),
+  missions: many(missions),
+}));
+
 export const clientsRelations = relations(clients, ({ one, many }) => ({
   user: one(users, { fields: [clients.userId], references: [users.id] }),
   missions: many(missions),
@@ -27,6 +33,7 @@ export const clientsRelations = relations(clients, ({ one, many }) => ({
 
 export const missionsRelations = relations(missions, ({ one, many }) => ({
   client: one(clients, { fields: [missions.clientId], references: [clients.id] }),
+  company: one(companies, { fields: [missions.companyId], references: [companies.id] }),
   user: one(users, { fields: [missions.userId], references: [users.id] }),
   activityReports: many(activityReports),
 }));
@@ -46,6 +53,7 @@ const fullSchema = {
   ...schema,
   usersRelations,
   userSettingsRelations,
+  companiesRelations,
   clientsRelations,
   missionsRelations,
   activityReportsRelations,

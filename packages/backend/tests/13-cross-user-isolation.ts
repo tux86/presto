@@ -2,6 +2,26 @@ import { describe, expect, test } from "bun:test";
 import { api, state } from "./helpers";
 
 describe("Cross-User List Isolation", () => {
+  test("GET /companies → Alice does not see Bob's companies", async () => {
+    const res = await api("GET", "/companies");
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const ids = body.map((c: { id: string }) => c.id);
+    expect(ids).not.toContain(state.bobCompanyId);
+  });
+
+  test("Cross-user: Alice cannot delete Bob's company → 404", async () => {
+    const res = await api("DELETE", `/companies/${state.bobCompanyId}`);
+    expect(res.status).toBe(404);
+  });
+
+  test("Cross-user: Alice cannot update Bob's company → 404", async () => {
+    const res = await api("PATCH", `/companies/${state.bobCompanyId}`, {
+      body: { name: "Hijacked" },
+    });
+    expect(res.status).toBe(404);
+  });
+
   test("GET /clients → Alice does not see Bob's clients", async () => {
     const res = await api("GET", "/clients");
     expect(res.status).toBe(200);
@@ -28,6 +48,13 @@ describe("Cross-User List Isolation", () => {
 
   test("Cross-user: Alice cannot delete Bob's client → 404", async () => {
     const res = await api("DELETE", `/clients/${state.bobClientId}`);
+    expect(res.status).toBe(404);
+  });
+
+  test("Cross-user: Alice cannot create mission with Bob's company → 404", async () => {
+    const res = await api("POST", "/missions", {
+      body: { name: "Sneaky Mission", clientId: state.clientId, companyId: state.bobCompanyId },
+    });
     expect(res.status).toBe(404);
   });
 
@@ -102,7 +129,7 @@ describe("Client & Mission Validation Edge Cases", () => {
 
   test("POST /missions with zero daily rate → 201", async () => {
     const res = await api("POST", "/missions", {
-      body: { name: "Zero Rate", clientId: state.clientId, dailyRate: 0 },
+      body: { name: "Zero Rate", clientId: state.clientId, companyId: state.companyId, dailyRate: 0 },
     });
     expect(res.status).toBe(201);
     const body = await res.json();
@@ -113,7 +140,7 @@ describe("Client & Mission Validation Edge Cases", () => {
 
   test("POST /missions with float daily rate → 201", async () => {
     const res = await api("POST", "/missions", {
-      body: { name: "Float Rate", clientId: state.clientId, dailyRate: 650.5 },
+      body: { name: "Float Rate", clientId: state.clientId, companyId: state.companyId, dailyRate: 650.5 },
     });
     expect(res.status).toBe(201);
     const body = await res.json();

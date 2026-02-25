@@ -184,6 +184,8 @@ export const pt: Record<TranslationKey, string> = {
   "common.auto": "Auto",
   "common.default": "Padr\u00e3o",
   "common.navigation": "Navega\u00e7\u00e3o",
+  "common.actions": "A\u00e7\u00f5es",
+  "common.preferences": "Prefer\u00eancias",
   "common.logout": "Sair",
 
   // Theme

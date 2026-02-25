@@ -184,6 +184,8 @@ export const fr: Record<TranslationKey, string> = {
   "common.auto": "Auto",
   "common.default": "Par d\u00e9faut",
   "common.navigation": "Navigation",
+  "common.actions": "Actions",
+  "common.preferences": "Pr\u00e9f\u00e9rences",
   "common.logout": "D\u00e9connexion",
 
   // Theme

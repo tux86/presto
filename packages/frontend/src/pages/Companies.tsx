@@ -1,6 +1,7 @@
 import type { Company } from "@presto/shared";
 import { Building2, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
@@ -14,6 +15,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { useT } from "@/i18n";
 
 export function Companies() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Company | null>(null);
   const [name, setName] = useState("");
@@ -36,6 +38,18 @@ export function Companies() {
     setIsDefault(false);
     setShowModal(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setEditing(null);
+      setName("");
+      setAddress("");
+      setBusinessId("");
+      setIsDefault(false);
+      setShowModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const openEdit = (company: Company) => {
     setEditing(company);

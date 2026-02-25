@@ -8,7 +8,8 @@ import {
   HOLIDAY_COUNTRIES,
 } from "@presto/shared";
 import { Trash2, Users as UsersIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
@@ -27,6 +28,7 @@ function CountryFlag({ code }: { code: string }) {
 }
 
 export function Clients() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
   const [name, setName] = useState("");
@@ -57,6 +59,23 @@ export function Clients() {
     setHolidayCountry("");
     setShowModal(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setEditing(null);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setAddress("");
+      setBusinessId("");
+      setColor("");
+      setCurrency("");
+      setHolidayCountry("");
+      setShowModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   const openEdit = (client: Client) => {
     setEditing(client);
     setName(client.name);

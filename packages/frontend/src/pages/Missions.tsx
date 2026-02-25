@@ -1,6 +1,7 @@
 import type { Mission } from "@presto/shared";
 import { Briefcase, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
@@ -19,6 +20,7 @@ import { useT } from "@/i18n";
 import { formatCurrency } from "@/lib/utils";
 
 export function Missions() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Mission | null>(null);
   const [name, setName] = useState("");
@@ -82,6 +84,18 @@ export function Missions() {
     setDailyRate("");
     setShowModal(true);
   };
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setEditing(null);
+      setName("");
+      setClientId("");
+      setCompanyId(defaultCompanyId);
+      setDailyRate("");
+      setShowModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, defaultCompanyId]);
 
   const openEdit = (mission: Mission) => {
     setEditing(mission);

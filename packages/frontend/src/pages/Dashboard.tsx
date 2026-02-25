@@ -1,6 +1,7 @@
 import { getMonthName } from "@presto/shared";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
@@ -14,7 +15,15 @@ import { useT } from "@/i18n";
 import { cn, getClientColor } from "@/lib/utils";
 
 export function Dashboard() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setShowCreateModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [newReportMonth, setNewReportMonth] = useState(new Date().getMonth() + 1);
   const [newReportYear, setNewReportYear] = useState(new Date().getFullYear());

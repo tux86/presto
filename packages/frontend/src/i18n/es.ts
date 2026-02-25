@@ -183,6 +183,8 @@ export const es: Record<TranslationKey, string> = {
   "common.auto": "Auto",
   "common.default": "Por defecto",
   "common.navigation": "Navegaci\u00f3n",
+  "common.actions": "Acciones",
+  "common.preferences": "Preferencias",
   "common.logout": "Cerrar sesi\u00f3n",
 
   // Theme

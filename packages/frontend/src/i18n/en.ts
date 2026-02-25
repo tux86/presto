@@ -176,6 +176,8 @@ export const en = {
   "common.auto": "Auto",
   "common.default": "Default",
   "common.navigation": "Navigation",
+  "common.actions": "Actions",
+  "common.preferences": "Preferences",
   "common.logout": "Sign out",
 
   // Theme

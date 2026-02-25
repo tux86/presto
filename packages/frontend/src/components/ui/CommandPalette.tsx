@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useT } from "@/i18n";
+import { usePreferencesStore } from "@/stores/preferences.store";
 
 const commandPaletteListeners = new Set<() => void>();
 
@@ -26,20 +27,16 @@ export function CommandPalette() {
   const navigate = useNavigate();
   const { t } = useT();
 
+  const setTheme = usePreferencesStore((s) => s.setTheme);
+
   const commands: CommandItem[] = useMemo(
     () => [
+      // Navigation
       {
         id: "dashboard",
         label: t("dashboard.title"),
         section: t("common.navigation"),
         icon: "~",
-        action: () => navigate("/"),
-      },
-      {
-        id: "activities",
-        label: t("nav.activities"),
-        section: t("common.navigation"),
-        icon: "#",
         action: () => navigate("/"),
       },
       {
@@ -57,14 +54,72 @@ export function CommandPalette() {
         action: () => navigate("/missions"),
       },
       {
+        id: "companies",
+        label: t("nav.companies"),
+        section: t("common.navigation"),
+        icon: "&",
+        action: () => navigate("/companies"),
+      },
+      {
         id: "reporting",
         label: t("nav.reporting"),
         section: t("common.navigation"),
         icon: "%",
         action: () => navigate("/reporting"),
       },
+      // Actions
+      {
+        id: "new-activity",
+        label: t("dashboard.newActivity"),
+        section: t("common.actions"),
+        icon: "+",
+        action: () => navigate("/?create=true"),
+      },
+      {
+        id: "new-client",
+        label: t("clients.newClient"),
+        section: t("common.actions"),
+        icon: "+",
+        action: () => navigate("/clients?create=true"),
+      },
+      {
+        id: "new-mission",
+        label: t("missions.newMission"),
+        section: t("common.actions"),
+        icon: "+",
+        action: () => navigate("/missions?create=true"),
+      },
+      {
+        id: "new-company",
+        label: t("companies.newCompany"),
+        section: t("common.actions"),
+        icon: "+",
+        action: () => navigate("/companies?create=true"),
+      },
+      // Preferences
+      {
+        id: "theme-light",
+        label: t("theme.light"),
+        section: t("common.preferences"),
+        icon: "*",
+        action: () => setTheme("light"),
+      },
+      {
+        id: "theme-dark",
+        label: t("theme.dark"),
+        section: t("common.preferences"),
+        icon: "/",
+        action: () => setTheme("dark"),
+      },
+      {
+        id: "theme-auto",
+        label: t("theme.auto"),
+        section: t("common.preferences"),
+        icon: "=",
+        action: () => setTheme("auto"),
+      },
     ],
-    [navigate, t],
+    [navigate, t, setTheme],
   );
 
   const filtered = useMemo(() => {

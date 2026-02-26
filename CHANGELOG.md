@@ -1,3 +1,9 @@
+## [1.21.1](https://github.com/tux86/presto/compare/v1.21.0...v1.21.1) (2026-02-26)
+
+### Bug Fixes
+
+* comprehensive codebase audit — bug fixes, DRY improvements, and component extraction ([1035937](https://github.com/tux86/presto/commit/1035937389d35a17dddc0498f57a217f693b4674))
+
 ## [1.21.0](https://github.com/tux86/presto/compare/v1.20.0...v1.21.0) (2026-02-26)
 
 ### Features

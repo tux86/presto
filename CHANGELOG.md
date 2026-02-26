@@ -1,3 +1,9 @@
+## [1.21.2](https://github.com/tux86/presto/compare/v1.21.1...v1.21.2) (2026-02-26)
+
+### Bug Fixes
+
+* security hardening — timing attacks, PII logging, password policy, headers, and account lockout ([6789ef9](https://github.com/tux86/presto/commit/6789ef910d8ea7d366b93984d61648f4e648f27a))
+
 ## [1.21.1](https://github.com/tux86/presto/compare/v1.21.0...v1.21.1) (2026-02-26)
 
 ### Bug Fixes

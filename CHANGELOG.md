@@ -1,3 +1,9 @@
+## [1.18.0](https://github.com/tux86/presto/compare/v1.17.0...v1.18.0) (2026-02-26)
+
+### Features
+
+* add change password feature with tabbed profile modal ([12e9af3](https://github.com/tux86/presto/commit/12e9af3e24098b6d29fb24ce1f30e8af8f41210b))
+
 ## [1.17.0](https://github.com/tux86/presto/compare/v1.16.0...v1.17.0) (2026-02-25)
 
 ### Features

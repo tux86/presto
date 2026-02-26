@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Briefcase, Building2, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
+import { BarChart3, Briefcase, Building2, Download, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
 import { type FormEvent, useCallback, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { ApiError } from "@/api/client";
+import { ApiError, api } from "@/api/client";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { PreferencesControls, PreferencesMenu } from "@/components/layout/PreferencesMenu";
 import { Button } from "@/components/ui/Button";
@@ -23,7 +23,7 @@ export function Sidebar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({ firstName: "", lastName: "" });
   const [profileSaving, setProfileSaving] = useState(false);
-  const [profileTab, setProfileTab] = useState<"profile" | "password">("profile");
+  const [profileTab, setProfileTab] = useState<"profile" | "password" | "account">("profile");
   const [pwForm, setPwForm] = useState({ current: "", new: "", confirm: "" });
   const [pwSaving, setPwSaving] = useState(false);
   const [pwError, setPwError] = useState("");
@@ -32,6 +32,8 @@ export function Sidebar() {
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState("");
 
   const resetPasswordState = useCallback(() => {
     setProfileTab("profile");
@@ -111,6 +113,28 @@ export function Sidebar() {
     }
   };
 
+  const handleExportData = async () => {
+    setExportLoading(true);
+    setExportError("");
+    try {
+      const res = await api.getBlob("/auth/export-data");
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const filenameMatch = disposition.match(/filename="(.+?)"/);
+      const filename = filenameMatch?.[1] ?? "presto-export.json";
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setExportError(t("auth.genericError"));
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   const navItems: { to: string; label: string; icon: LucideIcon }[] = [
     { to: "/", label: t("nav.activities"), icon: Home },
     { to: "/clients", label: t("nav.clients"), icon: Users },
@@ -123,9 +147,9 @@ export function Sidebar() {
 
   const profileModal = (
     <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title={t("profile.title")} size="md">
-      {!authDisabled && (
-        <div className="mb-4 flex gap-1 rounded-lg bg-inset p-1">
-          {(["profile", "password"] as const).map((tab) => (
+      <div className="mb-4 flex gap-1 rounded-lg bg-inset p-1">
+        {(authDisabled ? (["profile", "account"] as const) : (["profile", "password", "account"] as const)).map(
+          (tab) => (
             <button
               key={tab}
               type="button"
@@ -133,86 +157,55 @@ export function Sidebar() {
                 setProfileTab(tab);
                 setPwError("");
                 setPwSuccess(false);
+                setDeleteExpanded(false);
+                setDeletePassword("");
+                setDeleteError("");
               }}
               className={cn(
                 "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer",
                 profileTab === tab ? "bg-panel text-heading shadow-sm" : "text-muted hover:text-body",
               )}
             >
-              {t(tab === "profile" ? "profile.tabProfile" : "profile.tabPassword")}
+              {t(
+                tab === "profile"
+                  ? "profile.tabProfile"
+                  : tab === "password"
+                    ? "profile.tabPassword"
+                    : "profile.tabAccount",
+              )}
             </button>
-          ))}
-        </div>
-      )}
+          ),
+        )}
+      </div>
 
       {profileTab === "profile" && (
-        <>
-          <form onSubmit={handleProfileSave} className="space-y-4">
-            <Input label={t("auth.email")} value={user?.email ?? ""} disabled />
-            <Input
-              label={t("profile.firstName")}
-              value={profileForm.firstName}
-              onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
-              required
-            />
-            <Input
-              label={t("profile.lastName")}
-              value={profileForm.lastName}
-              onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
-              required
-            />
-            <div className="flex items-center pt-2">
-              {!authDisabled && !deleteExpanded && (
-                <Button variant="danger" size="sm" type="button" onClick={() => setDeleteExpanded(true)}>
-                  {t("profile.deleteAccount")}
-                </Button>
-              )}
-              <div className="ml-auto flex gap-3">
-                <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
-                  {t("common.cancel")}
-                </Button>
-                <Button
-                  type="submit"
-                  loading={profileSaving}
-                  disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
-                >
-                  {t("common.save")}
-                </Button>
-              </div>
-            </div>
-          </form>
-
-          {!authDisabled && deleteExpanded && (
-            <form onSubmit={handleDeleteAccount} className="mt-4 space-y-3 border-t border-edge pt-4">
-              <p className="text-sm text-muted">{t("profile.deleteAccountWarning")}</p>
-              <Input
-                label={t("profile.deleteAccountConfirm")}
-                type="password"
-                value={deletePassword}
-                onChange={(e) => setDeletePassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-              {deleteError && <p className="text-sm text-red-500">{deleteError}</p>}
-              <div className="flex justify-end gap-3">
-                <Button
-                  variant="ghost"
-                  type="button"
-                  onClick={() => {
-                    setDeleteExpanded(false);
-                    setDeletePassword("");
-                    setDeleteError("");
-                  }}
-                >
-                  {t("common.cancel")}
-                </Button>
-                <Button type="submit" variant="danger" loading={deleteLoading} disabled={!deletePassword}>
-                  {t("profile.deleteAccountButton")}
-                </Button>
-              </div>
-            </form>
-          )}
-        </>
+        <form onSubmit={handleProfileSave} className="space-y-4">
+          <Input label={t("auth.email")} value={user?.email ?? ""} disabled />
+          <Input
+            label={t("profile.firstName")}
+            value={profileForm.firstName}
+            onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
+            required
+          />
+          <Input
+            label={t("profile.lastName")}
+            value={profileForm.lastName}
+            onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
+            required
+          />
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="submit"
+              loading={profileSaving}
+              disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
+            >
+              {t("common.save")}
+            </Button>
+          </div>
+        </form>
       )}
 
       {profileTab === "password" && (
@@ -255,6 +248,56 @@ export function Sidebar() {
             </Button>
           </div>
         </form>
+      )}
+
+      {profileTab === "account" && (
+        <div className="space-y-4">
+          <Button variant="ghost" size="sm" type="button" onClick={handleExportData} loading={exportLoading}>
+            <Download className="h-4 w-4" />
+            {t("profile.downloadData")}
+          </Button>
+          {exportError && <p className="text-sm text-red-500">{exportError}</p>}
+
+          {!authDisabled && (
+            <>
+              <div className="border-t border-edge" />
+              {!deleteExpanded ? (
+                <Button variant="danger" size="sm" type="button" onClick={() => setDeleteExpanded(true)}>
+                  {t("profile.deleteAccount")}
+                </Button>
+              ) : (
+                <form onSubmit={handleDeleteAccount} className="space-y-3">
+                  <p className="text-sm text-muted">{t("profile.deleteAccountWarning")}</p>
+                  <Input
+                    label={t("profile.deleteAccountConfirm")}
+                    type="password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                  />
+                  {deleteError && <p className="text-sm text-red-500">{deleteError}</p>}
+                  <div className="flex justify-end gap-3">
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() => {
+                        setDeleteExpanded(false);
+                        setDeletePassword("");
+                        setDeleteError("");
+                      }}
+                    >
+                      {t("common.cancel")}
+                    </Button>
+                    <Button type="submit" variant="danger" loading={deleteLoading} disabled={!deletePassword}>
+                      {t("profile.deleteAccountButton")}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </>
+          )}
+        </div>
       )}
     </Modal>
   );

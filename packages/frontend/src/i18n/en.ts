@@ -161,6 +161,7 @@ export const en = {
   "profile.lastName": "Last Name",
   "profile.tabProfile": "Profile",
   "profile.tabPassword": "Password",
+  "profile.tabAccount": "Account",
   "profile.changePassword": "Change Password",
   "profile.currentPassword": "Current password",
   "profile.newPassword": "New password",
@@ -174,6 +175,7 @@ export const en = {
     "This will permanently delete your account and all your data. This action cannot be undone.",
   "profile.deleteAccountConfirm": "Enter your password to confirm",
   "profile.deleteAccountButton": "Delete my account permanently",
+  "profile.downloadData": "Download my data",
 
   // Common
   "common.save": "Save",

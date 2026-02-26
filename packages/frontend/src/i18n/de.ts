@@ -169,6 +169,7 @@ export const de: Record<TranslationKey, string> = {
   "profile.lastName": "Nachname",
   "profile.tabProfile": "Profil",
   "profile.tabPassword": "Passwort",
+  "profile.tabAccount": "Konto",
   "profile.changePassword": "Passwort ändern",
   "profile.currentPassword": "Aktuelles Passwort",
   "profile.newPassword": "Neues Passwort",
@@ -182,6 +183,7 @@ export const de: Record<TranslationKey, string> = {
     "Dies löscht Ihr Konto und alle Ihre Daten dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
   "profile.deleteAccountConfirm": "Geben Sie Ihr Passwort zur Bestätigung ein",
   "profile.deleteAccountButton": "Mein Konto endgültig löschen",
+  "profile.downloadData": "Meine Daten herunterladen",
 
   // Common
   "common.save": "Speichern",

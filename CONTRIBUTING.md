@@ -186,7 +186,7 @@ All routes are prefixed with `/api`.
 |---|---|
 | `GET /api/health` | Health check — returns `{ status: "ok" }` |
 | `GET /api/config` | Public configuration (app name, theme, locale, auth status) |
-| `/api/auth/*` | Login, register, and current user (`/me`) |
+| `/api/auth/*` | Login, register, current user, profile, password change, account deletion, data export |
 | `/api/companies/*` | CRUD for companies (user's legal entities) |
 | `/api/clients/*` | CRUD for clients |
 | `/api/missions/*` | CRUD for missions (linked to clients) |

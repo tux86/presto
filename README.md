@@ -71,11 +71,13 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 - **Multi-currency support** — per-client billing currency with automatic conversion to your base currency via [open.er-api.com](https://www.exchangerate-api.com/)
 - Configurable base currency per user (any ISO 4217 code)
 
-### Authentication & Security
+### Authentication & Account Management
 - **Optional auth** — disable for single-user setups (`AUTH_DISABLED=true`)
 - JWT-based authentication with bcrypt password hashing
 - User registration with password policies (min 8 chars, uppercase, lowercase, digit)
 - Registration can be disabled after initial setup (`REGISTRATION_ENABLED=false`)
+- **Change password** and **delete account** from the profile modal
+- **Export all data** — download your entire account as a JSON file
 - Per-IP rate limiting on auth endpoints
 - Secure headers (CSP, HSTS) and CORS configuration
 - Multi-user support with full data isolation (ownership checks on all resources)
@@ -160,7 +162,7 @@ To skip login entirely, set `AUTH_DISABLED=true`. A default user is auto-created
 | **Backend** | Hono 4, Drizzle ORM, @react-pdf/renderer |
 | **Database** | PostgreSQL 17 |
 | **Language** | TypeScript 5.7 (strict mode) |
-| **Testing** | Bun test runner, 206 API E2E tests |
+| **Testing** | Bun test runner, 222 API E2E tests |
 | **CI/CD** | GitHub Actions, semantic-release, Docker Hub |
 
 ---
@@ -181,7 +183,7 @@ bun run dev                    # http://localhost:5173
 
 ### Testing
 
-206 API E2E tests using Bun's test runner with Hono's `app.request()` — no running server needed.
+222 API E2E tests using Bun's test runner with Hono's `app.request()` — no running server needed.
 
 ```bash
 bun run test

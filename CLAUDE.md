@@ -9,7 +9,7 @@ Activity report time-tracking app. Monorepo with 3 packages.
 - **Backend:** Hono 4, Drizzle ORM, @react-pdf/renderer
 - **Database:** PostgreSQL (Drizzle ORM)
 - **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
-- **Testing:** Bun test runner, Hono `app.request()` (109 API E2E tests)
+- **Testing:** Bun test runner, Hono `app.request()` (222 API E2E tests)
 - **Language:** TypeScript 5.7, strict mode
 
 ## Project Structure
@@ -78,7 +78,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 ## Testing
 
 - **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
-- **Location:** `packages/backend/tests/` — 15 test suites, 213 tests
+- **Location:** `packages/backend/tests/` — 15 test suites, 222 tests
 - **Database:** PostgreSQL test database (`presto_test`) — fresh migrations each run
 - **Setup:** preload script (`setup.ts`) runs Drizzle migrations before tests
 - **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)

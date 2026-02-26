@@ -161,6 +161,9 @@ export const es: Record<TranslationKey, string> = {
   "auth.genericError": "Ha ocurrido un error",
   "auth.tagline": "Registre su tiempo.\nSimplifique sus informes.",
   "auth.brandingDescription": "Seguimiento del tiempo e informes de actividad, simplificados.",
+  "auth.demoTitle": "Modo demo",
+  "auth.demoDescription":
+    "Una cuenta demo con datos de ejemplo est\u00e1 disponible. Use las credenciales a continuaci\u00f3n para explorar la aplicaci\u00f3n.",
 
   // Profile
   "profile.title": "Editar perfil",

@@ -31,6 +31,7 @@ export const config = {
     name: env("APP_NAME", "Presto"),
     port: envInt("PORT", 3001),
     logLevel: env("LOG_LEVEL", "info"),
+    demoData: envBool("DEMO_DATA", false),
   },
   defaults: {
     theme: env("DEFAULT_THEME", "light") as "light" | "dark" | "auto",
@@ -84,6 +85,7 @@ export function getPublicConfig() {
     appName: config.app.name,
     authDisabled: config.auth.disabled,
     registrationEnabled: config.auth.registrationEnabled,
+    demoMode: config.app.demoData,
     defaults: config.defaults,
   };
 }

@@ -1,4 +1,6 @@
 import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
+import { count } from "drizzle-orm";
+import { config } from "../lib/config.js";
 import { logger } from "../lib/logger.js";
 import { createId } from "./id.js";
 import {
@@ -85,14 +87,14 @@ function monthRange(
   return result;
 }
 
-async function main() {
+export async function seedDemoData() {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
 
   // --- User ---
   const userId = createId();
-  const password = await Bun.password.hash("demo1234", { algorithm: "bcrypt", cost: 10 });
+  const password = await Bun.password.hash("demo1234", { algorithm: "bcrypt", cost: config.auth.bcryptCost });
 
   await db.insert(users).values({
     id: userId,
@@ -121,7 +123,7 @@ async function main() {
 
   await db.insert(userSettings).values({
     userId,
-    theme: "dark",
+    theme: "light",
     locale: "fr",
     baseCurrency: "EUR",
   });
@@ -377,10 +379,24 @@ async function main() {
   logger.success(
     `Seed completed: demo@presto.dev / demo1234 — 2 companies, ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
   );
-  await closeDb();
 }
 
-await main().catch((err) => {
-  logger.error("Seed failed:", err);
-  process.exit(1);
-});
+export async function seedDemoDataIfEmpty() {
+  const [{ total }] = await db.select({ total: count() }).from(users);
+  if (total > 0) {
+    logger.info("Database already has users — skipping demo seed");
+    return;
+  }
+  logger.info("Empty database detected — seeding demo data...");
+  await seedDemoData();
+}
+
+// Standalone script: `bun run db:seed`
+if (import.meta.main) {
+  await seedDemoData()
+    .then(() => closeDb())
+    .catch((err) => {
+      logger.error("Seed failed:", err);
+      process.exit(1);
+    });
+}

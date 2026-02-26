@@ -162,6 +162,9 @@ export const pt: Record<TranslationKey, string> = {
   "auth.genericError": "Ocorreu um erro",
   "auth.tagline": "Registe o seu tempo.\nSimplifique os seus relat\u00f3rios.",
   "auth.brandingDescription": "Registo de tempo e relat\u00f3rios de atividade, simplificados.",
+  "auth.demoTitle": "Modo demo",
+  "auth.demoDescription":
+    "Uma conta demo com dados de exemplo est\u00e1 dispon\u00edvel. Use as credenciais abaixo para explorar a aplica\u00e7\u00e3o.",
 
   // Profile
   "profile.title": "Editar perfil",

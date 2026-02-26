@@ -162,6 +162,9 @@ export const fr: Record<TranslationKey, string> = {
   "auth.genericError": "Une erreur est survenue",
   "auth.tagline": "Suivez votre temps.\nSimplifiez vos comptes-rendus.",
   "auth.brandingDescription": "Suivi du temps et comptes-rendus d'activit\u00e9, simplifi\u00e9s.",
+  "auth.demoTitle": "Mode d\u00e9mo",
+  "auth.demoDescription":
+    "Un compte d\u00e9mo avec des donn\u00e9es d'exemple est disponible. Utilisez les identifiants ci-dessous pour explorer l'application.",
 
   // Profile
   "profile.title": "Modifier le profil",

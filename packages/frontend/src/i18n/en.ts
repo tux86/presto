@@ -154,6 +154,8 @@ export const en = {
   "auth.genericError": "An error occurred",
   "auth.tagline": "Track your time.\nSimplify your reports.",
   "auth.brandingDescription": "Time tracking and activity reports, simplified.",
+  "auth.demoTitle": "Demo mode",
+  "auth.demoDescription": "A demo account with sample data is available. Use the credentials below to explore the app.",
 
   // Profile
   "profile.title": "Edit Profile",

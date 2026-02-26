@@ -18,6 +18,7 @@ import { useConfigStore } from "@/stores/config.store";
 export function Sidebar() {
   const { user, logout, updateProfile, changePassword, deleteAccount } = useAuthStore();
   const authDisabled = useConfigStore((s) => s.config?.authDisabled ?? false);
+  const demoMode = useConfigStore((s) => s.config?.demoMode ?? false);
   const { t } = useT();
   const isMobile = useIsMobile();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -148,34 +149,37 @@ export function Sidebar() {
   const profileModal = (
     <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title={t("profile.title")} size="md">
       <div className="mb-4 flex gap-1 rounded-lg bg-inset p-1">
-        {(authDisabled ? (["profile", "account"] as const) : (["profile", "password", "account"] as const)).map(
-          (tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => {
-                setProfileTab(tab);
-                setPwError("");
-                setPwSuccess(false);
-                setDeleteExpanded(false);
-                setDeletePassword("");
-                setDeleteError("");
-              }}
-              className={cn(
-                "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer",
-                profileTab === tab ? "bg-panel text-heading shadow-sm" : "text-muted hover:text-body",
-              )}
-            >
-              {t(
-                tab === "profile"
-                  ? "profile.tabProfile"
-                  : tab === "password"
-                    ? "profile.tabPassword"
-                    : "profile.tabAccount",
-              )}
-            </button>
-          ),
-        )}
+        {(demoMode
+          ? (["profile"] as const)
+          : authDisabled
+            ? (["profile", "account"] as const)
+            : (["profile", "password", "account"] as const)
+        ).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => {
+              setProfileTab(tab);
+              setPwError("");
+              setPwSuccess(false);
+              setDeleteExpanded(false);
+              setDeletePassword("");
+              setDeleteError("");
+            }}
+            className={cn(
+              "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer",
+              profileTab === tab ? "bg-panel text-heading shadow-sm" : "text-muted hover:text-body",
+            )}
+          >
+            {t(
+              tab === "profile"
+                ? "profile.tabProfile"
+                : tab === "password"
+                  ? "profile.tabPassword"
+                  : "profile.tabAccount",
+            )}
+          </button>
+        ))}
       </div>
 
       {profileTab === "profile" && (
@@ -186,25 +190,29 @@ export function Sidebar() {
             value={profileForm.firstName}
             onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
             required
+            disabled={demoMode}
           />
           <Input
             label={t("profile.lastName")}
             value={profileForm.lastName}
             onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
             required
+            disabled={demoMode}
           />
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              loading={profileSaving}
-              disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
-            >
-              {t("common.save")}
-            </Button>
-          </div>
+          {!demoMode && (
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
+                {t("common.cancel")}
+              </Button>
+              <Button
+                type="submit"
+                loading={profileSaving}
+                disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
+              >
+                {t("common.save")}
+              </Button>
+            </div>
+          )}
         </form>
       )}
 
@@ -252,13 +260,17 @@ export function Sidebar() {
 
       {profileTab === "account" && (
         <div className="space-y-4">
-          <Button variant="ghost" size="sm" type="button" onClick={handleExportData} loading={exportLoading}>
-            <Download className="h-4 w-4" />
-            {t("profile.downloadData")}
-          </Button>
-          {exportError && <p className="text-sm text-red-500">{exportError}</p>}
+          {!demoMode && (
+            <>
+              <Button variant="ghost" size="sm" type="button" onClick={handleExportData} loading={exportLoading}>
+                <Download className="h-4 w-4" />
+                {t("profile.downloadData")}
+              </Button>
+              {exportError && <p className="text-sm text-red-500">{exportError}</p>}
+            </>
+          )}
 
-          {!authDisabled && (
+          {!authDisabled && !demoMode && (
             <>
               <div className="border-t border-edge" />
               {!deleteExpanded ? (

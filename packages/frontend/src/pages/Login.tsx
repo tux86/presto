@@ -21,6 +21,7 @@ export function Login() {
   const { t } = useT();
   const isMobile = useIsMobile();
   const registrationEnabled = useConfigStore((s) => s.config?.registrationEnabled ?? true);
+  const demoMode = useConfigStore((s) => s.config?.demoMode ?? false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +95,21 @@ export function Login() {
           </h2>
           <p className="text-sm text-muted mb-6">{isRegister ? t("auth.registerSubtitle") : t("auth.loginSubtitle")}</p>
 
+          {demoMode && !isRegister && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 mb-6 dark:border-amber-500/30 dark:bg-amber-500/10">
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-200">{t("auth.demoTitle")}</p>
+              <p className="mt-0.5 text-xs text-amber-800/80 dark:text-amber-300/70">{t("auth.demoDescription")}</p>
+              <div className="mt-2 flex items-center gap-3 text-xs">
+                <span className="rounded bg-amber-100 px-2 py-0.5 font-mono text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
+                  demo@presto.dev
+                </span>
+                <span className="rounded bg-amber-100 px-2 py-0.5 font-mono text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
+                  demo1234
+                </span>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             {isRegister && (
               <div className="grid grid-cols-2 gap-3">
@@ -137,7 +153,7 @@ export function Login() {
             </Button>
           </form>
 
-          {registrationEnabled && (
+          {registrationEnabled && !demoMode && (
             <p className="mt-4 text-center text-sm text-muted">
               {isRegister ? t("auth.hasAccount") : t("auth.noAccount")}{" "}
               <button

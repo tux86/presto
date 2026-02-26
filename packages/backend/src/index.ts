@@ -9,6 +9,10 @@ const level = LogLevels[config.app.logLevel as keyof typeof LogLevels];
 if (level !== undefined) logger.level = level;
 
 await runMigrations();
+if (config.app.demoData) {
+  const { seedDemoDataIfEmpty } = await import("./db/seed.js");
+  await seedDemoDataIfEmpty();
+}
 await initExchangeRates();
 
 const { default: app } = await import("./app.js");

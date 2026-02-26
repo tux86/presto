@@ -56,7 +56,7 @@ const authLimiter =
     : noopMiddleware;
 
 auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c) => {
-  if (!config.auth.registrationEnabled) {
+  if (!config.auth.registrationEnabled || config.app.demoData) {
     throw new HTTPException(403, { message: "Registration is disabled" });
   }
 
@@ -129,7 +129,14 @@ auth.get("/me", authMiddleware, async (c) => {
   return c.json(user);
 });
 
-auth.patch("/profile", authMiddleware, zValidator("json", updateProfileSchema), async (c) => {
+const demoGuard = createMiddleware(async (_c, next) => {
+  if (config.app.demoData) {
+    throw new HTTPException(403, { message: "This action is disabled in demo mode" });
+  }
+  await next();
+});
+
+auth.patch("/profile", authMiddleware, demoGuard, zValidator("json", updateProfileSchema), async (c) => {
   const userId = c.get("userId");
   const body = c.req.valid("json");
 
@@ -138,7 +145,7 @@ auth.patch("/profile", authMiddleware, zValidator("json", updateProfileSchema), 
   return c.json(safeUser);
 });
 
-auth.patch("/password", authMiddleware, zValidator("json", changePasswordSchema), async (c) => {
+auth.patch("/password", authMiddleware, demoGuard, zValidator("json", changePasswordSchema), async (c) => {
   const userId = c.get("userId");
   const { currentPassword, newPassword } = c.req.valid("json");
 
@@ -161,26 +168,33 @@ auth.patch("/password", authMiddleware, zValidator("json", changePasswordSchema)
   return c.body(null, 204);
 });
 
-auth.post("/delete-account", authMiddleware, authLimiter, zValidator("json", deleteAccountSchema), async (c) => {
-  const userId = c.get("userId");
-  const { password } = c.req.valid("json");
+auth.post(
+  "/delete-account",
+  authMiddleware,
+  demoGuard,
+  authLimiter,
+  zValidator("json", deleteAccountSchema),
+  async (c) => {
+    const userId = c.get("userId");
+    const { password } = c.req.valid("json");
 
-  const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
-  if (!user) {
-    throw new HTTPException(404, { message: "User not found" });
-  }
+    const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
+    if (!user) {
+      throw new HTTPException(404, { message: "User not found" });
+    }
 
-  const valid = await Bun.password.verify(password, user.password);
-  if (!valid) {
-    throw new HTTPException(401, { message: "Invalid password" });
-  }
+    const valid = await Bun.password.verify(password, user.password);
+    if (!valid) {
+      throw new HTTPException(401, { message: "Invalid password" });
+    }
 
-  await db.delete(users).where(eq(users.id, userId));
-  logger.info("Account deleted:", user.email);
-  return c.body(null, 204);
-});
+    await db.delete(users).where(eq(users.id, userId));
+    logger.info("Account deleted:", user.email);
+    return c.body(null, 204);
+  },
+);
 
-auth.get("/export-data", authMiddleware, async (c) => {
+auth.get("/export-data", authMiddleware, demoGuard, async (c) => {
   const userId = c.get("userId");
 
   const user = await db.query.users.findFirst({

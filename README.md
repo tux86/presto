@@ -144,6 +144,7 @@ To skip login entirely, set `AUTH_DISABLED=true`. A default user is auto-created
 | `REGISTRATION_ENABLED` | `true` | Allow new user registration |
 | `PORT` | `8080` | HTTP server port |
 | `APP_NAME` | `Presto` | Application name shown in the UI |
+| `DEMO_DATA` | `false` | Seed demo data on first startup (when DB is empty). Shows credentials on login page and hides registration. |
 | `CORS_ORIGINS` | — | Comma-separated allowed origins |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per window |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |

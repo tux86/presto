@@ -165,6 +165,7 @@ Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must
 | `DEFAULT_THEME` | `light` | Default theme for new users (`light`, `dark`, `auto`) |
 | `DEFAULT_LOCALE` | `en` | Default locale for new users (`en`, `fr`, `de`, `es`, `pt`) |
 | `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency for new users (ISO 4217) |
+| `DEMO_DATA` | `false` | Seed demo data on first startup (when DB is empty). Shows credentials on login page and hides registration. |
 | `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |
 | `DEFAULT_USER_PASSWORD` | _(empty)_ | Default admin password |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per IP per window (`0` to disable) |

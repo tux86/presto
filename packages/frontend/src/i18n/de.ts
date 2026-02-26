@@ -162,6 +162,9 @@ export const de: Record<TranslationKey, string> = {
   "auth.genericError": "Ein Fehler ist aufgetreten",
   "auth.tagline": "Erfassen Sie Ihre Zeit.\nVereinfachen Sie Ihre Berichte.",
   "auth.brandingDescription": "Zeiterfassung und T\u00e4tigkeitsberichte, vereinfacht.",
+  "auth.demoTitle": "Demomodus",
+  "auth.demoDescription":
+    "Ein Demokonto mit Beispieldaten ist verf\u00fcgbar. Verwenden Sie die folgenden Zugangsdaten, um die App zu erkunden.",
 
   // Profile
   "profile.title": "Profil bearbeiten",

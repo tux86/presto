@@ -3,11 +3,10 @@
 
   <h1>Presto</h1>
 
-  <p><strong>Self-hosted time tracking for freelancers and consultants.</strong><br/>
-  Generate monthly activity reports, track clients and missions, and export everything as PDF.</p>
+  <p><strong>Self-hosted activity report generator for freelancers and consultants.</strong><br/>
+  Track clients, missions, and billable days. Export professional PDF reports in one click.</p>
 
   [![CI](https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/tux86/presto/actions/workflows/ci.yml)
-  [![Tests](https://img.shields.io/badge/tests-101%20passed-brightgreen?style=flat-square)](https://github.com/tux86/presto/actions/workflows/ci.yml)
   [![Release](https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=blue)](https://github.com/tux86/presto/releases)
   [![Docker Hub](https://img.shields.io/docker/v/axforge/presto?sort=semver&style=flat-square&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/axforge/presto)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -24,84 +23,136 @@
   <img src="docs/images/demo-dashboard.png" alt="Presto — Activity Reports Dashboard" width="100%" />
 </p>
 <p align="center">
+  <img src="docs/images/demo-activity-report.png" alt="Presto — Activity Report Editor" width="100%" />
+</p>
+<p align="center">
   <img src="docs/images/demo-reporting.png" alt="Presto — Reporting & Revenue Charts" width="100%" />
 </p>
 
+---
+
 ## Why Presto?
 
-Most time-tracking tools are built for teams. Presto is built for **independent freelancers** who need one thing: a clean monthly activity report they can send to their client.
+Most time-tracking tools are built for teams. Presto is built for **independent freelancers and consultants** who need one thing: a clean monthly activity report they can send to their client.
 
 - **Single Docker image** — no separate frontend/backend/worker containers to manage
 - **PDF-ready activity reports** — calendar view with billable days, ready to print or email
 - **Works without auth** — disable login for single-user setups, no account needed
 - **Your data, your server** — fully self-hosted, no cloud dependency, MIT licensed
 
+---
+
 ## Features
 
 ### Activity Reports
 - Calendar-based day tracking with **half-day precision** (0, 0.5, or 1 per day)
 - **Auto-fill workdays** — one click fills all weekdays, skipping weekends and public holidays
-- **Country-specific holidays** — per-client holiday calendar (all countries supported via `date-holidays`)
+- **Country-specific holidays** — per-client holiday calendar (all countries supported via [`date-holidays`](https://github.com/commenthol/date-holidays))
 - **Draft / Completed workflow** — lock reports to prevent accidental edits
 - Report notes for delivery comments or internal tracking
 - Clear all entries or revert completed reports back to draft
 
-### Client & Mission Management
-- Organize work by **client** and **mission** (project)
+### Company, Client & Mission Management
+- Create **companies** (your own legal entities) with name, address, and business ID
+- Set a default company used automatically on new reports
+- Organize work by **client** and **mission** (project/contract)
 - Per-client **currency** (all ISO 4217 currencies) and **holiday country**
-- Optional fields: email, phone, address, business ID (SIRET, VAT, etc.)
+- Optional client fields: email, phone, address, business ID (SIRET, VAT, etc.)
 - Daily rate tracking per mission with date ranges
 - Active/inactive mission status
 
 ### PDF Export
-- Professional, print-ready reports generated server-side via `@react-pdf/renderer`
+- Professional, print-ready reports generated server-side with [`@react-pdf/renderer`](https://react-pdf.org/)
 - Multilingual output — export in **English**, **French**, **German**, **Spanish**, or **Portuguese**
-- Includes client info, mission name, calendar grid, totals, and notes
+- Includes company info, client details, mission name, calendar grid, totals, and notes
 - Filename auto-generated from client, mission, and period
 
-### Revenue Dashboards
+### Revenue Dashboards & Multi-Currency
 - Yearly overview with **total days**, **total revenue**, and **average daily rate**
 - Monthly breakdown charts (days worked + revenue per month)
 - Per-client revenue distribution
-- Built with Recharts
+- **Multi-currency support** — per-client billing currency with automatic conversion to your base currency via [open.er-api.com](https://www.exchangerate-api.com/)
+- Configurable base currency per user (any ISO 4217 code)
 
 ### Authentication & Security
-- **Optional** — disable for single-user setups (`AUTH_DISABLED=true`)
-- JWT-based auth with configurable expiry
+- **Optional auth** — disable for single-user setups (`AUTH_DISABLED=true`)
+- JWT-based authentication with bcrypt password hashing
 - User registration with password policies (min 8 chars, uppercase, lowercase, digit)
 - Registration can be disabled after initial setup (`REGISTRATION_ENABLED=false`)
 - Per-IP rate limiting on auth endpoints
 - Secure headers (CSP, HSTS) and CORS configuration
-- Multi-user with full data isolation (ownership checks on all resources)
+- Multi-user support with full data isolation (ownership checks on all resources)
 
 ### User Experience
-- **Dark mode** — system-aware with manual override
-- **Multilingual** — English, French, German, Spanish, Portuguese (locale toggle)
-- **Responsive** — mobile (375px+), tablet (768px+), and desktop (1024px+)
-- Searchable select components for clients and missions
-- Dashboard filters by client and mission
+- **Dark / Light / Auto theme** — system-aware with manual override
+- **5 languages** — English, French, German, Spanish, Portuguese
+- **Command palette** — quick navigation and actions via keyboard shortcut
+- **Responsive design** — mobile (375px+), tablet (768px+), desktop (1024px+)
+- Searchable select components for clients, missions, and currencies
+- User preferences synced to server (theme, locale, base currency)
 
 ### Deployment
 - **Single Docker image** — backend + frontend served together
 - Auto-runs database migrations on startup
 - Built-in health check endpoint (`/api/health`)
-- **PostgreSQL** — powered by Drizzle ORM with auto-migrations at startup
+- **PostgreSQL** — powered by Drizzle ORM
+- Configurable via environment variables (see below)
+
+---
 
 ## Quick Start
+
+### Docker Compose (recommended)
 
 ```bash
 curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.production.yml
 
-# Required: set secrets before starting
+# Required: generate secrets before starting
 export POSTGRES_PASSWORD="$(openssl rand -base64 32)"
 export JWT_SECRET="$(openssl rand -base64 48)"
 
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Open [http://localhost:8080](http://localhost:8080).
+Open [http://localhost:8080](http://localhost:8080) and create your account.
 
-See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environment variables, `docker run`, and configuration options.
+### Docker Run
+
+```bash
+docker run -d \
+  --name presto \
+  -p 8080:8080 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/presto" \
+  -e JWT_SECRET="$(openssl rand -base64 48)" \
+  axforge/presto:latest
+```
+
+> Requires an existing PostgreSQL database. Migrations run automatically on startup.
+
+### Single-User Mode
+
+To skip login entirely, set `AUTH_DISABLED=true`. A default user is auto-created and all requests are associated with it.
+
+---
+
+## Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `DATABASE_URL` | **(required)** | PostgreSQL connection string |
+| `JWT_SECRET` | **(required)** | Secret for signing JWT tokens (min 32 chars) |
+| `AUTH_DISABLED` | `false` | Disable authentication for single-user mode |
+| `REGISTRATION_ENABLED` | `true` | Allow new user registration |
+| `PORT` | `8080` | HTTP server port |
+| `APP_NAME` | `Presto` | Application name shown in the UI |
+| `CORS_ORIGINS` | — | Comma-separated allowed origins |
+| `RATE_LIMIT_MAX` | `20` | Max auth requests per window |
+| `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
+| `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
+| `DEFAULT_LOCALE` | `en` | Default language (`en`, `fr`, `de`, `es`, `pt`) |
+| `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency (ISO 4217) |
+
+---
 
 ## Tech Stack
 
@@ -110,74 +161,16 @@ See the [Docker Hub page](https://hub.docker.com/r/axforge/presto) for environme
 | **Runtime** | [Bun](https://bun.sh/) |
 | **Frontend** | React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts |
 | **Backend** | Hono 4, Drizzle ORM, @react-pdf/renderer |
-| **Database** | PostgreSQL |
+| **Database** | PostgreSQL 17 |
 | **Language** | TypeScript 5.7 (strict mode) |
-| **Testing** | Bun test runner, Hono `app.request()` (101 E2E tests) |
-| **CI/CD** | GitHub Actions (lint, typecheck, build, test), semantic-release |
+| **Testing** | Bun test runner, 206 API E2E tests |
+| **CI/CD** | GitHub Actions, semantic-release, Docker Hub |
 
-## Architecture
-
-```mermaid
-flowchart LR
-    subgraph client["Browser"]
-        SPA["React 19 SPA<br/>React Router 7 · Tailwind CSS 4<br/>Zustand · TanStack Query · Recharts"]
-    end
-
-    subgraph docker["Docker · Bun · :8080"]
-        Static["Static Files"]
-
-        subgraph hono["Hono 4 API Server"]
-            direction LR
-            MW["Middleware<br/>CORS · CSP<br/>Rate Limit"] --> Auth["Auth<br/>JWT · BCrypt"] --> Routes["Routes<br/>clients · missions<br/>reports · reporting"]
-        end
-
-        subgraph services["Services"]
-            direction LR
-            PDF["PDF Export"]
-            Shared["@presto/shared<br/>Types · Dates · Holidays"]
-        end
-    end
-
-    DB[("PostgreSQL")]
-
-    Static -.->|"HTML · JS · CSS"| SPA
-    SPA -->|"REST /api"| MW
-    Routes --> services
-    Routes -->|"Drizzle ORM"| DB
-    Shared -.-> Routes
-
-    classDef frontend fill:#6366f1,stroke:#4f46e5,color:#fff
-    classDef backend fill:#0ea5e9,stroke:#0284c7,color:#fff
-    classDef service fill:#8b5cf6,stroke:#7c3aed,color:#fff
-    classDef database fill:#10b981,stroke:#059669,color:#fff
-    classDef static fill:#64748b,stroke:#475569,color:#fff
-
-    class SPA frontend
-    class MW,Auth,Routes backend
-    class PDF,Shared service
-    class DB database
-    class Static static
-```
-
-Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The Hono backend serves both the REST API and the pre-built React frontend as static files. All data stays on your server.
-
-## Comparison
-
-| Feature | Presto | Kimai | Traggo | Wakapi |
-|---|:---:|:---:|:---:|:---:|
-| Single Docker image | ✅ | ❌ | ✅ | ✅ |
-| Monthly activity reports | ✅ | ❌ | ❌ | ❌ |
-| PDF export | ✅ | ✅ | ❌ | ❌ |
-| Optional auth (single-user) | ✅ | ❌ | ❌ | ❌ |
-| i18n (5 languages) | ✅ | ✅ | ❌ | ❌ |
-| Client/mission tracking | ✅ | ✅ | ❌ | ❌ |
-| Revenue dashboards | ✅ | ✅ | ❌ | ❌ |
-| Holiday-aware calendars | ✅ | ✅ | ❌ | ❌ |
-| Half-day precision | ✅ | ❌ | ❌ | ❌ |
+---
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, project structure, environment variables, and guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup, project structure, and guidelines.
 
 ```bash
 git clone https://github.com/tux86/presto.git
@@ -191,11 +184,13 @@ bun run dev                    # http://localhost:5173
 
 ### Testing
 
-101 API E2E tests using Bun's test runner with Hono's `app.request()` — no running server needed.
+206 API E2E tests using Bun's test runner with Hono's `app.request()` — no running server needed.
 
 ```bash
 bun run test
 ```
+
+---
 
 ## License
 

@@ -63,6 +63,53 @@ bun run test
 
 Tests automatically run Drizzle migrations and truncate all tables before each run, so your dev database is never affected.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph client["Browser"]
+        SPA["React 19 SPA<br/>React Router 7 · Tailwind CSS 4<br/>Zustand · TanStack Query · Recharts"]
+    end
+
+    subgraph docker["Docker · Bun · :8080"]
+        Static["Static Files"]
+
+        subgraph hono["Hono 4 API Server"]
+            direction LR
+            MW["Middleware<br/>CORS · CSP<br/>Rate Limit"] --> Auth["Auth<br/>JWT · BCrypt"] --> Routes["Routes<br/>companies · clients<br/>missions · reports<br/>reporting · settings"]
+        end
+
+        subgraph services["Services"]
+            direction LR
+            PDF["PDF Export"]
+            FX["Exchange Rates"]
+            Shared["@presto/shared<br/>Types · Dates · Holidays"]
+        end
+    end
+
+    DB[("PostgreSQL")]
+
+    Static -.->|"HTML · JS · CSS"| SPA
+    SPA -->|"REST /api"| MW
+    Routes --> services
+    Routes -->|"Drizzle ORM"| DB
+    Shared -.-> Routes
+
+    classDef frontend fill:#6366f1,stroke:#4f46e5,color:#fff
+    classDef backend fill:#0ea5e9,stroke:#0284c7,color:#fff
+    classDef service fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef database fill:#10b981,stroke:#059669,color:#fff
+    classDef static fill:#64748b,stroke:#475569,color:#fff
+
+    class SPA frontend
+    class MW,Auth,Routes backend
+    class PDF,FX,Shared service
+    class DB database
+    class Static static
+```
+
+Presto ships as a **single Docker image** running on [Bun](https://bun.sh/). The Hono backend serves both the REST API and the pre-built React frontend as static files. All data stays on your server.
+
 ## Project Structure
 
 Presto is a Bun monorepo with three packages.
@@ -74,18 +121,18 @@ packages/
 │   │   ├── app.ts            # Hono app, route registration
 │   │   ├── index.ts          # Server entry point
 │   │   ├── lib/config.ts     # Environment variable configuration
-│   │   └── routes/           # auth, clients, missions, activity-reports, reporting
+│   │   └── routes/           # auth, companies, clients, missions, activity-reports, reporting, settings
 │   │   └── db/               # Drizzle ORM schema, migrations, helpers
 │   │       ├── schema/       # pg.schema.ts
 │   │       └── migrations/   # pg/ migration SQL
 ├── frontend/                 # @presto/frontend — React SPA
 │   └── src/
 │       ├── App.tsx           # Route definitions
-│       ├── pages/            # Dashboard, ActivityReportEditor, Clients, Missions, Reporting, Login
+│       ├── pages/            # Dashboard, ActivityReportEditor, Clients, Companies, Missions, Reporting, Login
 │       ├── components/       # Shared UI components
 │       ├── stores/           # Zustand state stores
 │       ├── hooks/            # Custom hooks (useIsMobile, etc.)
-│       └── i18n/             # French and English translation files
+│       └── i18n/             # Translation files (en, fr, de, es, pt)
 └── shared/                   # @presto/shared — Shared types and utilities
     └── src/
         └── index.ts
@@ -140,6 +187,7 @@ All routes are prefixed with `/api`.
 | `GET /api/health` | Health check — returns `{ status: "ok" }` |
 | `GET /api/config` | Public configuration (app name, theme, locale, auth status) |
 | `/api/auth/*` | Login, register, and current user (`/me`) |
+| `/api/companies/*` | CRUD for companies (user's legal entities) |
 | `/api/clients/*` | CRUD for clients |
 | `/api/missions/*` | CRUD for missions (linked to clients) |
 | `/api/activity-reports/*` | CRUD for monthly activity reports, PDF export |

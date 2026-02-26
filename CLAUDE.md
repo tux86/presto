@@ -105,7 +105,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 - **DB table:** `UserSettings` (PK = `userId`, FK cascade to users) — auto-created on first `GET /api/settings`
 - **Defaults for new users:** `DEFAULT_THEME`, `DEFAULT_LOCALE`, `DEFAULT_BASE_CURRENCY` env vars
 - **Currency:** per-client field (billing) + per-user baseCurrency (reporting aggregation)
-- **Multi-currency reporting:** revenues converted to baseCurrency via frankfurter.app (ECB rates, 1h cache)
+- **Multi-currency reporting:** revenues converted to baseCurrency via open.er-api.com (1h cache with retry)
 - **Holiday country:** per-client field (all countries via `date-holidays` library)
 - **Config store** (`config.store.ts`) remains read-only server config (appName, authDisabled, registrationEnabled)
 - **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls + currency selector
@@ -115,6 +115,11 @@ docker compose up -d       # Start PostgreSQL (dev)
 - **`.env`** (root) — dev config: database, JWT, app settings. All `dev`, `db:*` scripts load from here.
 - **`packages/backend/.env.test`** — test config: PostgreSQL test database. Used only by `bun run test`.
 - **`.env.example`** (root) — template with all available env vars.
+
+## Workflow Rules
+
+- **No code review:** Do not review or critique existing code unless explicitly asked. Focus on the task at hand.
+- **Update E2E tests:** When modifying backend routes or API behavior, always update the corresponding E2E tests in `packages/backend/tests/` to cover the changes.
 
 ## Key Conventions
 

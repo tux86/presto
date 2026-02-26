@@ -179,7 +179,7 @@ export const es: Record<TranslationKey, string> = {
   "profile.passwordMismatch": "Las contraseñas no coinciden",
   "profile.passwordChanged": "Contraseña cambiada con éxito",
   "profile.wrongPassword": "La contraseña actual es incorrecta",
-  "profile.passwordRequirements": "Mín 8 caracteres, mayúscula, minúscula, dígito",
+  "profile.passwordRequirements": "Mín 8 caracteres, mayúscula, minúscula, dígito, carácter especial",
   "profile.deleteAccount": "Eliminar cuenta",
   "profile.deleteAccountWarning":
     "Esto eliminará permanentemente su cuenta y todos sus datos. Esta acción no se puede deshacer.",

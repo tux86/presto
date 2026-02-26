@@ -34,7 +34,9 @@ export function slugify(s: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
-    .toLowerCase();
+    .toLowerCase()
+    .slice(0, 100)
+    .replace(/-$/, "");
 }
 
 /** Parse a query param as integer, with optional min/max validation. */

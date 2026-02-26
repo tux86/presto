@@ -7,7 +7,7 @@ describe("Auth", () => {
       token: "",
       body: {
         email: "alice@example.com",
-        password: "SecurePass1",
+        password: "SecurePass1!",
         firstName: "Alice",
         lastName: "Dupont",
       },
@@ -30,12 +30,12 @@ describe("Auth", () => {
     state.companyId = body[0].id;
   });
 
-  test("POST /auth/register duplicate email → 409", async () => {
+  test("POST /auth/register duplicate email → 400", async () => {
     const res = await api("POST", "/auth/register", {
       token: "",
-      body: { email: "alice@example.com", password: "SecurePass1", firstName: "Bob", lastName: "Martin" },
+      body: { email: "alice@example.com", password: "SecurePass1!", firstName: "Bob", lastName: "Martin" },
     });
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(400);
   });
 
   test("POST /auth/register weak password (no uppercase) → 400", async () => {
@@ -50,6 +50,14 @@ describe("Auth", () => {
     const res = await api("POST", "/auth/register", {
       token: "",
       body: { email: "weak2@example.com", password: "NoDigitHere", firstName: "Weak", lastName: "User" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test("POST /auth/register weak password (no special char) → 400", async () => {
+    const res = await api("POST", "/auth/register", {
+      token: "",
+      body: { email: "nospec@example.com", password: "SecurePass1", firstName: "No", lastName: "Special" },
     });
     expect(res.status).toBe(400);
   });
@@ -73,7 +81,7 @@ describe("Auth", () => {
   test("POST /auth/register invalid email → 400", async () => {
     const res = await api("POST", "/auth/register", {
       token: "",
-      body: { email: "not-an-email", password: "SecurePass1", firstName: "Bad", lastName: "Email" },
+      body: { email: "not-an-email", password: "SecurePass1!", firstName: "Bad", lastName: "Email" },
     });
     expect(res.status).toBe(400);
   });
@@ -81,7 +89,7 @@ describe("Auth", () => {
   test("POST /auth/login valid credentials → 200 with token", async () => {
     const res = await api("POST", "/auth/login", {
       token: "",
-      body: { email: "alice@example.com", password: "SecurePass1" },
+      body: { email: "alice@example.com", password: "SecurePass1!" },
     });
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -102,7 +110,7 @@ describe("Auth", () => {
   test("POST /auth/login non-existent email → 401", async () => {
     const res = await api("POST", "/auth/login", {
       token: "",
-      body: { email: "nobody@example.com", password: "SecurePass1" },
+      body: { email: "nobody@example.com", password: "SecurePass1!" },
     });
     expect(res.status).toBe(401);
     const body = await res.json();

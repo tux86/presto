@@ -171,7 +171,7 @@ export const en = {
   "profile.passwordMismatch": "Passwords do not match",
   "profile.passwordChanged": "Password changed successfully",
   "profile.wrongPassword": "Current password is incorrect",
-  "profile.passwordRequirements": "Min 8 chars, uppercase, lowercase, digit",
+  "profile.passwordRequirements": "Min 8 chars, uppercase, lowercase, digit, special character",
   "profile.deleteAccount": "Delete account",
   "profile.deleteAccountWarning":
     "This will permanently delete your account and all your data. This action cannot be undone.",

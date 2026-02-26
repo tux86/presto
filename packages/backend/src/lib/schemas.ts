@@ -15,7 +15,8 @@ const passwordSchema = z
   .max(128)
   .regex(/[a-z]/, "Must contain a lowercase letter")
   .regex(/[A-Z]/, "Must contain an uppercase letter")
-  .regex(/[0-9]/, "Must contain a digit");
+  .regex(/[0-9]/, "Must contain a digit")
+  .regex(/[^a-zA-Z0-9]/, "Must contain a special character");
 
 export const registerSchema = z.object({
   email: z.string().email().max(254),

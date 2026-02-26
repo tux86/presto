@@ -94,7 +94,7 @@ export async function seedDemoData() {
 
   // --- User ---
   const userId = createId();
-  const password = await Bun.password.hash("demo1234", { algorithm: "bcrypt", cost: config.auth.bcryptCost });
+  const password = await Bun.password.hash("Demo1234!", { algorithm: "bcrypt", cost: config.auth.bcryptCost });
 
   await db.insert(users).values({
     id: userId,
@@ -377,7 +377,7 @@ export async function seedDemoData() {
   await db.insert(reportEntries).values(entryRows);
 
   logger.success(
-    `Seed completed: demo@presto.dev / demo1234 — 2 companies, ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
+    `Seed completed: demo@presto.dev — 2 companies, ${clientDefs.length} clients, ${reportRows.length} reports, ${entryRows.length} entries (${currentYear - 3}–${currentYear})`,
   );
 }
 

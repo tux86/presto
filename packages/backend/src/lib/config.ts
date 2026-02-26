@@ -32,6 +32,7 @@ export const config = {
     port: envInt("PORT", 3001),
     logLevel: env("LOG_LEVEL", "info"),
     demoData: envBool("DEMO_DATA", false),
+    trustProxy: envBool("TRUST_PROXY", false),
   },
   defaults: {
     theme: env("DEFAULT_THEME", "light") as "light" | "dark" | "auto",

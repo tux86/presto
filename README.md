@@ -74,7 +74,7 @@ Most time-tracking tools are built for teams. Presto is built for **independent 
 ### Authentication & Account Management
 - **Optional auth** — disable for single-user setups (`AUTH_DISABLED=true`)
 - JWT-based authentication with bcrypt password hashing
-- User registration with password policies (min 8 chars, uppercase, lowercase, digit)
+- User registration with password policies (min 8 chars, uppercase, lowercase, digit, special character)
 - Registration can be disabled after initial setup (`REGISTRATION_ENABLED=false`)
 - **Change password** and **delete account** from the profile modal
 - **Export all data** — download your entire account as a JSON file

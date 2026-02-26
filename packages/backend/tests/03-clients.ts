@@ -91,7 +91,7 @@ describe("Clients", () => {
     // Register second user
     const regRes = await api("POST", "/auth/register", {
       token: "",
-      body: { email: "bob@example.com", password: "SecurePass1", firstName: "Bob", lastName: "Martin" },
+      body: { email: "bob@example.com", password: "SecurePass1!", firstName: "Bob", lastName: "Martin" },
     });
     const regBody = await regRes.json();
     state.token2 = regBody.token;

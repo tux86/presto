@@ -23,6 +23,9 @@ import { authMiddleware } from "../middleware/auth.js";
 
 const auth = new Hono<AppEnv>();
 
+// Pre-computed dummy hash for constant-time login rejection (mitigates timing attacks)
+const DUMMY_HASH = await Bun.password.hash("dummy-timing-pad", { algorithm: "bcrypt", cost: config.auth.bcryptCost });
+
 auth.use("*", async (c, next) => {
   if (
     config.auth.disabled &&
@@ -49,12 +52,50 @@ const authLimiter =
             const info = getConnInfo(c);
             return info.remote.address ?? "127.0.0.1";
           } catch {
-            // Behind a reverse proxy: trust x-real-ip (set by proxy) over x-forwarded-for (spoofable)
+            if (!config.app.trustProxy) return "127.0.0.1";
+            // Behind a trusted reverse proxy: prefer x-real-ip over x-forwarded-for
             return c.req.header("x-real-ip") ?? c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "127.0.0.1";
           }
         },
       })
     : noopMiddleware;
+
+// Per-account login lockout: 10 failures in 15 min → 15 min cooldown
+const LOGIN_LOCKOUT_MAX = 10;
+const LOGIN_LOCKOUT_WINDOW_MS = 15 * 60 * 1000;
+const loginAttempts = new Map<string, { count: number; firstAttempt: number }>();
+
+function checkAccountLockout(email: string): boolean {
+  const entry = loginAttempts.get(email);
+  if (!entry) return false;
+  if (Date.now() - entry.firstAttempt > LOGIN_LOCKOUT_WINDOW_MS) {
+    loginAttempts.delete(email);
+    return false;
+  }
+  return entry.count >= LOGIN_LOCKOUT_MAX;
+}
+
+function recordFailedLogin(email: string): void {
+  const now = Date.now();
+
+  // Evict stale entries to prevent unbounded memory growth
+  if (loginAttempts.size > 10_000) {
+    for (const [key, val] of loginAttempts) {
+      if (now - val.firstAttempt > LOGIN_LOCKOUT_WINDOW_MS) loginAttempts.delete(key);
+    }
+  }
+
+  const entry = loginAttempts.get(email);
+  if (!entry || now - entry.firstAttempt > LOGIN_LOCKOUT_WINDOW_MS) {
+    loginAttempts.set(email, { count: 1, firstAttempt: now });
+  } else {
+    entry.count++;
+  }
+}
+
+function resetLoginAttempts(email: string): void {
+  loginAttempts.delete(email);
+}
 
 auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c) => {
   if (!config.auth.registrationEnabled || config.app.demoData) {
@@ -66,8 +107,10 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (existing) {
-    logger.debug("Registration rejected: email already exists", email);
-    throw new HTTPException(409, { message: "Email already registered" });
+    // Hash anyway to prevent timing-based email enumeration
+    await Bun.password.hash(password, { algorithm: "bcrypt", cost: config.auth.bcryptCost });
+    logger.debug("Registration rejected: email conflict");
+    throw new HTTPException(400, { message: "Unable to complete registration" });
   }
 
   const hashedPassword = await Bun.password.hash(password, {
@@ -82,7 +125,7 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
   });
 
   const token = await createToken(user.id, user.email);
-  logger.info("User registered:", email);
+  logger.info("User registered:", user.id);
   return c.json({ token, user: sanitizeUser(user) }, 201);
 });
 
@@ -90,20 +133,31 @@ auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
   const { password } = c.req.valid("json");
   const email = c.req.valid("json").email.toLowerCase();
 
+  // Check account lockout (still do bcrypt work to prevent timing leak)
+  if (checkAccountLockout(email)) {
+    await Bun.password.verify(password, DUMMY_HASH);
+    logger.debug("Login failed: account temporarily locked");
+    throw new HTTPException(401, { message: "Invalid credentials" });
+  }
+
   const user = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (!user) {
-    logger.debug("Login failed: unknown email", email);
+    await Bun.password.verify(password, DUMMY_HASH); // constant-time path
+    recordFailedLogin(email);
+    logger.debug("Login failed: invalid credentials");
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
   const valid = await Bun.password.verify(password, user.password);
   if (!valid) {
-    logger.debug("Login failed: wrong password for", email);
+    recordFailedLogin(email);
+    logger.debug("Login failed: invalid credentials");
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
+  resetLoginAttempts(email);
   const token = await createToken(user.id, user.email);
-  logger.debug("Login successful:", email);
+  logger.debug("Login successful:", user.id);
   return c.json({ token, user: sanitizeUser(user) });
 });
 
@@ -187,7 +241,7 @@ auth.post(
     }
 
     await db.delete(users).where(eq(users.id, userId));
-    logger.info("Account deleted:", user.email);
+    logger.info("Account deleted:", userId);
     return c.body(null, 204);
   },
 );

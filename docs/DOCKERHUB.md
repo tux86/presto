@@ -26,7 +26,7 @@ To explore with a pre-populated dashboard, add `DEMO_DATA=true`:
 export DEMO_DATA=true
 ```
 
-Demo credentials are shown on the login page (`demo@presto.dev` / `demo1234`).
+Demo credentials are shown on the login page (`demo@presto.dev` / `Demo1234!`).
 
 ### Single-user mode
 

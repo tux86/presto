@@ -131,6 +131,6 @@ docker compose up -d       # Start PostgreSQL (dev)
 - Auth is optional, disabled via `AUTH_DISABLED=true` env var
 - Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
 - `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup
-- Registration password requires min 8 chars + uppercase + lowercase + digit
+- Registration password requires min 8 chars + uppercase + lowercase + digit + special character
 - Drizzle schema in `src/db/schema/pg.schema.ts` — PostgreSQL only
 - Completed reports are read-only — no entry editing, auto-fill, or clear. Only PDF export is allowed.

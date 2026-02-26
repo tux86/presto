@@ -104,7 +104,7 @@ export function Login() {
                   demo@presto.dev
                 </span>
                 <span className="rounded bg-amber-100 px-2 py-0.5 font-mono text-amber-900 dark:bg-amber-500/20 dark:text-amber-200">
-                  demo1234
+                  Demo1234!
                 </span>
               </div>
             </div>

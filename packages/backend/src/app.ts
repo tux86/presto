@@ -34,6 +34,13 @@ app.use(
       connectSrc: ["'self'"],
     },
     strictTransportSecurity: "max-age=31536000; includeSubDomains",
+    referrerPolicy: "strict-origin-when-cross-origin",
+    permissionsPolicy: {
+      camera: [],
+      microphone: [],
+      geolocation: [],
+    },
+    xFrameOptions: "DENY",
   }),
 );
 app.use("*", bodyLimit({ maxSize: 1024 * 1024 })); // 1 MB

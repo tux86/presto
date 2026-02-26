@@ -1,3 +1,15 @@
+## [1.21.0](https://github.com/tux86/presto/compare/v1.20.0...v1.21.0) (2026-02-26)
+
+### Features
+
+* add DEMO_DATA env var for one-time demo seeding ([83b272d](https://github.com/tux86/presto/commit/83b272d3c16eea60e50187c327103ff9767acda1))
+
+### Bug Fixes
+
+* change default theme from dark to light ([220d192](https://github.com/tux86/presto/commit/220d1921e34bbcb1b281c924cd27d978a975059f))
+* show password requirements on registration validation error ([d55affb](https://github.com/tux86/presto/commit/d55affb446747162aeeb373feb465775f827951e))
+* update settings tests to expect light as default theme ([0eb49d3](https://github.com/tux86/presto/commit/0eb49d3d9771dd6a7b46bdfca09093df1fab796b))
+
 ## [1.20.0](https://github.com/tux86/presto/compare/v1.19.0...v1.20.0) (2026-02-26)
 
 ### Features

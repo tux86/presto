@@ -28,7 +28,8 @@ auth.use("*", async (c, next) => {
     c.req.path !== "/api/auth/me" &&
     c.req.path !== "/api/auth/profile" &&
     c.req.path !== "/api/auth/password" &&
-    c.req.path !== "/api/auth/delete-account"
+    c.req.path !== "/api/auth/delete-account" &&
+    c.req.path !== "/api/auth/export-data"
   ) {
     throw new HTTPException(404, { message: "Auth is disabled" });
   }
@@ -177,6 +178,59 @@ auth.post("/delete-account", authMiddleware, authLimiter, zValidator("json", del
   await db.delete(users).where(eq(users.id, userId));
   logger.info("Account deleted:", user.email);
   return c.body(null, 204);
+});
+
+auth.get("/export-data", authMiddleware, async (c) => {
+  const userId = c.get("userId");
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { password: false },
+    with: {
+      settings: true,
+      companies: true,
+      clients: true,
+      missions: {
+        with: {
+          activityReports: {
+            with: { entries: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new HTTPException(404, { message: "User not found" });
+  }
+
+  const { settings, companies: userCompanies, clients: userClients, missions: userMissions, ...profile } = user;
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const data = {
+    exportedAt: new Date().toISOString(),
+    user: profile,
+    userSettings: settings,
+    companies: userCompanies,
+    clients: userClients,
+    missions: userMissions.map(({ activityReports, ...mission }) => ({
+      ...mission,
+      activityReports: activityReports.map(({ entries, ...report }) => ({
+        ...report,
+        reportEntries: entries,
+      })),
+    })),
+  };
+
+  const json = JSON.stringify(data, null, 2);
+
+  return new Response(json, {
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Disposition": `attachment; filename="presto-export-${today}.json"`,
+    },
+  });
 });
 
 export default auth;

@@ -204,6 +204,33 @@ describe("Auth — Delete Account", () => {
   });
 });
 
+describe("Auth — Export Data", () => {
+  test("GET /auth/export-data without auth → 401", async () => {
+    const res = await api("GET", "/auth/export-data", { token: "" });
+    expect(res.status).toBe(401);
+  });
+
+  test("GET /auth/export-data with auth → 200 + JSON with all expected keys", async () => {
+    const res = await api("GET", "/auth/export-data");
+    expect(res.status).toBe(200);
+
+    const disposition = res.headers.get("Content-Disposition") ?? "";
+    expect(disposition).toMatch(/^attachment; filename="presto-export-\d{4}-\d{2}-\d{2}\.json"$/);
+    expect(res.headers.get("Content-Type")).toContain("application/json");
+
+    const body = await res.json();
+    expect(body.exportedAt).toBeTruthy();
+    expect(body.user).toBeDefined();
+    expect(body.user.id).toBeTruthy();
+    expect(body.user.email).toBeTruthy();
+    expect(body.user.password).toBeUndefined();
+    expect(body.userSettings).toBeDefined();
+    expect(body.companies).toBeInstanceOf(Array);
+    expect(body.clients).toBeInstanceOf(Array);
+    expect(body.missions).toBeInstanceOf(Array);
+  });
+});
+
 describe("Auth — Extended Validation", () => {
   test("POST /auth/register password without lowercase → 400", async () => {
     const res = await api("POST", "/auth/register", {

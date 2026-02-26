@@ -34,7 +34,9 @@ export function Login() {
         await login(email, password);
       }
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
+      if (err instanceof ApiError && err.status === 400) {
+        setError(t("profile.passwordRequirements"));
+      } else if (err instanceof ApiError && err.status === 401) {
         setError(t("auth.invalidCredentials"));
       } else if (err instanceof ApiError && err.status === 409) {
         setError(t("auth.emailAlreadyRegistered"));

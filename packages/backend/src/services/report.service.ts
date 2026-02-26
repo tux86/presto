@@ -4,7 +4,7 @@ import { insertReturning, REPORT_WITH } from "../db/helpers.js";
 import { activityReports, db, reportEntries } from "../db/index.js";
 import { config } from "../lib/config.js";
 
-const defaultLocale: Locale = config.defaults.locale ?? "en";
+const defaultLocale: Locale = config.defaults.locale;
 
 /** Minimal shape required by enrichReport: a report with entries containing date + isHoliday. */
 interface ReportLike {
@@ -113,13 +113,14 @@ export async function clearReport(reportId: string) {
   });
 }
 
-export async function recalculateTotalDays(reportId: string) {
-  const result = await db
+export async function recalculateTotalDays(reportId: string, trx?: typeof db) {
+  const d = trx ?? db;
+  const result = await d
     .select({ total: sum(reportEntries.value) })
     .from(reportEntries)
     .where(eq(reportEntries.reportId, reportId));
   const total = Number(result[0]?.total) || 0;
-  await db
+  await d
     .update(activityReports)
     .set({ totalDays: total, updatedAt: new Date() })
     .where(eq(activityReports.id, reportId));

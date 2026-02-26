@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { findOwned, insertReturning, updateReturning } from "../db/helpers.js";
+import { checkDependents, findOwned, insertReturning, updateReturning } from "../db/helpers.js";
 import { clients, db, missions } from "../db/index.js";
 import { createClientSchema, updateClientSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
@@ -55,17 +55,14 @@ clientsRouter.delete("/:id", async (c) => {
 
   await findOwned("client", id, userId);
 
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(missions)
-    .where(eq(missions.clientId, id));
-  if (count > 0) {
+  const depCount = await checkDependents(missions, missions.clientId, id);
+  if (depCount > 0) {
     return c.json(
       {
         error: "Cannot delete: has dependent records",
         code: "FK_CONSTRAINT",
         entity: "missions",
-        dependentCount: count,
+        dependentCount: depCount,
       },
       409,
     );

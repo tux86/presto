@@ -92,7 +92,7 @@ export const en = {
   "activity.daysWorked": "Days worked",
   "activity.amount": "Amount (excl. tax)",
   "activity.backToDraft": "Revert to draft",
-  "activity.validate": "Validate",
+
   "activity.notFound": "Activity not found",
   "activity.revertTitle": "Revert to draft",
   "activity.revertMessage": "This report is validated. Are you sure you want to revert it to draft?",

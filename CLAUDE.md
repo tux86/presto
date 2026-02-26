@@ -54,13 +54,14 @@ docker compose up -d       # Start PostgreSQL (dev)
 ## Backend Patterns
 
 - **Routes:** all prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `settings`, `health`, `config`
-- **Errors:** throw `HTTPException` from `hono/http-exception` — don't use `c.json()` with error status codes
+- **Errors:** throw `HTTPException` from `hono/http-exception` — `c.json()` is acceptable for structured error responses (e.g., FK_CONSTRAINT pattern)
 - **ORM:** Drizzle ORM with PostgreSQL in `src/db/index.ts` — exports `db`, table references, and relations
 - **Schema:** `src/db/schema/pg.schema.ts` — single schema file
 - **Ownership checks:** use `findOwned(model, id, userId)` from `db/helpers.ts` — returns the record, throws 404
 - **Status guards:** use `ensureDraft(report)` from `lib/helpers.ts` — throws 400 if report is completed
-- **Utilities:** `slugify()` in `lib/helpers.ts` for filename-safe strings
-- **Query helpers:** `insertReturning()`, `updateReturning()` in `db/helpers.ts` — use PostgreSQL RETURNING clause
+- **Utilities:** `slugify()` in `lib/helpers.ts` for filename-safe strings; `sanitizeUser()` in `lib/utils.ts` for safe user objects (allowlist approach)
+- **Query helpers:** `insertReturning()`, `updateReturning()` in `db/helpers.ts` — use PostgreSQL RETURNING clause, both accept optional `trx` param for transactions
+- **FK guard:** `checkDependents(table, fkColumn, id)` in `db/helpers.ts` — counts dependent rows before delete
 - **Relational includes:** use `REPORT_WITH` / `REPORT_WITH_PDF` constants from `db/helpers.ts`
 - **Config:** all env vars accessed via `lib/config.ts` — never read `process.env` directly in routes
 - **IDs:** nanoid (21-char alphanumeric) generated in JS via `db/id.ts`
@@ -74,6 +75,9 @@ docker compose up -d       # Start PostgreSQL (dev)
 - **i18n:** `useT()` hook returns `{ t, locale }` — translation files in `i18n/fr.ts` and `i18n/en.ts`
 - **Responsive:** `useIsMobile()` hook + Tailwind breakpoints (375px+, 768px+, 1024px+)
 - **Styling:** Tailwind utility classes, `cn()` helper for conditional classes
+- **Download helper:** `downloadBlob(response, fallbackFilename)` in `lib/utils.ts` for file downloads from API responses
+- **Delete pattern:** `useDeleteWithFkGuard()` hook in `hooks/` — confirm → delete → FK_CONSTRAINT error dialog
+- **Chart constants:** `CHART_COLORS`, `CHART_TOOLTIP_STYLE` in `lib/constants.ts`
 
 ## Testing
 

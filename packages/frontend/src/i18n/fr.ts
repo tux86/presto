@@ -100,7 +100,7 @@ export const fr: Record<TranslationKey, string> = {
   "activity.daysWorked": "Jours travaill\u00e9s",
   "activity.amount": "Montant (HT)",
   "activity.backToDraft": "Repasser en brouillon",
-  "activity.validate": "Valider",
+
   "activity.notFound": "Activit\u00e9 introuvable",
   "activity.revertTitle": "Repasser en brouillon",
   "activity.revertMessage": "Ce rapport est valid\u00e9. \u00cates-vous s\u00fbr de vouloir le repasser en brouillon ?",

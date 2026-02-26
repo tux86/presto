@@ -1,5 +1,5 @@
-import { useAuthStore } from "../stores/auth.store";
-import { useConfigStore } from "../stores/config.store";
+import { useAuthStore } from "@/stores/auth.store";
+import { useConfigStore } from "@/stores/config.store";
 
 const API_BASE = "/api";
 

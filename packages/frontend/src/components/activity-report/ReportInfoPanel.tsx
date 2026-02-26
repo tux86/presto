@@ -1,9 +1,10 @@
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { Check, Download, X } from "lucide-react";
+import { StatusToggle } from "@/components/activity-report/StatusToggle";
+import { Button } from "@/components/ui/Button";
 import { useT } from "@/i18n";
-import { cn, formatCurrency } from "@/lib/utils";
-import { Button } from "../ui/Button";
+import { formatCurrency } from "@/lib/utils";
 
 interface ReportInfoPanelProps {
   report: ActivityReport;
@@ -50,28 +51,7 @@ export function ReportInfoPanel({
       </div>
 
       {/* Status toggle */}
-      <div className="flex rounded-lg border border-edge bg-elevated p-0.5">
-        <button
-          type="button"
-          onClick={isCompleted ? onToggleStatus : undefined}
-          className={cn(
-            "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
-            !isCompleted ? "bg-panel text-heading shadow-sm" : "text-faint hover:text-muted",
-          )}
-        >
-          {t("activity.draft")}
-        </button>
-        <button
-          type="button"
-          onClick={!isCompleted ? onToggleStatus : undefined}
-          className={cn(
-            "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
-            isCompleted ? "bg-success text-white shadow-sm" : "text-faint hover:text-muted",
-          )}
-        >
-          {t("activity.validated")}
-        </button>
-      </div>
+      <StatusToggle isCompleted={isCompleted} onToggleStatus={onToggleStatus} />
 
       {/* Stats */}
       <div className="space-y-3 py-1">

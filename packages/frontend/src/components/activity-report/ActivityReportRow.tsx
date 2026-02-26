@@ -1,9 +1,9 @@
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/Badge";
 import { useT } from "@/i18n";
 import { cn, formatCurrency, formatNumber, getClientColor } from "@/lib/utils";
-import { Badge } from "../ui/Badge";
 
 interface ActivityReportCardProps {
   report: ActivityReport;

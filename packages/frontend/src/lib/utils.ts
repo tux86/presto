@@ -2,6 +2,20 @@ import type { ClientColorKey } from "@presto/shared";
 import { localeMap } from "@presto/shared";
 import { usePreferencesStore } from "@/stores/preferences.store";
 
+/** Download a blob response as a file. Extracts filename from Content-Disposition header if present. */
+export async function downloadBlob(response: Response, fallbackFilename: string): Promise<void> {
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const filenameMatch = disposition.match(/filename="(.+?)"/);
+  const filename = filenameMatch?.[1] ?? fallbackFilename;
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function cn(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(" ");
 }

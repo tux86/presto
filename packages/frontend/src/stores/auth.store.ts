@@ -1,8 +1,8 @@
 import type { AuthResponse, User } from "@presto/shared";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { api } from "../api/client";
-import { queryClient } from "../lib/query-client";
+import { api } from "@/api/client";
+import { queryClient } from "@/lib/query-client";
 
 interface AuthState {
   token: string | null;

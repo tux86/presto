@@ -1,8 +1,8 @@
 import { CURRENCIES, getCurrencyName, getCurrencySymbol } from "@presto/shared";
 import type { LucideIcon } from "lucide-react";
 import { Monitor, Moon, Settings, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
+import { Modal } from "@/components/ui/Modal";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -124,21 +124,6 @@ export function PreferencesMenu() {
   const [open, setOpen] = useState(false);
   const { t } = useT();
 
-  useEffect(() => {
-    if (!open) return;
-    // Close on Escape
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("keydown", handler);
-    // Lock body scroll
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handler);
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
   return (
     <>
       <button
@@ -151,17 +136,9 @@ export function PreferencesMenu() {
         <span>{t("preferences.title")}</span>
       </button>
 
-      {open &&
-        createPortal(
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="fixed inset-0 bg-black/40" onClick={() => setOpen(false)} />
-            <div className="relative z-10 w-full max-w-sm rounded-xl border border-edge bg-panel shadow-xl p-6">
-              <h2 className="text-base font-semibold text-heading mb-5">{t("preferences.title")}</h2>
-              <PreferencesControls />
-            </div>
-          </div>,
-          document.body,
-        )}
+      <Modal open={open} onClose={() => setOpen(false)} title={t("preferences.title")} size="sm">
+        <PreferencesControls />
+      </Modal>
     </>
   );
 }

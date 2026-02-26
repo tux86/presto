@@ -1,6 +1,6 @@
 import type { Locale, ThemeMode } from "@presto/shared";
 import { create } from "zustand";
-import { api } from "../api/client";
+import { api } from "@/api/client";
 
 interface AppConfig {
   appName: string;

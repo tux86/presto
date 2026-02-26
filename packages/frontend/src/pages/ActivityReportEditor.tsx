@@ -2,10 +2,11 @@ import type { ReportEntry } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { ArrowLeft, Check, Download, MoreHorizontal, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
 import { ListView } from "@/components/activity-report/ListView";
 import { ReportInfoPanel } from "@/components/activity-report/ReportInfoPanel";
+import { StatusToggle } from "@/components/activity-report/StatusToggle";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import {
@@ -119,6 +120,8 @@ export function ActivityReportEditor() {
     navigate("/");
   };
 
+  if (!id) return <Navigate to="/" />;
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -190,28 +193,7 @@ export function ActivityReportEditor() {
                 {report.mission?.name} · {report.mission?.client?.name}
               </p>
             </div>
-            <div className="flex rounded-lg border border-edge bg-elevated p-0.5">
-              <button
-                type="button"
-                onClick={isCompleted ? handleToggleStatus : undefined}
-                className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer",
-                  !isCompleted ? "bg-panel text-heading shadow-sm" : "text-faint hover:text-muted",
-                )}
-              >
-                {t("activity.draft")}
-              </button>
-              <button
-                type="button"
-                onClick={!isCompleted ? handleToggleStatus : undefined}
-                className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer",
-                  isCompleted ? "bg-success text-white shadow-sm" : "text-faint hover:text-muted",
-                )}
-              >
-                {t("activity.validated")}
-              </button>
-            </div>
+            <StatusToggle isCompleted={isCompleted} onToggleStatus={handleToggleStatus} compact />
           </div>
 
           <div className="flex items-center gap-4 text-sm mb-2">
@@ -239,12 +221,12 @@ export function ActivityReportEditor() {
                   variant="primary"
                   size="sm"
                   className="flex-1"
-                  onClick={() => autoFill.mutate(id!)}
+                  onClick={() => autoFill.mutate(id)}
                   loading={autoFill.isPending}
                 >
                   <Check className="h-3.5 w-3.5" /> {t("activity.fillWorkdays")}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => clear.mutate(id!)} loading={clear.isPending}>
+                <Button variant="ghost" size="sm" onClick={() => clear.mutate(id)} loading={clear.isPending}>
                   <X className="h-3.5 w-3.5" />
                 </Button>
               </>
@@ -253,7 +235,7 @@ export function ActivityReportEditor() {
                 variant="primary"
                 size="sm"
                 className="flex-1"
-                onClick={() => downloadPdf.mutate(id!)}
+                onClick={() => downloadPdf.mutate(id)}
                 loading={downloadPdf.isPending}
               >
                 <Download className="h-3.5 w-3.5" /> {t("activity.exportPdf")}
@@ -272,9 +254,9 @@ export function ActivityReportEditor() {
               workdays={workdays}
               progressPercent={progressPercent}
               clientHexColor={clientHexColor}
-              onAutoFill={() => autoFill.mutate(id!)}
-              onClear={() => clear.mutate(id!)}
-              onDownloadPdf={() => downloadPdf.mutate(id!)}
+              onAutoFill={() => autoFill.mutate(id)}
+              onClear={() => clear.mutate(id)}
+              onDownloadPdf={() => downloadPdf.mutate(id)}
               onToggleStatus={handleToggleStatus}
               filling={autoFill.isPending}
               clearing={clear.isPending}

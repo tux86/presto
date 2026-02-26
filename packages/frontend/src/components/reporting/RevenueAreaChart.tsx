@@ -3,6 +3,7 @@ import { getMonthName } from "@presto/shared";
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useT } from "@/i18n";
+import { CHART_TOOLTIP_STYLE } from "@/lib/constants";
 import { compactTick, formatCurrency, getClientHexColor } from "@/lib/utils";
 
 interface MonthlyClientRevenue {
@@ -48,13 +49,7 @@ export function RevenueAreaChart({ data, clientIds, label, baseCurrency }: Reven
               tickFormatter={compactTick}
             />
             <Tooltip
-              contentStyle={{
-                background: "var(--th-panel)",
-                border: "1px solid var(--th-edge)",
-                borderRadius: 8,
-                fontSize: 12,
-                color: "var(--th-body)",
-              }}
+              contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value: number, name: string) => [formatCurrency(value, baseCurrency), name]}
             />
             {clientIds.map((c) => {

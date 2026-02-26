@@ -1,7 +1,7 @@
 import type { Locale, ThemeMode, UserSettings } from "@presto/shared";
 import { create } from "zustand";
-import { api } from "../api/client";
-import { queryClient } from "../lib/query-client";
+import { api } from "@/api/client";
+import { queryClient } from "@/lib/query-client";
 
 const STORAGE_KEY = "presto-preferences";
 
@@ -42,7 +42,7 @@ function readFromStorage(): { theme?: ThemeMode; locale?: Locale; baseCurrency?:
 
 // Hydrate initial state from localStorage (instant, no flash)
 const stored = readFromStorage();
-const initialTheme = stored.theme ?? "dark";
+const initialTheme = stored.theme ?? "light";
 const initialLocale = stored.locale ?? "en";
 const initialCurrency = stored.baseCurrency ?? "EUR";
 

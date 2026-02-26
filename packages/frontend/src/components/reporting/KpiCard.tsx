@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -13,10 +14,8 @@ interface KpiCardProps {
   sparkColor?: string;
 }
 
-let sparkUid = 0;
-
 export function KpiCard({ label, value, subtitle, delta, sparkData, sparkColor }: KpiCardProps) {
-  const id = `spark-${++sparkUid}`;
+  const id = useId();
   const color = sparkColor ?? "var(--th-accent)";
 
   return (

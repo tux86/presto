@@ -1,6 +1,7 @@
 import { getMonthName } from "@presto/shared";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useT } from "@/i18n";
+import { CHART_COLORS, CHART_TOOLTIP_STYLE } from "@/lib/constants";
 import { compactTick } from "@/lib/utils";
 
 interface MonthlyData {
@@ -17,7 +18,7 @@ interface MonthlyChartProps {
   formatValue?: (value: number) => string;
 }
 
-export function MonthlyChart({ data, dataKey, label, color = "#6366f1", formatValue }: MonthlyChartProps) {
+export function MonthlyChart({ data, dataKey, label, color = CHART_COLORS.indigo, formatValue }: MonthlyChartProps) {
   const { locale } = useT();
 
   const chartData = data.map((d) => ({
@@ -40,13 +41,7 @@ export function MonthlyChart({ data, dataKey, label, color = "#6366f1", formatVa
               tickFormatter={compactTick}
             />
             <Tooltip
-              contentStyle={{
-                background: "var(--th-panel)",
-                border: "1px solid var(--th-edge)",
-                borderRadius: 8,
-                fontSize: 12,
-                color: "var(--th-body)",
-              }}
+              contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value: number) => [formatValue ? formatValue(value) : value, label]}
             />
             <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} maxBarSize={32} />

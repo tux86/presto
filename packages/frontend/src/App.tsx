@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
@@ -9,10 +9,11 @@ import { Companies } from "./pages/Companies";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
 import { Missions } from "./pages/Missions";
-import { Reporting } from "./pages/Reporting";
 import { useAuthStore } from "./stores/auth.store";
 import { useConfigStore } from "./stores/config.store";
 import { usePreferencesStore } from "./stores/preferences.store";
+
+const Reporting = lazy(() => import("./pages/Reporting").then((m) => ({ default: m.Reporting })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
@@ -87,7 +88,14 @@ export default function App() {
           <Route path="/clients" element={<Clients />} />
           <Route path="/companies" element={<Companies />} />
           <Route path="/missions" element={<Missions />} />
-          <Route path="/reporting" element={<Reporting />} />
+          <Route
+            path="/reporting"
+            element={
+              <Suspense fallback={<div className="p-8 text-center text-muted">Loading...</div>}>
+                <Reporting />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </ErrorBoundary>

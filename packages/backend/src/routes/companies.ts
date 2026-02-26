@@ -1,8 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, count, eq, ne } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { findOwned, insertReturning, updateReturning } from "../db/helpers.js";
+import { checkDependents, findOwned, insertReturning, updateReturning } from "../db/helpers.js";
 import { companies, db, missions } from "../db/index.js";
 import { createCompanySchema, updateCompanySchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
@@ -25,11 +25,11 @@ companiesRouter.post("/", zValidator("json", createCompanySchema), async (c) => 
   const { name, address, businessId, isDefault } = c.req.valid("json");
 
   // Check if this is the first company for the user
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
+  const [{ value: companyCount }] = await db
+    .select({ value: count() })
     .from(companies)
     .where(eq(companies.userId, userId));
-  const forceDefault = count === 0;
+  const forceDefault = companyCount === 0;
 
   const wantDefault = forceDefault || isDefault === true;
 
@@ -67,22 +67,23 @@ companiesRouter.patch("/:id", zValidator("json", updateCompanySchema), async (c)
 
   // Prevent unsetting the only default
   if (data.isDefault === false && existing.isDefault) {
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)::int` })
+    const [{ value: defaultCount }] = await db
+      .select({ value: count() })
       .from(companies)
       .where(and(eq(companies.userId, userId), eq(companies.isDefault, true), ne(companies.id, id)));
-    if (count === 0) {
+    if (defaultCount === 0) {
       throw new HTTPException(400, { message: "Cannot unset the only default company" });
     }
   }
 
   if (data.isDefault === true) {
+    const now = new Date();
     const company = await db.transaction(async (trx) => {
       await trx
         .update(companies)
-        .set({ isDefault: false, updatedAt: new Date() })
+        .set({ isDefault: false, updatedAt: now })
         .where(and(eq(companies.userId, userId), eq(companies.isDefault, true), ne(companies.id, id)));
-      return updateReturning(companies, id, { ...data, updatedAt: new Date() });
+      return updateReturning(companies, id, { ...data, updatedAt: now }, trx as typeof db);
     });
     return c.json(company);
   }
@@ -97,17 +98,14 @@ companiesRouter.delete("/:id", async (c) => {
 
   await findOwned("company", id, userId);
 
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(missions)
-    .where(eq(missions.companyId, id));
-  if (count > 0) {
+  const depCount = await checkDependents(missions, missions.companyId, id);
+  if (depCount > 0) {
     return c.json(
       {
         error: "Cannot delete: has dependent records",
         code: "FK_CONSTRAINT",
         entity: "missions",
-        dependentCount: count,
+        dependentCount: depCount,
       },
       409,
     );

@@ -7,19 +7,19 @@ import {
   getCurrencySymbol,
   HOLIDAY_COUNTRIES,
 } from "@presto/shared";
-import { Trash2, Users as UsersIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Users as UsersIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
+import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "@/hooks/use-clients";
-import { useConfirm } from "@/hooks/use-confirm";
+import { useDeleteWithFkGuard } from "@/hooks/use-delete-with-fk-guard";
 import { useT } from "@/i18n";
 import { CLIENT_COLOR_MAP, cn, getClientColor } from "@/lib/utils";
 
@@ -44,10 +44,16 @@ export function Clients() {
   const createClient = useCreateClient();
   const updateClient = useUpdateClient();
   const deleteClient = useDeleteClient();
-  const { confirm, dialog } = useConfirm();
   const { t, locale } = useT();
 
-  const openCreate = () => {
+  const { handleDelete, dialog } = useDeleteWithFkGuard(deleteClient, t, {
+    confirmTitle: t("clients.deleteTitle"),
+    confirmMessage: t("clients.deleteMessage"),
+    fkErrorTitle: t("common.deleteErrorTitle"),
+    fkErrorMessage: (count) => t("clients.deleteError", { count }),
+  });
+
+  const openCreate = useCallback(() => {
     setEditing(null);
     setName("");
     setEmail("");
@@ -58,23 +64,14 @@ export function Clients() {
     setCurrency("");
     setHolidayCountry("");
     setShowModal(true);
-  };
+  }, []);
 
   useEffect(() => {
     if (searchParams.get("create") === "true") {
-      setEditing(null);
-      setName("");
-      setEmail("");
-      setPhone("");
-      setAddress("");
-      setBusinessId("");
-      setColor("");
-      setCurrency("");
-      setHolidayCountry("");
-      setShowModal(true);
+      openCreate();
       setSearchParams({}, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, openCreate]);
 
   const openEdit = (client: Client) => {
     setEditing(client);
@@ -107,29 +104,6 @@ export function Clients() {
       await createClient.mutateAsync({ ...base, color: color || undefined });
     }
     setShowModal(false);
-  };
-
-  const handleDelete = async (id: string) => {
-    const ok = await confirm({
-      title: t("clients.deleteTitle"),
-      message: t("clients.deleteMessage"),
-      confirmLabel: t("common.delete"),
-      variant: "danger",
-    });
-    if (!ok) return;
-    try {
-      await deleteClient.mutateAsync(id);
-    } catch (err) {
-      if (err instanceof ApiError && err.code === "FK_CONSTRAINT") {
-        await confirm({
-          title: t("common.deleteErrorTitle"),
-          message: t("clients.deleteError", { count: err.dependentCount ?? 0 }),
-          confirmLabel: t("common.ok"),
-        });
-      } else {
-        throw err;
-      }
-    }
   };
 
   return (
@@ -165,17 +139,7 @@ export function Clients() {
                   </span>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(c.id);
-                }}
-                className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
-                title={t("common.delete")}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <DeleteIconButton onClick={() => handleDelete(c.id)} title={t("common.delete")} />
             </div>
           )}
           columns={[
@@ -221,19 +185,7 @@ export function Clients() {
               key: "actions",
               header: "",
               className: "text-right",
-              render: (c) => (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(c.id);
-                  }}
-                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
-                  title={t("common.delete")}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              ),
+              render: (c) => <DeleteIconButton onClick={() => handleDelete(c.id)} title={t("common.delete")} />,
             },
           ]}
         />

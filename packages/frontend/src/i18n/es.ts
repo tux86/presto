@@ -98,7 +98,7 @@ export const es: Record<TranslationKey, string> = {
   "activity.daysWorked": "D\u00edas trabajados",
   "activity.amount": "Importe (sin IVA)",
   "activity.backToDraft": "Volver a borrador",
-  "activity.validate": "Validar",
+
   "activity.notFound": "Actividad no encontrada",
   "activity.revertTitle": "Volver a borrador",
   "activity.revertMessage":

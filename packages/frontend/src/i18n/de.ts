@@ -99,7 +99,7 @@ export const de: Record<TranslationKey, string> = {
   "activity.daysWorked": "Gearbeitete Tage",
   "activity.amount": "Betrag (netto)",
   "activity.backToDraft": "Zur\u00fcck zum Entwurf",
-  "activity.validate": "Best\u00e4tigen",
+
   "activity.notFound": "Aktivit\u00e4t nicht gefunden",
   "activity.revertTitle": "Zur\u00fcck zum Entwurf",
   "activity.revertMessage":

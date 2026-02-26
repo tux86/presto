@@ -173,9 +173,8 @@ activityReportsRouter.patch("/:id/entries", zValidator("json", updateEntriesSche
         await tx.update(reportEntries).set(setData).where(eq(reportEntries.id, entry.id));
       }
     }
+    await recalculateTotalDays(id, tx as typeof db);
   });
-
-  await recalculateTotalDays(id);
   return c.json(await fetchEnrichedReport(id, userId));
 });
 

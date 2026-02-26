@@ -1,17 +1,17 @@
 import type { Company } from "@presto/shared";
-import { Building2, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Building2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useCompanies, useCreateCompany, useDeleteCompany, useUpdateCompany } from "@/hooks/use-companies";
-import { useConfirm } from "@/hooks/use-confirm";
+import { useDeleteWithFkGuard } from "@/hooks/use-delete-with-fk-guard";
 import { useT } from "@/i18n";
 
 export function Companies() {
@@ -27,29 +27,30 @@ export function Companies() {
   const createCompany = useCreateCompany();
   const updateCompany = useUpdateCompany();
   const deleteCompany = useDeleteCompany();
-  const { confirm, dialog } = useConfirm();
   const { t } = useT();
 
-  const openCreate = () => {
+  const { handleDelete, dialog } = useDeleteWithFkGuard(deleteCompany, t, {
+    confirmTitle: t("companies.deleteTitle"),
+    confirmMessage: t("companies.deleteMessage"),
+    fkErrorTitle: t("common.deleteErrorTitle"),
+    fkErrorMessage: (count) => t("companies.deleteError", { count }),
+  });
+
+  const openCreate = useCallback(() => {
     setEditing(null);
     setName("");
     setAddress("");
     setBusinessId("");
     setIsDefault(false);
     setShowModal(true);
-  };
+  }, []);
 
   useEffect(() => {
     if (searchParams.get("create") === "true") {
-      setEditing(null);
-      setName("");
-      setAddress("");
-      setBusinessId("");
-      setIsDefault(false);
-      setShowModal(true);
+      openCreate();
       setSearchParams({}, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, openCreate]);
 
   const openEdit = (company: Company) => {
     setEditing(company);
@@ -82,29 +83,6 @@ export function Companies() {
     setShowModal(false);
   };
 
-  const handleDelete = async (id: string) => {
-    const ok = await confirm({
-      title: t("companies.deleteTitle"),
-      message: t("companies.deleteMessage"),
-      confirmLabel: t("common.delete"),
-      variant: "danger",
-    });
-    if (!ok) return;
-    try {
-      await deleteCompany.mutateAsync(id);
-    } catch (err) {
-      if (err instanceof ApiError && err.code === "FK_CONSTRAINT") {
-        await confirm({
-          title: t("common.deleteErrorTitle"),
-          message: t("companies.deleteError", { count: err.dependentCount ?? 0 }),
-          confirmLabel: t("common.ok"),
-        });
-      } else {
-        throw err;
-      }
-    }
-  };
-
   return (
     <div>
       <Header
@@ -130,17 +108,7 @@ export function Companies() {
                 </span>
                 {c.address && <div className="text-xs text-muted mt-1 truncate">{c.address}</div>}
               </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(c.id);
-                }}
-                className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
-                title={t("common.delete")}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <DeleteIconButton onClick={() => handleDelete(c.id)} title={t("common.delete")} />
             </div>
           )}
           columns={[
@@ -168,19 +136,7 @@ export function Companies() {
               key: "actions",
               header: "",
               className: "text-right",
-              render: (c) => (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(c.id);
-                  }}
-                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
-                  title={t("common.delete")}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              ),
+              render: (c) => <DeleteIconButton onClick={() => handleDelete(c.id)} title={t("common.delete")} />,
             },
           ]}
         />

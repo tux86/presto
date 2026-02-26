@@ -19,10 +19,7 @@ async function getOrCreateSettings(userId: string) {
   if (existing) return existing;
 
   const { theme, locale, baseCurrency } = config.defaults;
-  await db.insert(userSettings).values({ userId, theme, locale, baseCurrency });
-  const created = await db.query.userSettings.findFirst({
-    where: eq(userSettings.userId, userId),
-  });
+  const [created] = await db.insert(userSettings).values({ userId, theme, locale, baseCurrency }).returning();
   if (!created) {
     logger.error("Failed to create user settings for", userId);
     throw new HTTPException(500, { message: "Failed to create settings" });
@@ -43,14 +40,11 @@ settings.patch("/", zValidator("json", updateSettingsSchema), async (c) => {
   // Ensure row exists
   await getOrCreateSettings(userId);
 
-  await db
+  const [updated] = await db
     .update(userSettings)
     .set({ ...body, updatedAt: new Date() })
-    .where(eq(userSettings.userId, userId));
-
-  const updated = await db.query.userSettings.findFirst({
-    where: eq(userSettings.userId, userId),
-  });
+    .where(eq(userSettings.userId, userId))
+    .returning();
   if (!updated) throw new HTTPException(500, { message: "Failed to update settings" });
   return c.json(updated);
 });

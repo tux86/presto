@@ -6,13 +6,7 @@ import { db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { verifyToken } from "../lib/jwt.js";
 import { logger } from "../lib/logger.js";
-
-type AuthEnv = {
-  Variables: {
-    userId: string;
-    userEmail: string;
-  };
-};
+import type { AppEnv } from "../lib/types.js";
 
 async function getOrCreateDefaultUser(): Promise<{ id: string; email: string }> {
   const { email, password, firstName, lastName } = config.auth.defaultUser;
@@ -29,7 +23,7 @@ async function getOrCreateDefaultUser(): Promise<{ id: string; email: string }> 
 
 let singleUserCache: { id: string; email: string } | null = null;
 
-export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
+export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   if (config.auth.disabled) {
     if (!singleUserCache) {
       singleUserCache = await getOrCreateDefaultUser();

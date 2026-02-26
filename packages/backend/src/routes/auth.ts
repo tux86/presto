@@ -18,6 +18,7 @@ import {
   updateProfileSchema,
 } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
+import { sanitizeUser } from "../lib/utils.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const auth = new Hono<AppEnv>();
@@ -31,7 +32,7 @@ auth.use("*", async (c, next) => {
     c.req.path !== "/api/auth/delete-account" &&
     c.req.path !== "/api/auth/export-data"
   ) {
-    throw new HTTPException(404, { message: "Auth is disabled" });
+    throw new HTTPException(403, { message: "Auth is disabled" });
   }
   return next();
 });
@@ -80,10 +81,9 @@ auth.post("/register", authLimiter, zValidator("json", registerSchema), async (c
     return u;
   });
 
-  const { password: _, ...safeUser } = user;
   const token = await createToken(user.id, user.email);
   logger.info("User registered:", email);
-  return c.json({ token, user: safeUser }, 201);
+  return c.json({ token, user: sanitizeUser(user) }, 201);
 });
 
 auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
@@ -102,10 +102,9 @@ auth.post("/login", authLimiter, zValidator("json", loginSchema), async (c) => {
     throw new HTTPException(401, { message: "Invalid credentials" });
   }
 
-  const { password: _, ...safeUser } = user;
   const token = await createToken(user.id, user.email);
   logger.debug("Login successful:", email);
-  return c.json({ token, user: safeUser });
+  return c.json({ token, user: sanitizeUser(user) });
 });
 
 auth.get("/me", authMiddleware, async (c) => {
@@ -141,8 +140,7 @@ auth.patch("/profile", authMiddleware, demoGuard, zValidator("json", updateProfi
   const body = c.req.valid("json");
 
   const updated = await updateReturning(users, userId, { ...body, updatedAt: new Date() });
-  const { password: _, ...safeUser } = updated;
-  return c.json(safeUser);
+  return c.json(sanitizeUser(updated));
 });
 
 auth.patch("/password", authMiddleware, demoGuard, zValidator("json", changePasswordSchema), async (c) => {

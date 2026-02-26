@@ -50,7 +50,7 @@ export const userSettings = pgTable("UserSettings", {
   userId: text("userId")
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
-  theme: text("theme").notNull().default("dark"),
+  theme: text("theme").notNull().default("light"),
   locale: text("locale").notNull().default("en"),
   baseCurrency: text("baseCurrency").notNull().default("EUR"),
   createdAt: createdAt(),

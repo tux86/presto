@@ -1,5 +1,5 @@
-import { and, asc, eq } from "drizzle-orm";
-import type { PgTable } from "drizzle-orm/pg-core";
+import { and, asc, count, eq } from "drizzle-orm";
+import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import { HTTPException } from "hono/http-exception";
 import { activityReports, clients, companies, db, missions } from "./index.js";
 
@@ -46,14 +46,17 @@ export async function insertReturning<T extends PgTable>(
 
 /**
  * Update a row by id and return it.
+ * Accepts an optional transaction handle; defaults to the module-level `db`.
  */
 export async function updateReturning<T extends PgTable>(
   table: T,
   id: string,
   values: Partial<T["$inferInsert"]>,
+  trx?: typeof db,
 ): Promise<T["$inferSelect"]> {
+  const d = trx ?? db;
   const idCol = (table as Record<string, any>).id;
-  const rows = (await db
+  const rows = (await d
     .update(table)
     .set(values as any)
     .where(eq(idCol, id))
@@ -88,3 +91,12 @@ export const REPORT_WITH_PDF = {
   mission: { with: { client: true, company: { columns: { name: true } } } },
   user: { columns: { firstName: true, lastName: true } },
 } as const;
+
+/**
+ * Count rows in `table` where `fkColumn` equals `id`.
+ * Used before delete to check for dependent records.
+ */
+export async function checkDependents(table: PgTable, fkColumn: PgColumn, id: string): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(table).where(eq(fkColumn, id));
+  return row?.value ?? 0;
+}

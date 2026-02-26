@@ -1,11 +1,11 @@
 import type { Mission } from "@presto/shared";
-import { Briefcase, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Briefcase } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ApiError } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients } from "@/hooks/use-clients";
 import { useCompanies } from "@/hooks/use-companies";
-import { useConfirm } from "@/hooks/use-confirm";
+import { useDeleteWithFkGuard } from "@/hooks/use-delete-with-fk-guard";
 import { useCreateMission, useDeleteMission, useMissions, useUpdateMission } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
 import { formatCurrency } from "@/lib/utils";
@@ -36,8 +36,14 @@ export function Missions() {
   const createMission = useCreateMission();
   const updateMission = useUpdateMission();
   const deleteMission = useDeleteMission();
-  const { confirm, dialog } = useConfirm();
   const { t } = useT();
+
+  const { handleDelete, dialog } = useDeleteWithFkGuard(deleteMission, t, {
+    confirmTitle: t("missions.deleteTitle"),
+    confirmMessage: t("missions.deleteMessage"),
+    fkErrorTitle: t("common.deleteErrorTitle"),
+    fkErrorMessage: (count) => t("missions.deleteError", { count }),
+  });
 
   const companyList = useMemo(() => {
     if (!missions) return [];
@@ -76,26 +82,21 @@ export function Missions() {
 
   const defaultCompanyId = companiesList?.find((c) => c.isDefault)?.id ?? companiesList?.[0]?.id ?? "";
 
-  const openCreate = () => {
+  const openCreate = useCallback(() => {
     setEditing(null);
     setName("");
     setClientId("");
     setCompanyId(defaultCompanyId);
     setDailyRate("");
     setShowModal(true);
-  };
+  }, [defaultCompanyId]);
 
   useEffect(() => {
     if (searchParams.get("create") === "true") {
-      setEditing(null);
-      setName("");
-      setClientId("");
-      setCompanyId(defaultCompanyId);
-      setDailyRate("");
-      setShowModal(true);
+      openCreate();
       setSearchParams({}, { replace: true });
     }
-  }, [searchParams, setSearchParams, defaultCompanyId]);
+  }, [searchParams, setSearchParams, openCreate]);
 
   const openEdit = (mission: Mission) => {
     setEditing(mission);
@@ -123,29 +124,6 @@ export function Missions() {
       await createMission.mutateAsync(data);
     }
     setShowModal(false);
-  };
-
-  const handleDelete = async (id: string) => {
-    const ok = await confirm({
-      title: t("missions.deleteTitle"),
-      message: t("missions.deleteMessage"),
-      confirmLabel: t("common.delete"),
-      variant: "danger",
-    });
-    if (!ok) return;
-    try {
-      await deleteMission.mutateAsync(id);
-    } catch (err) {
-      if (err instanceof ApiError && err.code === "FK_CONSTRAINT") {
-        await confirm({
-          title: t("common.deleteErrorTitle"),
-          message: t("missions.deleteError", { count: err.dependentCount ?? 0 }),
-          confirmLabel: t("common.ok"),
-        });
-      } else {
-        throw err;
-      }
-    }
   };
 
   const handleToggleActive = async (mission: Mission) => {
@@ -219,17 +197,7 @@ export function Missions() {
                     {m.isActive ? t("missions.active") : t("missions.inactive")}
                   </Badge>
                 </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(m.id);
-                  }}
-                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
-                  title={t("common.delete")}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                <DeleteIconButton onClick={() => handleDelete(m.id)} title={t("common.delete")} />
               </div>
             </div>
           )}
@@ -258,6 +226,7 @@ export function Missions() {
               header: t("missions.status"),
               render: (m) => (
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleToggleActive(m);
@@ -274,19 +243,7 @@ export function Missions() {
               key: "actions",
               header: "",
               className: "text-right",
-              render: (m) => (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(m.id);
-                  }}
-                  className="p-1.5 rounded-md text-faint hover:text-error hover:bg-error-subtle transition-colors cursor-pointer"
-                  title={t("common.delete")}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              ),
+              render: (m) => <DeleteIconButton onClick={() => handleDelete(m.id)} title={t("common.delete")} />,
             },
           ]}
         />

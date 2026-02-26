@@ -11,6 +11,7 @@ import { FilterChips } from "@/components/ui/FilterChips";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useT } from "@/i18n";
+import { CHART_COLORS } from "@/lib/constants";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 
 function computeDelta(
@@ -152,7 +153,7 @@ export function Reporting() {
               subtitle={prev ? t("reporting.vsYear", { year: year - 1 }) : t("reporting.onYear", { year })}
               delta={daysDelta}
               sparkData={daysSpark}
-              sparkColor="#6366f1"
+              sparkColor={CHART_COLORS.indigo}
             />
             <KpiCard
               label={t("reporting.revenue")}
@@ -162,7 +163,7 @@ export function Reporting() {
               })}
               delta={revenueDelta}
               sparkData={revenueSpark}
-              sparkColor="#10b981"
+              sparkColor={CHART_COLORS.emerald}
             />
             {!hasFilter && (
               <KpiCard
@@ -234,14 +235,14 @@ export function Reporting() {
               data={report.monthlyData}
               dataKey="revenue"
               label={t("reporting.revenuePerMonth")}
-              color="#10b981"
+              color={CHART_COLORS.emerald}
               formatValue={(v) => formatCurrency(v, report.baseCurrency)}
             />
             <MonthlyChart
               data={report.monthlyData}
               dataKey="days"
               label={t("reporting.daysPerMonth")}
-              color="#6366f1"
+              color={CHART_COLORS.indigo}
             />
           </div>
         </div>

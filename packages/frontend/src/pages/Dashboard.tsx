@@ -24,15 +24,17 @@ export function Dashboard() {
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [newReportMonth, setNewReportMonth] = useState(new Date().getMonth() + 1);
-  const [newReportYear, setNewReportYear] = useState(new Date().getFullYear());
+
+  const [now] = useState(() => new Date());
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [newReportMonth, setNewReportMonth] = useState(currentMonth);
+  const [newReportYear, setNewReportYear] = useState(currentYear);
   const [newReportMissionId, setNewReportMissionId] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
   const [filterCompanyId, setFilterCompanyId] = useState("");
-
-  const currentMonth = useMemo(() => new Date().getMonth() + 1, []);
-  const currentYear = useMemo(() => new Date().getFullYear(), []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollAssigned = useRef(false);
   const initialYear = useRef(selectedYear);

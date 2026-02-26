@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { findOwned, insertReturning, MISSION_WITH, updateReturning } from "../db/helpers.js";
+import { checkDependents, findOwned, insertReturning, MISSION_WITH, updateReturning } from "../db/helpers.js";
 import { activityReports, db, missions } from "../db/index.js";
 import { createMissionSchema, updateMissionSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
@@ -10,8 +10,11 @@ import { authMiddleware } from "../middleware/auth.js";
 const missionsRouter = new Hono<AppEnv>();
 missionsRouter.use("*", authMiddleware);
 
-async function fetchMissionWithClient(id: string) {
-  return db.query.missions.findFirst({ where: eq(missions.id, id), with: MISSION_WITH });
+async function fetchMissionWithClient(id: string, userId: string) {
+  return db.query.missions.findFirst({
+    where: and(eq(missions.id, id), eq(missions.userId, userId)),
+    with: MISSION_WITH,
+  });
 }
 
 missionsRouter.get("/", async (c) => {
@@ -42,7 +45,7 @@ missionsRouter.post("/", zValidator("json", createMissionSchema), async (c) => {
   });
 
   c.header("Location", `/api/missions/${mission.id}`);
-  return c.json(await fetchMissionWithClient(mission.id), 201);
+  return c.json(await fetchMissionWithClient(mission.id, userId), 201);
 });
 
 missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) => {
@@ -66,7 +69,7 @@ missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) 
     updatedAt: new Date(),
   });
 
-  return c.json(await fetchMissionWithClient(id));
+  return c.json(await fetchMissionWithClient(id, userId));
 });
 
 missionsRouter.delete("/:id", async (c) => {
@@ -75,17 +78,14 @@ missionsRouter.delete("/:id", async (c) => {
 
   await findOwned("mission", id, userId);
 
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(activityReports)
-    .where(eq(activityReports.missionId, id));
-  if (count > 0) {
+  const depCount = await checkDependents(activityReports, activityReports.missionId, id);
+  if (depCount > 0) {
     return c.json(
       {
         error: "Cannot delete: has dependent records",
         code: "FK_CONSTRAINT",
         entity: "activity-reports",
-        dependentCount: count,
+        dependentCount: depCount,
       },
       409,
     );

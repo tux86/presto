@@ -5,8 +5,9 @@ import type {
   UpdateEntriesRequest,
 } from "@presto/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "../api/client";
-import { usePreferencesStore } from "../stores/preferences.store";
+import { api } from "@/api/client";
+import { downloadBlob } from "@/lib/utils";
+import { usePreferencesStore } from "@/stores/preferences.store";
 
 export function useActivityReports(filters?: { year?: number; month?: number; missionId?: string }) {
   const params = new URLSearchParams();
@@ -133,16 +134,7 @@ export function useDownloadPdf() {
   return useMutation({
     mutationFn: async (reportId: string) => {
       const res = await api.getBlob(`/activity-reports/${reportId}/pdf?locale=${locale}`);
-      const disposition = res.headers.get("Content-Disposition") ?? "";
-      const filenameMatch = disposition.match(/filename="(.+?)"/);
-      const filename = filenameMatch?.[1] ?? `presto-${reportId}.pdf`;
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
+      await downloadBlob(res, `presto-${reportId}.pdf`);
     },
   });
 }

@@ -1,3 +1,10 @@
+## [1.20.0](https://github.com/tux86/presto/compare/v1.19.0...v1.20.0) (2026-02-26)
+
+### Features
+
+* add data export endpoint with JSON download ([fe043f4](https://github.com/tux86/presto/commit/fe043f4352310b6264ba4a0d773c0776cccb938b))
+* redesign profile modal with 3-tab layout ([75d68ea](https://github.com/tux86/presto/commit/75d68eac96e386326ea14f19874ac7ed3670fbcd))
+
 ## [1.19.0](https://github.com/tux86/presto/compare/v1.18.0...v1.19.0) (2026-02-26)
 
 ### Features

@@ -169,6 +169,11 @@ export const en = {
   "profile.passwordChanged": "Password changed successfully",
   "profile.wrongPassword": "Current password is incorrect",
   "profile.passwordRequirements": "Min 8 chars, uppercase, lowercase, digit",
+  "profile.deleteAccount": "Delete account",
+  "profile.deleteAccountWarning":
+    "This will permanently delete your account and all your data. This action cannot be undone.",
+  "profile.deleteAccountConfirm": "Enter your password to confirm",
+  "profile.deleteAccountButton": "Delete my account permanently",
 
   // Common
   "common.save": "Save",

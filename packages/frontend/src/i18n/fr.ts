@@ -177,6 +177,11 @@ export const fr: Record<TranslationKey, string> = {
   "profile.passwordChanged": "Mot de passe modifié avec succès",
   "profile.wrongPassword": "Le mot de passe actuel est incorrect",
   "profile.passwordRequirements": "Min 8 caractères, majuscule, minuscule, chiffre",
+  "profile.deleteAccount": "Supprimer le compte",
+  "profile.deleteAccountWarning":
+    "Cela supprimera définitivement votre compte et toutes vos données. Cette action est irréversible.",
+  "profile.deleteAccountConfirm": "Entrez votre mot de passe pour confirmer",
+  "profile.deleteAccountButton": "Supprimer mon compte définitivement",
 
   // Common
   "common.save": "Enregistrer",

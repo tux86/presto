@@ -117,6 +117,93 @@ describe("Auth — Change Password", () => {
   });
 });
 
+describe("Auth — Delete Account", () => {
+  let throwawayToken = "";
+
+  test("POST /auth/register → create throwaway user", async () => {
+    const res = await api("POST", "/auth/register", {
+      token: "",
+      body: { email: "throwaway@example.com", password: "SecurePass1", firstName: "Del", lastName: "User" },
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    throwawayToken = body.token;
+  });
+
+  test("Create dependent data for throwaway user", async () => {
+    // Create a client
+    const clientRes = await api("POST", "/clients", {
+      token: throwawayToken,
+      body: { name: "Throwaway Client", currency: "EUR", holidayCountry: "FR" },
+    });
+    expect(clientRes.status).toBe(201);
+    const client = await clientRes.json();
+
+    // Get the default company
+    const companiesRes = await api("GET", "/companies", { token: throwawayToken });
+    expect(companiesRes.status).toBe(200);
+    const companies = await companiesRes.json();
+    expect(companies.length).toBeGreaterThan(0);
+
+    // Create a mission
+    const missionRes = await api("POST", "/missions", {
+      token: throwawayToken,
+      body: { name: "Throwaway Mission", clientId: client.id, companyId: companies[0].id },
+    });
+    expect(missionRes.status).toBe(201);
+    const mission = await missionRes.json();
+
+    // Create an activity report
+    const reportRes = await api("POST", "/activity-reports", {
+      token: throwawayToken,
+      body: { month: 1, year: 2025, missionId: mission.id },
+    });
+    expect(reportRes.status).toBe(201);
+  });
+
+  test("POST /auth/delete-account without auth → 401", async () => {
+    const res = await api("POST", "/auth/delete-account", {
+      token: "",
+      body: { password: "SecurePass1" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test("POST /auth/delete-account with empty body → 400", async () => {
+    const res = await api("POST", "/auth/delete-account", {
+      token: throwawayToken,
+      body: {},
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test("POST /auth/delete-account with wrong password → 401", async () => {
+    const res = await api("POST", "/auth/delete-account", {
+      token: throwawayToken,
+      body: { password: "WrongPassword1" },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe("Invalid password");
+  });
+
+  test("POST /auth/delete-account with correct password → 204", async () => {
+    const res = await api("POST", "/auth/delete-account", {
+      token: throwawayToken,
+      body: { password: "SecurePass1" },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test("POST /auth/login after delete → 401 (user gone)", async () => {
+    const res = await api("POST", "/auth/login", {
+      token: "",
+      body: { email: "throwaway@example.com", password: "SecurePass1" },
+    });
+    expect(res.status).toBe(401);
+  });
+});
+
 describe("Auth — Extended Validation", () => {
   test("POST /auth/register password without lowercase → 400", async () => {
     const res = await api("POST", "/auth/register", {

@@ -177,6 +177,11 @@ export const de: Record<TranslationKey, string> = {
   "profile.passwordChanged": "Passwort erfolgreich geändert",
   "profile.wrongPassword": "Aktuelles Passwort ist falsch",
   "profile.passwordRequirements": "Min 8 Zeichen, Großbuchstabe, Kleinbuchstabe, Ziffer",
+  "profile.deleteAccount": "Konto löschen",
+  "profile.deleteAccountWarning":
+    "Dies löscht Ihr Konto und alle Ihre Daten dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "profile.deleteAccountConfirm": "Geben Sie Ihr Passwort zur Bestätigung ein",
+  "profile.deleteAccountButton": "Mein Konto endgültig löschen",
 
   // Common
   "common.save": "Speichern",

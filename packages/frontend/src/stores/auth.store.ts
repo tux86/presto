@@ -14,6 +14,7 @@ interface AuthState {
   fetchMe: () => Promise<void>;
   updateProfile: (data: { firstName?: string; lastName?: string }) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -57,6 +58,11 @@ export const useAuthStore = create<AuthState>()(
 
       changePassword: async (currentPassword, newPassword) => {
         await api.patch("/auth/password", { currentPassword, newPassword });
+      },
+
+      deleteAccount: async (password) => {
+        await api.post("/auth/delete-account", { password });
+        get().logout();
       },
     }),
     {

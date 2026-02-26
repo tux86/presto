@@ -39,6 +39,10 @@ export const loginSchema = z.object({
   password: z.string().min(1).max(128),
 });
 
+export const deleteAccountSchema = z.object({
+  password: z.string().min(1).max(128),
+});
+
 // Companies
 export const createCompanySchema = z.object({
   name: z.string().min(1).max(200),

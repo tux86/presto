@@ -10,7 +10,13 @@ import { companies, db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
 import { logger } from "../lib/logger.js";
-import { changePasswordSchema, loginSchema, registerSchema, updateProfileSchema } from "../lib/schemas.js";
+import {
+  changePasswordSchema,
+  deleteAccountSchema,
+  loginSchema,
+  registerSchema,
+  updateProfileSchema,
+} from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
@@ -21,7 +27,8 @@ auth.use("*", async (c, next) => {
     config.auth.disabled &&
     c.req.path !== "/api/auth/me" &&
     c.req.path !== "/api/auth/profile" &&
-    c.req.path !== "/api/auth/password"
+    c.req.path !== "/api/auth/password" &&
+    c.req.path !== "/api/auth/delete-account"
   ) {
     throw new HTTPException(404, { message: "Auth is disabled" });
   }
@@ -150,6 +157,25 @@ auth.patch("/password", authMiddleware, zValidator("json", changePasswordSchema)
   });
 
   await updateReturning(users, userId, { password: hashedPassword, updatedAt: new Date() });
+  return c.body(null, 204);
+});
+
+auth.post("/delete-account", authMiddleware, authLimiter, zValidator("json", deleteAccountSchema), async (c) => {
+  const userId = c.get("userId");
+  const { password } = c.req.valid("json");
+
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
+  if (!user) {
+    throw new HTTPException(404, { message: "User not found" });
+  }
+
+  const valid = await Bun.password.verify(password, user.password);
+  if (!valid) {
+    throw new HTTPException(401, { message: "Invalid password" });
+  }
+
+  await db.delete(users).where(eq(users.id, userId));
+  logger.info("Account deleted:", user.email);
   return c.body(null, 204);
 });
 

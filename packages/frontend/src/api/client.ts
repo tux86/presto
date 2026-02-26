@@ -62,7 +62,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   const authDisabled = useConfigStore.getState().config?.authDisabled ?? false;
   const isAuthRoute =
-    path.startsWith("/auth/login") || path.startsWith("/auth/register") || path.startsWith("/auth/password");
+    path.startsWith("/auth/login") ||
+    path.startsWith("/auth/register") ||
+    path.startsWith("/auth/password") ||
+    path.startsWith("/auth/delete-account");
   if (res.status === 401 && !authDisabled && !isAuthRoute) {
     useAuthStore.getState().logout();
     throw new ApiError("Unauthorized", 401);

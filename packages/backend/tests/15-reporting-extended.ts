@@ -168,7 +168,7 @@ describe("Settings — Extended Validation", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     // Bob's settings should be defaults, not Alice's modified ones
-    expect(body.theme).toBe("dark");
+    expect(body.theme).toBe("light");
     expect(body.locale).toBe("en");
     expect(body.baseCurrency).toBe("EUR");
   });

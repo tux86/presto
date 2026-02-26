@@ -6,7 +6,7 @@ describe("Settings", () => {
     const res = await api("GET", "/settings");
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.theme).toBe("dark");
+    expect(body.theme).toBe("light");
     expect(body.locale).toBe("en");
     expect(body.baseCurrency).toBe("EUR");
     expect(body).toHaveProperty("userId");

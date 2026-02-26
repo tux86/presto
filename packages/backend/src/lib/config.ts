@@ -33,7 +33,7 @@ export const config = {
     logLevel: env("LOG_LEVEL", "info"),
   },
   defaults: {
-    theme: env("DEFAULT_THEME", "dark") as "light" | "dark" | "auto",
+    theme: env("DEFAULT_THEME", "light") as "light" | "dark" | "auto",
     locale: env("DEFAULT_LOCALE", "en") as Locale,
     baseCurrency: env("DEFAULT_BASE_CURRENCY", "EUR"),
   },

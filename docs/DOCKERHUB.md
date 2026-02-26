@@ -85,7 +85,7 @@ docker run -d \
 | `JWT_SECRET` | **required** (min 32 chars) | Secret for signing JWT tokens |
 | `AUTH_DISABLED` | `false` | Set `true` to disable authentication (single-user mode) |
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
-| `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
+| `DEFAULT_THEME` | `light` | Default theme for new users (`light`, `dark`, `auto`) |
 | `DEFAULT_LOCALE` | `en` | Default locale for new users: `en`, `fr`, `de`, `es`, `pt` |
 | `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency for new users (ISO 4217) |
 | `CORS_ORIGINS` | *(empty)* | Allowed CORS origins (comma-separated) |

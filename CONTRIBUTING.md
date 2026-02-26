@@ -162,7 +162,7 @@ Copy `.env.example` to `.env` and fill in the required values (`JWT_SECRET` must
 | `REGISTRATION_ENABLED` | `true` | Enable/disable user registration |
 | `CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins (comma-separated) |
 | `APP_NAME` | `Presto` | Application name in public config API |
-| `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
+| `DEFAULT_THEME` | `light` | Default theme for new users (`light`, `dark`, `auto`) |
 | `DEFAULT_LOCALE` | `en` | Default locale for new users (`en`, `fr`, `de`, `es`, `pt`) |
 | `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency for new users (ISO 4217) |
 | `DEFAULT_USER_EMAIL` | `admin@localhost` | Default admin email |

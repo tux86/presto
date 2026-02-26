@@ -147,7 +147,7 @@ To skip login entirely, set `AUTH_DISABLED=true`. A default user is auto-created
 | `CORS_ORIGINS` | — | Comma-separated allowed origins |
 | `RATE_LIMIT_MAX` | `20` | Max auth requests per window |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
-| `DEFAULT_THEME` | `dark` | Default theme for new users (`light`, `dark`, `auto`) |
+| `DEFAULT_THEME` | `light` | Default theme for new users (`light`, `dark`, `auto`) |
 | `DEFAULT_LOCALE` | `en` | Default language (`en`, `fr`, `de`, `es`, `pt`) |
 | `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency (ISO 4217) |
 

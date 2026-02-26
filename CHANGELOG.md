@@ -1,3 +1,9 @@
+## [1.19.0](https://github.com/tux86/presto/compare/v1.18.0...v1.19.0) (2026-02-26)
+
+### Features
+
+* add delete account feature with password confirmation ([59a7420](https://github.com/tux86/presto/commit/59a742097f5640c9b3fe7af3e55a4931a79395c7))
+
 ## [1.18.0](https://github.com/tux86/presto/compare/v1.17.0...v1.18.0) (2026-02-26)
 
 ### Features

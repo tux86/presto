@@ -17,9 +17,6 @@
 <br/>
 
 <p align="center">
-  <img src="docs/images/demo-login.png" alt="Presto — Login Page" width="100%" />
-</p>
-<p align="center">
   <img src="docs/images/demo-dashboard.png" alt="Presto — Activity Reports Dashboard" width="100%" />
 </p>
 <p align="center">

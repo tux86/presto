@@ -9,17 +9,24 @@ const dateString = z
   .refine((d) => !Number.isNaN(new Date(d).getTime()), "Invalid date");
 
 // Auth
+const passwordSchema = z
+  .string()
+  .min(8)
+  .max(128)
+  .regex(/[a-z]/, "Must contain a lowercase letter")
+  .regex(/[A-Z]/, "Must contain an uppercase letter")
+  .regex(/[0-9]/, "Must contain a digit");
+
 export const registerSchema = z.object({
   email: z.string().email().max(254),
-  password: z
-    .string()
-    .min(8)
-    .max(128)
-    .regex(/[a-z]/, "Must contain a lowercase letter")
-    .regex(/[A-Z]/, "Must contain an uppercase letter")
-    .regex(/[0-9]/, "Must contain a digit"),
+  password: passwordSchema,
   firstName: z.string().min(1).max(200),
   lastName: z.string().min(1).max(200),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(128),
+  newPassword: passwordSchema,
 });
 
 export const updateProfileSchema = z.object({

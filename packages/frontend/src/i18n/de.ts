@@ -167,6 +167,16 @@ export const de: Record<TranslationKey, string> = {
   "profile.title": "Profil bearbeiten",
   "profile.firstName": "Vorname",
   "profile.lastName": "Nachname",
+  "profile.tabProfile": "Profil",
+  "profile.tabPassword": "Passwort",
+  "profile.changePassword": "Passwort ändern",
+  "profile.currentPassword": "Aktuelles Passwort",
+  "profile.newPassword": "Neues Passwort",
+  "profile.confirmPassword": "Neues Passwort bestätigen",
+  "profile.passwordMismatch": "Passwörter stimmen nicht überein",
+  "profile.passwordChanged": "Passwort erfolgreich geändert",
+  "profile.wrongPassword": "Aktuelles Passwort ist falsch",
+  "profile.passwordRequirements": "Min 8 Zeichen, Großbuchstabe, Kleinbuchstabe, Ziffer",
 
   // Common
   "common.save": "Speichern",

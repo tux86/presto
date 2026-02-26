@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { api } from "./helpers";
+import { api, state } from "./helpers";
 
 describe("Auth — Profile", () => {
   test("PATCH /auth/profile → update firstName", async () => {
@@ -54,6 +54,66 @@ describe("Auth — Profile", () => {
     const body = await res.json();
     expect(body.firstName).toBe("Alice");
     expect(body.lastName).toBe("Dupont");
+  });
+});
+
+describe("Auth — Change Password", () => {
+  test("PATCH /auth/password without auth → 401", async () => {
+    const res = await api("PATCH", "/auth/password", {
+      token: "",
+      body: { currentPassword: "SecurePass1", newPassword: "NewSecure1" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test("PATCH /auth/password with wrong current password → 401", async () => {
+    const res = await api("PATCH", "/auth/password", {
+      body: { currentPassword: "WrongPassword1", newPassword: "NewSecure1" },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe("Invalid current password");
+  });
+
+  test("PATCH /auth/password with weak new password → 400", async () => {
+    const res = await api("PATCH", "/auth/password", {
+      body: { currentPassword: "SecurePass1", newPassword: "weak" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test("PATCH /auth/password with correct current password → 204", async () => {
+    const res = await api("PATCH", "/auth/password", {
+      body: { currentPassword: "SecurePass1", newPassword: "NewSecure1" },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test("POST /auth/login with old password fails after change → 401", async () => {
+    const res = await api("POST", "/auth/login", {
+      token: "",
+      body: { email: "alice@example.com", password: "SecurePass1" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test("POST /auth/login with new password succeeds after change → 200", async () => {
+    const res = await api("POST", "/auth/login", {
+      token: "",
+      body: { email: "alice@example.com", password: "NewSecure1" },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.token).toBeTruthy();
+    state.token = body.token;
+  });
+
+  // Restore original password for remaining tests
+  test("PATCH /auth/password → restore original password", async () => {
+    const res = await api("PATCH", "/auth/password", {
+      body: { currentPassword: "NewSecure1", newPassword: "SecurePass1" },
+    });
+    expect(res.status).toBe(204);
   });
 });
 

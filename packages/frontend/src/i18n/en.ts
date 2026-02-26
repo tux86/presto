@@ -159,6 +159,16 @@ export const en = {
   "profile.title": "Edit Profile",
   "profile.firstName": "First Name",
   "profile.lastName": "Last Name",
+  "profile.tabProfile": "Profile",
+  "profile.tabPassword": "Password",
+  "profile.changePassword": "Change Password",
+  "profile.currentPassword": "Current password",
+  "profile.newPassword": "New password",
+  "profile.confirmPassword": "Confirm new password",
+  "profile.passwordMismatch": "Passwords do not match",
+  "profile.passwordChanged": "Password changed successfully",
+  "profile.wrongPassword": "Current password is incorrect",
+  "profile.passwordRequirements": "Min 8 chars, uppercase, lowercase, digit",
 
   // Common
   "common.save": "Save",

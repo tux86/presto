@@ -78,7 +78,7 @@ docker compose up -d       # Start PostgreSQL (dev)
 ## Testing
 
 - **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
-- **Location:** `packages/backend/tests/` — 10 test suites, 109 tests
+- **Location:** `packages/backend/tests/` — 15 test suites, 213 tests
 - **Database:** PostgreSQL test database (`presto_test`) — fresh migrations each run
 - **Setup:** preload script (`setup.ts`) runs Drizzle migrations before tests
 - **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)

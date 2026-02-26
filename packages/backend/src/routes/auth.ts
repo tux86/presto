@@ -10,14 +10,19 @@ import { companies, db, users } from "../db/index.js";
 import { config } from "../lib/config.js";
 import { createToken } from "../lib/jwt.js";
 import { logger } from "../lib/logger.js";
-import { loginSchema, registerSchema, updateProfileSchema } from "../lib/schemas.js";
+import { changePasswordSchema, loginSchema, registerSchema, updateProfileSchema } from "../lib/schemas.js";
 import type { AppEnv } from "../lib/types.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const auth = new Hono<AppEnv>();
 
 auth.use("*", async (c, next) => {
-  if (config.auth.disabled && c.req.path !== "/api/auth/me" && c.req.path !== "/api/auth/profile") {
+  if (
+    config.auth.disabled &&
+    c.req.path !== "/api/auth/me" &&
+    c.req.path !== "/api/auth/profile" &&
+    c.req.path !== "/api/auth/password"
+  ) {
     throw new HTTPException(404, { message: "Auth is disabled" });
   }
   return next();
@@ -123,6 +128,29 @@ auth.patch("/profile", authMiddleware, zValidator("json", updateProfileSchema), 
   const updated = await updateReturning(users, userId, { ...body, updatedAt: new Date() });
   const { password: _, ...safeUser } = updated;
   return c.json(safeUser);
+});
+
+auth.patch("/password", authMiddleware, zValidator("json", changePasswordSchema), async (c) => {
+  const userId = c.get("userId");
+  const { currentPassword, newPassword } = c.req.valid("json");
+
+  const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
+  if (!user) {
+    throw new HTTPException(404, { message: "User not found" });
+  }
+
+  const valid = await Bun.password.verify(currentPassword, user.password);
+  if (!valid) {
+    throw new HTTPException(401, { message: "Invalid current password" });
+  }
+
+  const hashedPassword = await Bun.password.hash(newPassword, {
+    algorithm: "bcrypt",
+    cost: config.auth.bcryptCost,
+  });
+
+  await updateReturning(users, userId, { password: hashedPassword, updatedAt: new Date() });
+  return c.body(null, 204);
 });
 
 export default auth;

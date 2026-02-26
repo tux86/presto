@@ -1,7 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import { BarChart3, Briefcase, Building2, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useCallback, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { ApiError } from "@/api/client";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { PreferencesControls, PreferencesMenu } from "@/components/layout/PreferencesMenu";
 import { Button } from "@/components/ui/Button";
@@ -15,19 +16,32 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
 
 export function Sidebar() {
-  const { user, logout, updateProfile } = useAuthStore();
+  const { user, logout, updateProfile, changePassword } = useAuthStore();
   const authDisabled = useConfigStore((s) => s.config?.authDisabled ?? false);
   const { t } = useT();
   const isMobile = useIsMobile();
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({ firstName: "", lastName: "" });
   const [profileSaving, setProfileSaving] = useState(false);
+  const [profileTab, setProfileTab] = useState<"profile" | "password">("profile");
+  const [pwForm, setPwForm] = useState({ current: "", new: "", confirm: "" });
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
+
+  const resetPasswordState = useCallback(() => {
+    setProfileTab("profile");
+    setPwForm({ current: "", new: "", confirm: "" });
+    setPwError("");
+    setPwSuccess(false);
+  }, []);
 
   const openProfileModal = () => {
     setProfileForm({
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
     });
+    resetPasswordState();
     setProfileOpen(true);
   };
 
@@ -45,6 +59,34 @@ export function Sidebar() {
     }
   };
 
+  const handlePasswordChange = async (e: FormEvent) => {
+    e.preventDefault();
+    setPwError("");
+    setPwSuccess(false);
+
+    if (pwForm.new !== pwForm.confirm) {
+      setPwError(t("profile.passwordMismatch"));
+      return;
+    }
+
+    setPwSaving(true);
+    try {
+      await changePassword(pwForm.current, pwForm.new);
+      setPwSuccess(true);
+      setPwForm({ current: "", new: "", confirm: "" });
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        setPwError(t("profile.wrongPassword"));
+      } else if (err instanceof ApiError && err.status === 400) {
+        setPwError(t("profile.passwordRequirements"));
+      } else {
+        setPwError(t("auth.genericError"));
+      }
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   const navItems: { to: string; label: string; icon: LucideIcon }[] = [
     { to: "/", label: t("nav.activities"), icon: Home },
     { to: "/clients", label: t("nav.clients"), icon: Users },
@@ -57,33 +99,99 @@ export function Sidebar() {
 
   const profileModal = (
     <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title={t("profile.title")} size="md">
-      <form onSubmit={handleProfileSave} className="space-y-4">
-        <Input label={t("auth.email")} value={user?.email ?? ""} disabled />
-        <Input
-          label={t("profile.firstName")}
-          value={profileForm.firstName}
-          onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
-          required
-        />
-        <Input
-          label={t("profile.lastName")}
-          value={profileForm.lastName}
-          onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
-          required
-        />
-        <div className="flex justify-end gap-3 pt-2">
-          <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
-            {t("common.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            loading={profileSaving}
-            disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
-          >
-            {t("common.save")}
-          </Button>
+      {!authDisabled && (
+        <div className="mb-4 flex gap-1 rounded-lg bg-inset p-1">
+          {(["profile", "password"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => {
+                setProfileTab(tab);
+                setPwError("");
+                setPwSuccess(false);
+              }}
+              className={cn(
+                "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer",
+                profileTab === tab ? "bg-panel text-heading shadow-sm" : "text-muted hover:text-body",
+              )}
+            >
+              {t(tab === "profile" ? "profile.tabProfile" : "profile.tabPassword")}
+            </button>
+          ))}
         </div>
-      </form>
+      )}
+
+      {profileTab === "profile" && (
+        <form onSubmit={handleProfileSave} className="space-y-4">
+          <Input label={t("auth.email")} value={user?.email ?? ""} disabled />
+          <Input
+            label={t("profile.firstName")}
+            value={profileForm.firstName}
+            onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
+            required
+          />
+          <Input
+            label={t("profile.lastName")}
+            value={profileForm.lastName}
+            onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
+            required
+          />
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="submit"
+              loading={profileSaving}
+              disabled={!profileForm.firstName.trim() || !profileForm.lastName.trim()}
+            >
+              {t("common.save")}
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {profileTab === "password" && (
+        <form onSubmit={handlePasswordChange} className="space-y-4">
+          <Input
+            label={t("profile.currentPassword")}
+            type="password"
+            value={pwForm.current}
+            onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
+            required
+            autoComplete="current-password"
+          />
+          <Input
+            label={t("profile.newPassword")}
+            type="password"
+            value={pwForm.new}
+            onChange={(e) => setPwForm((f) => ({ ...f, new: e.target.value }))}
+            required
+            hint={t("profile.passwordRequirements")}
+            autoComplete="new-password"
+          />
+          <Input
+            label={t("profile.confirmPassword")}
+            type="password"
+            value={pwForm.confirm}
+            onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
+            required
+            autoComplete="new-password"
+          />
+
+          {pwError && <p className="text-sm text-red-500">{pwError}</p>}
+          {pwSuccess && <p className="text-sm text-green-600">{t("profile.passwordChanged")}</p>}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="ghost" type="button" onClick={() => setProfileOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button type="submit" loading={pwSaving} disabled={!pwForm.current || !pwForm.new || !pwForm.confirm}>
+              {t("profile.changePassword")}
+            </Button>
+          </div>
+        </form>
+      )}
     </Modal>
   );
 

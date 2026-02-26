@@ -166,6 +166,16 @@ export const es: Record<TranslationKey, string> = {
   "profile.title": "Editar perfil",
   "profile.firstName": "Nombre",
   "profile.lastName": "Apellido",
+  "profile.tabProfile": "Perfil",
+  "profile.tabPassword": "Contraseña",
+  "profile.changePassword": "Cambiar contraseña",
+  "profile.currentPassword": "Contraseña actual",
+  "profile.newPassword": "Nueva contraseña",
+  "profile.confirmPassword": "Confirmar nueva contraseña",
+  "profile.passwordMismatch": "Las contraseñas no coinciden",
+  "profile.passwordChanged": "Contraseña cambiada con éxito",
+  "profile.wrongPassword": "La contraseña actual es incorrecta",
+  "profile.passwordRequirements": "Mín 8 caracteres, mayúscula, minúscula, dígito",
 
   // Common
   "common.save": "Guardar",

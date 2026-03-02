@@ -1,4 +1,4 @@
-import { getHolidayName, getMonthDates, isWeekend } from "@presto/shared";
+import { getHolidayName, getMonthDates, isWeekend, utcDate } from "@presto/shared";
 import { count } from "drizzle-orm";
 import { config } from "../lib/config.js";
 import { logger } from "../lib/logger.js";
@@ -89,8 +89,8 @@ function monthRange(
 
 export async function seedDemoData() {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getUTCFullYear();
+  const currentMonth = now.getUTCMonth() + 1;
 
   // --- User ---
   const userId = createId();
@@ -310,8 +310,8 @@ export async function seedDemoData() {
 
     for (const mDef of mDefs) {
       const missionId = createId();
-      const startDate = new Date(mDef.startYear, mDef.startMonth - 1, 1);
-      const endDate = mDef.endYear ? new Date(mDef.endYear, (mDef.endMonth ?? 12) - 1, 28) : undefined;
+      const startDate = utcDate(mDef.startYear, mDef.startMonth, 1);
+      const endDate = mDef.endYear ? utcDate(mDef.endYear, mDef.endMonth ?? 12, 28) : undefined;
 
       missionRows.push({
         id: missionId,

@@ -35,7 +35,7 @@ export function ListDayRow({ entry, colors, onToggle, onTaskChange }: ListDayRow
       {/* Date */}
       <div className="w-24 shrink-0">
         <div className={cn("text-base font-bold", isSpecial && "text-faint", !isSpecial && "text-heading")}>
-          {String(date.getDate()).padStart(2, "0")}
+          {String(date.getUTCDate()).padStart(2, "0")}
         </div>
         <div className={cn("text-xs", isSpecial ? "text-faint" : "text-muted")}>{getDayNameFull(date, locale)}</div>
       </div>

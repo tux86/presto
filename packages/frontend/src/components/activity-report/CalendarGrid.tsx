@@ -22,19 +22,15 @@ export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly
   }, []);
 
   const selectedEntry = selectedId ? entries.find((e) => e.id === selectedId) : null;
+  const selectedDate = selectedEntry ? new Date(selectedEntry.date) : null;
 
-  const offset =
-    entries.length > 0
-      ? (() => {
-          const d = new Date(entries[0].date).getDay() - 1;
-          return d < 0 ? 6 : d;
-        })()
-      : 0;
+  // Monday-based offset: Mon=0, Tue=1, ..., Sun=6
+  const firstDay = entries.length > 0 ? (new Date(entries[0].date).getUTCDay() + 6) % 7 : 0;
 
   // Generate localized short day names (Mon..Sun)
   const dayHeaders = Array.from({ length: 7 }, (_, i) => {
     // Monday = 0, Sunday = 6 → Date with known Monday (2024-01-01 is a Monday)
-    const date = new Date(2024, 0, 1 + i);
+    const date = new Date(Date.UTC(2024, 0, 1 + i, 12));
     return getDayName(date, locale);
   });
 
@@ -79,7 +75,7 @@ export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly
 
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
-        {Array.from({ length: offset }, (_, i) => (
+        {Array.from({ length: firstDay }, (_, i) => (
           <div key={`empty-${i}`} className="h-12 sm:h-16" />
         ))}
         {entries.map((entry) => {
@@ -88,7 +84,7 @@ export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly
             <CalendarDay
               key={entry.id}
               entry={entry}
-              dayNumber={date.getDate()}
+              dayNumber={date.getUTCDate()}
               dayName={getDayName(date, locale)}
               colors={colors}
               selected={entry.id === selectedId}
@@ -100,11 +96,11 @@ export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly
       </div>
 
       {/* Task editor for selected day */}
-      {selectedEntry && !readOnly && (
+      {selectedEntry && selectedDate && !readOnly && (
         <div className="mt-4 flex items-center gap-3 rounded-lg border border-edge bg-elevated px-4 py-3">
           <div className="shrink-0 flex items-center gap-1.5">
-            <span className="text-sm font-bold text-heading">{new Date(selectedEntry.date).getDate()}</span>
-            <span className="text-xs text-muted">{getDayNameFull(new Date(selectedEntry.date), locale)}</span>
+            <span className="text-sm font-bold text-heading">{selectedDate.getUTCDate()}</span>
+            <span className="text-xs text-muted">{getDayNameFull(selectedDate, locale)}</span>
             {selectedEntry.isHoliday && (
               <span className="text-xs font-medium text-warning">
                 — {selectedEntry.holidayName ?? t("activity.holiday")}

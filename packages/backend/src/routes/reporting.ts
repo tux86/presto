@@ -14,7 +14,7 @@ reporting.use("*", authMiddleware);
 
 reporting.get("/", async (c) => {
   const userId = c.get("userId");
-  const year = parseIntParam(c.req.query("year"), "year", 2000, 2100) ?? new Date().getFullYear();
+  const year = parseIntParam(c.req.query("year"), "year", 2000, 2100) ?? new Date().getUTCFullYear();
 
   const settings = await db.query.userSettings.findFirst({
     where: eq(userSettings.userId, userId),

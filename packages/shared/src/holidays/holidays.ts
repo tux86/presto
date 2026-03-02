@@ -25,11 +25,3 @@ export function getHolidayName(date: Date, country = "FR", locale?: string): str
   const publicHoliday = result.find((h) => h.type === "public");
   return publicHoliday?.name ?? null;
 }
-
-/**
- * Check if a date is a weekend (Saturday or Sunday)
- */
-export function isWeekend(date: Date): boolean {
-  const day = date.getDay();
-  return day === 0 || day === 6;
-}

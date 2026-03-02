@@ -29,6 +29,11 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install dependencies
+        run: npm install --workspaces=false --ignore-scripts
+        env:
+          HUSKY: "0"
+
       - name: Run semantic-release
         run: npx semantic-release
         env:

@@ -1,3 +1,9 @@
+## [1.21.3](https://github.com/tux86/presto/compare/v1.21.2...v1.21.3) (2026-03-02)
+
+### Bug Fixes
+
+* pdf generation and timezone-safe date handling across the app ([6770369](https://github.com/tux86/presto/commit/677036915182a577345eddcc75a338ad13d5fd69))
+
 ## [1.21.2](https://github.com/tux86/presto/compare/v1.21.1...v1.21.2) (2026-02-26)
 
 ### Bug Fixes

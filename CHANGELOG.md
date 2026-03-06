@@ -1,3 +1,9 @@
+## [1.22.0](https://github.com/tux86/presto/compare/v1.21.3...v1.22.0) (2026-03-06)
+
+### Features
+
+* add About modal with app version display ([eec6ec6](https://github.com/tux86/presto/commit/eec6ec6b5982ebb7b53de8f3aa868f8059391886))
+
 ## [1.21.3](https://github.com/tux86/presto/compare/v1.21.2...v1.21.3) (2026-03-02)
 
 ### Bug Fixes

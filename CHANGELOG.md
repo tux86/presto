@@ -1,3 +1,9 @@
+## [1.22.1](https://github.com/tux86/presto/compare/v1.22.0...v1.22.1) (2026-03-06)
+
+### Bug Fixes
+
+* remove non-existent assets COPY from Dockerfile ([531be2c](https://github.com/tux86/presto/commit/531be2c88af55e2b4eafd1d525a0be1568cda3c8))
+
 ## [1.22.0](https://github.com/tux86/presto/compare/v1.21.3...v1.22.0) (2026-03-06)
 
 ### Features

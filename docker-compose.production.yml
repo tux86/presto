@@ -18,7 +18,7 @@ services:
       retries: 5
 
   presto:
-    image: axforge/presto:latest
+    image: ghcr.io/tux86/presto:latest
     container_name: presto
     restart: unless-stopped
     depends_on:

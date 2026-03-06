@@ -1,3 +1,9 @@
+## [1.23.1](https://github.com/tux86/presto/compare/v1.23.0...v1.23.1) (2026-03-06)
+
+### Bug Fixes
+
+* use correct shell escaping for --define in Dockerfile ([f0b89e0](https://github.com/tux86/presto/commit/f0b89e0ba75971d5796eeff86cb78da0410f1f65))
+
 ## [1.23.0](https://github.com/tux86/presto/compare/v1.22.2...v1.23.0) (2026-03-06)
 
 ### Features

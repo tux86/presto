@@ -1,3 +1,9 @@
+## [1.23.2](https://github.com/tux86/presto/compare/v1.23.1...v1.23.2) (2026-03-06)
+
+### Bug Fixes
+
+* update production compose image to ghcr.io/tux86/presto ([022a03d](https://github.com/tux86/presto/commit/022a03ddf7cdb7dc48bd80e1c7589593833abbd2))
+
 ## [1.23.1](https://github.com/tux86/presto/compare/v1.23.0...v1.23.1) (2026-03-06)
 
 ### Bug Fixes

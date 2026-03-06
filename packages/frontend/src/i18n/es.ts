@@ -15,6 +15,9 @@ export const es: Record<TranslationKey, string> = {
   // About
   "about.title": "Acerca de",
   "about.description": "Generador de informes de actividad de c\u00f3digo abierto.",
+  "about.releaseNotes": "Notas de versi\u00f3n",
+  "about.sourceCode": "C\u00f3digo fuente",
+  "about.license": "Licencia MIT",
 
   // Dashboard
   "dashboard.title": "Mis Actividades",

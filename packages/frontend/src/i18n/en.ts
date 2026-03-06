@@ -13,6 +13,9 @@ export const en = {
   // About
   "about.title": "About",
   "about.description": "Open-source activity report generator.",
+  "about.releaseNotes": "Release notes",
+  "about.sourceCode": "Source code",
+  "about.license": "MIT License",
 
   // Dashboard
   "dashboard.title": "My Activities",

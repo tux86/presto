@@ -1,5 +1,16 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Briefcase, Building2, Ellipsis, Home, Info, LogOut, Search, Users } from "lucide-react";
+import {
+  BarChart3,
+  Briefcase,
+  Building2,
+  Ellipsis,
+  ExternalLink,
+  Home,
+  Info,
+  LogOut,
+  Search,
+  Users,
+} from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
@@ -13,24 +24,37 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
 
+const REPO_URL = "https://github.com/tux86/presto";
+
+function AboutLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-muted hover:bg-elevated/50 hover:text-body transition-colors"
+    >
+      {children}
+      <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-40" strokeWidth={1.5} />
+    </a>
+  );
+}
+
 function AboutModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const version = useConfigStore((s) => s.config?.version);
   const { t } = useT();
 
   return (
-    <Modal open={open} onClose={() => onOpenChange(false)} title={t("about.title")} size="sm">
-      <div className="flex flex-col items-center gap-4 py-2">
+    <Modal open={open} onClose={() => onOpenChange(false)} size="sm">
+      <div className="flex flex-col items-center gap-3 pb-4">
         <LogoHorizontal className="h-10" />
-        {version && <span className="text-sm text-muted font-mono">v{version}</span>}
         <p className="text-xs text-faint text-center">{t("about.description")}</p>
-        <a
-          href="https://github.com/tux86/presto"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-accent hover:underline"
-        >
-          github.com/tux86/presto
-        </a>
+        {version && <span className="text-xs font-mono text-muted">v{version}</span>}
+      </div>
+      <div className="border-t border-edge pt-3 -mx-6 px-6 space-y-0.5">
+        {version && <AboutLink href={`${REPO_URL}/releases/tag/v${version}`}>{t("about.releaseNotes")}</AboutLink>}
+        <AboutLink href={REPO_URL}>{t("about.sourceCode")}</AboutLink>
+        <AboutLink href={`${REPO_URL}/blob/main/LICENSE`}>{t("about.license")}</AboutLink>
       </div>
     </Modal>
   );

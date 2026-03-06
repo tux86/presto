@@ -1,16 +1,40 @@
 import type { LucideIcon } from "lucide-react";
-import { BarChart3, Briefcase, Building2, Ellipsis, Home, LogOut, Search, Users } from "lucide-react";
+import { BarChart3, Briefcase, Building2, Ellipsis, Home, Info, LogOut, Search, Users } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { PreferencesControls, PreferencesMenu } from "@/components/layout/PreferencesMenu";
 import { ProfileModal } from "@/components/layout/ProfileModal";
 import { triggerCommandPalette } from "@/components/ui/CommandPalette";
+import { Modal } from "@/components/ui/Modal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
+
+function AboutModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const version = useConfigStore((s) => s.config?.version);
+  const { t } = useT();
+
+  return (
+    <Modal open={open} onClose={() => onOpenChange(false)} title={t("about.title")} size="sm">
+      <div className="flex flex-col items-center gap-4 py-2">
+        <LogoHorizontal className="h-10" />
+        {version && <span className="text-sm text-muted font-mono">v{version}</span>}
+        <p className="text-xs text-faint text-center">{t("about.description")}</p>
+        <a
+          href="https://github.com/tux86/presto"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-accent hover:underline"
+        >
+          github.com/tux86/presto
+        </a>
+      </div>
+    </Modal>
+  );
+}
 
 export function Sidebar() {
   const { user, logout } = useAuthStore();
@@ -18,6 +42,7 @@ export function Sidebar() {
   const { t } = useT();
   const isMobile = useIsMobile();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems: { to: string; label: string; icon: LucideIcon }[] = [
@@ -79,6 +104,21 @@ export function Sidebar() {
                   <PreferencesControls />
                 </div>
 
+                {/* About */}
+                <div className="border-t border-edge pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setAboutOpen(true);
+                    }}
+                    className="flex items-center gap-3 text-sm text-muted hover:text-body transition-colors cursor-pointer"
+                  >
+                    <Info className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                    {t("about.title")}
+                  </button>
+                </div>
+
                 {/* User + logout */}
                 <div className="border-t border-edge pt-4 space-y-3">
                   <p className="text-xs font-medium text-faint uppercase tracking-wider">{t("profile.title")}</p>
@@ -119,6 +159,7 @@ export function Sidebar() {
         )}
 
         <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
+        <AboutModal open={aboutOpen} onOpenChange={setAboutOpen} />
       </>
     );
   }
@@ -166,9 +207,19 @@ export function Sidebar() {
           ))}
         </nav>
 
-        {/* Preferences */}
-        <div className="px-3 py-2">
-          <PreferencesMenu />
+        {/* Preferences + About */}
+        <div className="px-3 py-2 flex items-center gap-1">
+          <div className="flex-1">
+            <PreferencesMenu />
+          </div>
+          <button
+            type="button"
+            onClick={() => setAboutOpen(true)}
+            className="p-2 text-faint hover:text-muted transition-colors cursor-pointer rounded-lg hover:bg-elevated/50"
+            title={t("about.title")}
+          >
+            <Info className="h-4 w-4" strokeWidth={1.5} />
+          </button>
         </div>
 
         {/* User */}
@@ -200,6 +251,7 @@ export function Sidebar() {
       </aside>
 
       <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
+      <AboutModal open={aboutOpen} onOpenChange={setAboutOpen} />
     </>
   );
 }

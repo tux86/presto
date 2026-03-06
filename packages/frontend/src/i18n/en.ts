@@ -10,6 +10,10 @@ export const en = {
   "nav.reporting": "Reporting",
   "nav.more": "More",
 
+  // About
+  "about.title": "About",
+  "about.description": "Open-source activity report generator.",
+
   // Dashboard
   "dashboard.title": "My Activities",
   "dashboard.subtitle": "Year {year}",

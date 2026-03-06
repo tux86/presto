@@ -15,7 +15,9 @@ COPY packages/backend/ packages/backend/
 
 RUN cd packages/frontend && bun run build
 
-RUN cd packages/backend && bun build src/index.ts --outdir dist --target bun
+RUN cd packages/backend && \
+    VERSION=$(node -p "require('./package.json').version") && \
+    bun build src/index.ts --outdir dist --target bun --define "__APP_VERSION__=\"\\\"$VERSION\\\"\""
 
 # ── Stage 2: Runtime ─────────────────────────────────────
 FROM oven/bun:1-alpine

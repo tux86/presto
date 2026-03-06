@@ -4,6 +4,7 @@ import { api } from "@/api/client";
 
 interface AppConfig {
   appName: string;
+  version: string;
   authDisabled: boolean;
   registrationEnabled: boolean;
   demoMode: boolean;
@@ -32,6 +33,7 @@ export const useConfigStore = create<ConfigState>()((set) => ({
       set({
         config: {
           appName: "Presto",
+          version: "",
           authDisabled: false,
           registrationEnabled: true,
           demoMode: false,

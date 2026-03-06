@@ -1,5 +1,8 @@
 import type { Locale } from "@presto/shared";
 
+declare const __APP_VERSION__: string;
+const APP_VERSION = typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "dev";
+
 function env(key: string, fallback: string): string {
   return process.env[key] ?? fallback;
 }
@@ -84,6 +87,7 @@ export const config = {
 export function getPublicConfig() {
   return {
     appName: config.app.name,
+    version: APP_VERSION,
     authDisabled: config.auth.disabled,
     registrationEnabled: config.auth.registrationEnabled,
     demoMode: config.app.demoData,

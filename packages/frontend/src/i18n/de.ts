@@ -12,6 +12,10 @@ export const de: Record<TranslationKey, string> = {
   "nav.reporting": "Berichte",
   "nav.more": "Mehr",
 
+  // About
+  "about.title": "\u00dcber",
+  "about.description": "Open-Source-Generator f\u00fcr T\u00e4tigkeitsberichte.",
+
   // Dashboard
   "dashboard.title": "Meine Aktivit\u00e4ten",
   "dashboard.subtitle": "Jahr {year}",

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --env-file ../../.env --hot src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build": "bun build src/index.ts --outdir dist --target bun --define __APP_VERSION__='\"'$npm_package_version'\"'",
     "db:generate": "bun run --env-file ../../.env drizzle-kit generate",
     "db:migrate": "bun run --env-file ../../.env src/db/migrate.ts",
     "db:reset": "bun run --env-file ../../.env src/db/reset.ts",

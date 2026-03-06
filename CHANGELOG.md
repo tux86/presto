@@ -1,3 +1,9 @@
+## [1.23.0](https://github.com/tux86/presto/compare/v1.22.2...v1.23.0) (2026-03-06)
+
+### Features
+
+* improve About modal with release notes, source code and license links ([d6d3ea1](https://github.com/tux86/presto/commit/d6d3ea1d645098057028ffbaf11713c025f0c2c8))
+
 ## [1.22.2](https://github.com/tux86/presto/compare/v1.22.1...v1.22.2) (2026-03-06)
 
 ### Bug Fixes

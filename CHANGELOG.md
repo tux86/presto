@@ -1,3 +1,9 @@
+## [1.22.2](https://github.com/tux86/presto/compare/v1.22.1...v1.22.2) (2026-03-06)
+
+### Bug Fixes
+
+* correct version string quoting in Dockerfile --define ([a3e116d](https://github.com/tux86/presto/commit/a3e116d29919f42f13a6b165ee88dbc107bf0299))
+
 ## [1.22.1](https://github.com/tux86/presto/compare/v1.22.0...v1.22.1) (2026-03-06)
 
 ### Bug Fixes

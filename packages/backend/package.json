@@ -19,7 +19,7 @@
     "@presto/shared": "workspace:*",
     "@react-pdf/renderer": "^4.3.0",
     "consola": "^3.4.2",
-    "drizzle-orm": "^0.44.0",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.7.0",
     "hono-rate-limiter": "^0.5.3",
     "nanoid": "^5.1.6",

@@ -42,7 +42,7 @@ export function MonthlyChart({ data, dataKey, label, color = CHART_COLORS.indigo
             />
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
-              formatter={(value: number) => [formatValue ? formatValue(value) : value, label]}
+              formatter={(value) => [formatValue ? formatValue(value as number) : value, label]}
             />
             <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} maxBarSize={32} />
           </BarChart>

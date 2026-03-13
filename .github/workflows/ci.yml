@@ -7,12 +7,26 @@ on:
       - "*.md"
       - "docs/**"
       - "LICENSE"
+      - ".github/dependabot.yml"
+      - ".github/workflows/docker.yml"
+      - ".husky/**"
+      - ".vscode/**"
+      - ".env.example"
+      - "docker-compose*.yml"
+      - "Dockerfile"
   pull_request:
     branches: [main]
     paths-ignore:
       - "*.md"
       - "docs/**"
       - "LICENSE"
+      - ".github/dependabot.yml"
+      - ".github/workflows/docker.yml"
+      - ".husky/**"
+      - ".vscode/**"
+      - ".env.example"
+      - "docker-compose*.yml"
+      - "Dockerfile"
 
 concurrency:
   group: ci-${{ github.ref }}

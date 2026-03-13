@@ -50,7 +50,7 @@ export function RevenueAreaChart({ data, clientIds, label, baseCurrency }: Reven
             />
             <Tooltip
               contentStyle={CHART_TOOLTIP_STYLE}
-              formatter={(value: number, name: string) => [formatCurrency(value, baseCurrency), name]}
+              formatter={(value, name) => [formatCurrency(value as number, baseCurrency), name as string]}
             />
             {clientIds.map((c) => {
               const hex = getClientHexColor(c.clientName, c.clientColor);

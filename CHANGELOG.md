@@ -1,3 +1,9 @@
+## [1.23.3](https://github.com/tux86/presto/compare/v1.23.2...v1.23.3) (2026-03-13)
+
+### Bug Fixes
+
+* resolve Recharts tooltip formatter type errors and expand CI paths-ignore ([989163c](https://github.com/tux86/presto/commit/989163cf1bf2ec017d864ef1be9493d67587f026))
+
 ## [1.23.2](https://github.com/tux86/presto/compare/v1.23.1...v1.23.2) (2026-03-06)
 
 ### Bug Fixes

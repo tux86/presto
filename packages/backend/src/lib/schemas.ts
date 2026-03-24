@@ -122,6 +122,7 @@ export const createReportSchema = z.object({
 export const updateReportSchema = z.object({
   status: z.enum(REPORT_STATUSES).optional(),
   note: z.string().max(2000).nullable().optional(),
+  privateNote: z.string().max(2000).nullable().optional(),
 });
 
 export const updateEntriesSchema = z.object({

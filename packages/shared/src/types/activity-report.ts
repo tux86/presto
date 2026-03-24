@@ -23,6 +23,7 @@ export interface ActivityReport {
   status: ReportStatus;
   totalDays: number;
   note: string | null;
+  privateNote: string | null;
   dailyRate: number | null;
   holidayCountry: HolidayCountryCode;
   missionId: string;
@@ -57,6 +58,7 @@ export interface CreateActivityReportRequest {
 export interface UpdateActivityReportRequest {
   status?: ReportStatus;
   note?: string | null;
+  privateNote?: string | null;
 }
 
 export interface UpdateEntriesRequest {

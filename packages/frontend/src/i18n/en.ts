@@ -118,6 +118,12 @@ export const en = {
   "activity.legendFull": "Full day",
   "activity.legendHalf": "Half day",
   "activity.legendHoliday": "Holiday",
+  "activity.note": "Notes",
+  "activity.noteHint": "Included in PDF export",
+  "activity.notePdfPlaceholder": "Notes included in PDF...",
+  "activity.privateNote": "Private notes",
+  "activity.privateNoteHint": "Not included in PDF",
+  "activity.privateNotePlaceholder": "Personal notes...",
 
   // Reporting
   "reporting.title": "Reporting",

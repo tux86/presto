@@ -126,6 +126,12 @@ export const pt: Record<TranslationKey, string> = {
   "activity.legendFull": "Dia completo",
   "activity.legendHalf": "Meio dia",
   "activity.legendHoliday": "Feriado",
+  "activity.note": "Notas",
+  "activity.noteHint": "Incluído na exportação PDF",
+  "activity.notePdfPlaceholder": "Notas incluídas no PDF...",
+  "activity.privateNote": "Notas privadas",
+  "activity.privateNoteHint": "Não incluído no PDF",
+  "activity.privateNotePlaceholder": "Notas pessoais...",
 
   // Reporting
   "reporting.title": "Relat\u00f3rios",

@@ -132,6 +132,7 @@ export const activityReports = pgTable(
     status: reportStatusEnum("status").notNull().default("DRAFT"),
     totalDays: doublePrecision("totalDays").notNull().default(0),
     note: text("note"),
+    privateNote: text("private_note"),
     dailyRate: doublePrecision("dailyRate"),
     holidayCountry: text("holidayCountry").notNull(),
     missionId: text("missionId")

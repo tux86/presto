@@ -216,6 +216,15 @@ describe("Report Lifecycle — Extended", () => {
     expect(body.note).toBeNull();
   });
 
+  test("PATCH report → clear privateNote to null on draft", async () => {
+    const res = await api("PATCH", `/activity-reports/${state.reportId}`, {
+      body: { privateNote: null },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.privateNote).toBeNull();
+  });
+
   test("Complete report with 0 totalDays → allowed", async () => {
     // Create temp report, don't fill it
     const createRes = await api("POST", "/activity-reports", {

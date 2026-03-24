@@ -1,6 +1,6 @@
 import type { ReportEntry } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
-import { ArrowLeft, Check, Download, MoreHorizontal, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Download, EyeOff, FileText, MoreHorizontal, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
@@ -8,6 +8,7 @@ import { ListView } from "@/components/activity-report/ListView";
 import { ReportInfoPanel } from "@/components/activity-report/ReportInfoPanel";
 import { StatusToggle } from "@/components/activity-report/StatusToggle";
 import { Button } from "@/components/ui/Button";
+import { DebouncedTextarea } from "@/components/ui/DebouncedTextarea";
 import { Skeleton } from "@/components/ui/Skeleton";
 import {
   useActivityReport,
@@ -89,6 +90,22 @@ export function ActivityReportEditor() {
       }, 500);
     },
     [id, updateEntries],
+  );
+
+  const handleNoteChange = useCallback(
+    (note: string | null) => {
+      if (!id) return;
+      updateReport.mutate({ id, note });
+    },
+    [id, updateReport],
+  );
+
+  const handlePrivateNoteChange = useCallback(
+    (privateNote: string | null) => {
+      if (!id) return;
+      updateReport.mutate({ id, privateNote });
+    },
+    [id, updateReport],
   );
 
   const handleToggleStatus = async () => {
@@ -312,6 +329,68 @@ export function ActivityReportEditor() {
               />
             )}
           </div>
+        </div>
+
+        {/* Notes — right column (desktop) */}
+        <div className="hidden lg:block w-64 shrink-0">
+          <div className="lg:sticky lg:top-8 space-y-4">
+            <div className="rounded-xl border border-edge bg-panel p-5">
+              <div className="flex items-center gap-1.5 mb-3">
+                <span className="text-sm font-medium text-heading">{t("activity.note")}</span>
+                <FileText className="h-3.5 w-3.5 text-faint" />
+              </div>
+              <DebouncedTextarea
+                value={report.note}
+                onChange={handleNoteChange}
+                placeholder={t("activity.notePdfPlaceholder")}
+                disabled={isCompleted}
+              />
+              <p className="text-xs text-faint mt-1.5">{t("activity.noteHint")}</p>
+            </div>
+
+            <div className="rounded-xl border border-edge bg-panel p-5">
+              <div className="flex items-center gap-1.5 mb-3">
+                <span className="text-sm font-medium text-heading">{t("activity.privateNote")}</span>
+                <EyeOff className="h-3.5 w-3.5 text-faint" />
+              </div>
+              <DebouncedTextarea
+                value={report.privateNote}
+                onChange={handlePrivateNoteChange}
+                placeholder={t("activity.privateNotePlaceholder")}
+              />
+              <p className="text-xs text-faint mt-1.5">{t("activity.privateNoteHint")}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Notes — below calendar (mobile) */}
+      <div className="lg:hidden mt-6 space-y-4">
+        <div className="rounded-xl border border-edge bg-panel p-4">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-sm font-medium text-heading">{t("activity.note")}</span>
+            <FileText className="h-3.5 w-3.5 text-faint" />
+          </div>
+          <DebouncedTextarea
+            value={report.note}
+            onChange={handleNoteChange}
+            placeholder={t("activity.notePdfPlaceholder")}
+            disabled={isCompleted}
+          />
+          <p className="text-xs text-faint mt-1">{t("activity.noteHint")}</p>
+        </div>
+
+        <div className="rounded-xl border border-edge bg-panel p-4">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-sm font-medium text-heading">{t("activity.privateNote")}</span>
+            <EyeOff className="h-3.5 w-3.5 text-faint" />
+          </div>
+          <DebouncedTextarea
+            value={report.privateNote}
+            onChange={handlePrivateNoteChange}
+            placeholder={t("activity.privateNotePlaceholder")}
+          />
+          <p className="text-xs text-faint mt-1">{t("activity.privateNoteHint")}</p>
         </div>
       </div>
 

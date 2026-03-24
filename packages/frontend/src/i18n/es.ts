@@ -125,6 +125,12 @@ export const es: Record<TranslationKey, string> = {
   "activity.legendFull": "D\u00eda completo",
   "activity.legendHalf": "Medio d\u00eda",
   "activity.legendHoliday": "Festivo",
+  "activity.note": "Notas",
+  "activity.noteHint": "Incluido en la exportación PDF",
+  "activity.notePdfPlaceholder": "Notas incluidas en el PDF...",
+  "activity.privateNote": "Notas privadas",
+  "activity.privateNoteHint": "No incluido en el PDF",
+  "activity.privateNotePlaceholder": "Notas personales...",
 
   // Reporting
   "reporting.title": "Informes",

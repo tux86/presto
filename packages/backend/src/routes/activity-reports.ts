@@ -109,7 +109,7 @@ activityReportsRouter.get("/:id", async (c) => {
   return c.json(report);
 });
 
-// Update activity report (status, note)
+// Update activity report (status, note, privateNote)
 activityReportsRouter.patch("/:id", zValidator("json", updateReportSchema), async (c) => {
   const userId = c.get("userId");
   const id = c.req.param("id");
@@ -117,15 +117,16 @@ activityReportsRouter.patch("/:id", zValidator("json", updateReportSchema), asyn
 
   const existing = await findOwned("activityReport", id, userId);
 
-  // Allow status changes (including revert to draft), but block note edits on completed reports
+  // Allow status changes (including revert to draft) and privateNote edits, but block note edits on completed reports
   if (existing.status === "COMPLETED" && data.note !== undefined && data.status !== "DRAFT") {
-    logger.debug(`Report update rejected: cannot modify completed report ${id}`);
+    logger.debug(`Report update rejected: cannot modify note on completed report ${id}`);
     throw new HTTPException(400, { message: "Cannot modify a completed report" });
   }
 
   await updateReturning(activityReports, id, {
     status: data.status,
     note: data.note,
+    privateNote: data.privateNote,
     updatedAt: new Date(),
   });
 

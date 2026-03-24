@@ -40,6 +40,15 @@ describe("Report Lifecycle", () => {
     expect(res.status).toBe(400);
   });
 
+  test("Edit privateNote on completed report → 200 (always editable)", async () => {
+    const res = await api("PATCH", `/activity-reports/${state.reportId}`, {
+      body: { privateNote: "Note on completed report" },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.privateNote).toBe("Note on completed report");
+  });
+
   test("Revert to draft → 200", async () => {
     const res = await api("PATCH", `/activity-reports/${state.reportId}`, {
       body: { status: "DRAFT" },
@@ -73,6 +82,15 @@ describe("Report Lifecycle", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.note).toBe("January delivery note");
+  });
+
+  test("Set privateNote on draft → 200", async () => {
+    const res = await api("PATCH", `/activity-reports/${state.reportId}`, {
+      body: { privateNote: "Private memo" },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.privateNote).toBe("Private memo");
   });
 
   test("Delete a draft report → 204", async () => {

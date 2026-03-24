@@ -126,6 +126,12 @@ export const de: Record<TranslationKey, string> = {
   "activity.legendFull": "Ganzer Tag",
   "activity.legendHalf": "Halber Tag",
   "activity.legendHoliday": "Feiertag",
+  "activity.note": "Notizen",
+  "activity.noteHint": "Im PDF-Export enthalten",
+  "activity.notePdfPlaceholder": "Notizen im PDF enthalten...",
+  "activity.privateNote": "Private Notizen",
+  "activity.privateNoteHint": "Nicht im PDF enthalten",
+  "activity.privateNotePlaceholder": "Persönliche Notizen...",
 
   // Reporting
   "reporting.title": "Berichte",

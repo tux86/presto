@@ -17,7 +17,7 @@ const ownedModels = {
  */
 export async function findOwned(model: OwnedModel, id: string, userId: string) {
   const { query, table, label } = ownedModels[model];
-  // Cast needed: TypeScript can't narrow a union of query namespaces to call findFirst
+  // biome-ignore lint/suspicious/noExplicitAny: Drizzle relational query namespace can't be narrowed from a union
   const record = await (db.query as any)[query].findFirst({
     where: and(eq(table.id, id), eq(table.userId, userId)),
   });
@@ -39,6 +39,7 @@ export async function insertReturning<T extends PgTable>(
   const d = trx ?? db;
   const [row] = await d
     .insert(table)
+    // biome-ignore lint/suspicious/noExplicitAny: Drizzle generic insert values require cast
     .values(values as any)
     .returning();
   return row as T["$inferSelect"];
@@ -55,9 +56,10 @@ export async function updateReturning<T extends PgTable>(
   trx?: typeof db,
 ): Promise<T["$inferSelect"]> {
   const d = trx ?? db;
-  const idCol = (table as Record<string, any>).id;
+  const idCol = (table as Record<string, unknown>).id as PgColumn;
   const rows = (await d
     .update(table)
+    // biome-ignore lint/suspicious/noExplicitAny: Drizzle generic set values require cast
     .set(values as any)
     .where(eq(idCol, id))
     .returning()) as T["$inferSelect"][];
@@ -71,7 +73,7 @@ export const MISSION_WITH = {
   company: { columns: { id: true, name: true } },
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Drizzle relational orderBy callback types are unresolvable without `any`
+// biome-ignore lint/suspicious/noExplicitAny: Drizzle relational orderBy callback types are unresolvable without cast
 const ENTRIES_ORDERED = { orderBy: (e: any, _: any) => [asc(e.date)] };
 
 /** Relational include: standard activity report with entries + mission. */

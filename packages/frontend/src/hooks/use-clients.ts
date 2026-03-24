@@ -8,4 +8,4 @@ const {
   useDelete: useDeleteClient,
 } = createCrudHooks<Client, CreateClientRequest, UpdateClientRequest>("/clients");
 
-export { useClients, useCreateClient, useUpdateClient, useDeleteClient };
+export { useClients, useCreateClient, useDeleteClient, useUpdateClient };

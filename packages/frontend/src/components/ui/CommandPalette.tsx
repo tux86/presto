@@ -199,6 +199,7 @@ export function CommandPalette() {
           ) : (
             filtered.map((cmd, i) => (
               <button
+                type="button"
                 key={cmd.id}
                 className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-left transition-colors cursor-pointer ${
                   i === selectedIndex ? "bg-accent-subtle text-accent-text" : "text-body hover:bg-elevated"

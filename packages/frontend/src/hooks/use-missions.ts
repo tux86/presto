@@ -8,4 +8,4 @@ const {
   useDelete: useDeleteMission,
 } = createCrudHooks<Mission, CreateMissionRequest, UpdateMissionRequest>("/missions");
 
-export { useMissions, useCreateMission, useUpdateMission, useDeleteMission };
+export { useCreateMission, useDeleteMission, useMissions, useUpdateMission };

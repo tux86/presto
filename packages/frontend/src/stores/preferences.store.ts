@@ -103,4 +103,4 @@ if (typeof window !== "undefined") {
   });
 }
 
-export type { ThemeMode, Locale };
+export type { Locale, ThemeMode };

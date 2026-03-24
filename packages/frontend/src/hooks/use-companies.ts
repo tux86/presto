@@ -8,4 +8,4 @@ const {
   useDelete: useDeleteCompany,
 } = createCrudHooks<Company, CreateCompanyRequest, UpdateCompanyRequest>("/companies");
 
-export { useCompanies, useCreateCompany, useUpdateCompany, useDeleteCompany };
+export { useCompanies, useCreateCompany, useDeleteCompany, useUpdateCompany };

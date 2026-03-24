@@ -229,7 +229,7 @@ export function Clients() {
 
           {/* Color picker — full width */}
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-heading mb-1.5">{t("clients.color")}</label>
+            <span className="block text-sm font-medium text-heading mb-1.5">{t("clients.color")}</span>
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"

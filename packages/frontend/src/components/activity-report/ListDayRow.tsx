@@ -42,6 +42,7 @@ export function ListDayRow({ entry, colors, onToggle, onTaskChange }: ListDayRow
 
       {/* Value toggle */}
       <button
+        type="button"
         className={cn(
           "relative flex h-9 w-16 items-center justify-center rounded-lg text-sm font-bold transition-all overflow-hidden",
           onToggle ? "cursor-pointer" : "cursor-default",

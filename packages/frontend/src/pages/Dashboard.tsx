@@ -153,12 +153,12 @@ export function Dashboard() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="rounded-xl border border-edge bg-panel p-4">
+            <div key={`skel-card-${i}`} className="rounded-xl border border-edge bg-panel p-4">
               <div className="h-5 w-32 bg-elevated rounded animate-pulse mb-3" />
               <div className="h-3 w-44 bg-elevated rounded animate-pulse mb-2" />
               <div className="flex flex-wrap gap-[3px] mb-2">
                 {Array.from({ length: 30 }, (_, j) => (
-                  <div key={j} className="w-2 h-2 rounded-sm bg-elevated animate-pulse" />
+                  <div key={`skel-dot-${i}-${j}`} className="w-2 h-2 rounded-sm bg-elevated animate-pulse" />
                 ))}
               </div>
               <div className="flex items-center justify-between">

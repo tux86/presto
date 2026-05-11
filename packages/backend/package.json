@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.7.6",
+    "@hono/zod-validator": "^0.8.0",
     "@presto/shared": "workspace:*",
     "@react-pdf/renderer": "^4.3.2",
     "consola": "^3.4.2",

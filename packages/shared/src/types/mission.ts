@@ -1,6 +1,15 @@
 import type { ClientColorKey } from "../colors.js";
 import type { CurrencyCode } from "../currencies.js";
 
+export interface MissionConsumption {
+  missionId: string;
+  missionName: string;
+  clientId: string;
+  plannedDays: number;
+  daysWorked: number;
+  isOverconsumed: boolean;
+}
+
 export interface Mission {
   id: string;
   name: string;
@@ -11,7 +20,7 @@ export interface Mission {
   startDate: string | null;
   endDate: string | null;
   isActive: boolean;
-  plannedDays: number; // Nombre de jours prévus pour la mission
+  plannedDays: number;
   createdAt: string;
   updatedAt: string;
   client?: {

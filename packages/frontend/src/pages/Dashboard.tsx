@@ -4,15 +4,35 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
+import { MissionConsumptionChart } from "@/components/reporting/MissionConsumptionChart";
 import { Button } from "@/components/ui/Button";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useActivityReports, useCreateActivityReport } from "@/hooks/use-activity-reports";
+import { useMissionConsumption } from "@/hooks/use-mission-consumption";
 import { useMissions } from "@/hooks/use-missions";
 import { useT } from "@/i18n";
 import { cn, getClientColor } from "@/lib/utils";
+
+// Wrapper pour le graphique de consommation
+function MissionConsumptionChartWrapper({ year }: { year: number }) {
+  const { data, isLoading, error } = useMissionConsumption(year);
+
+  if (isLoading) {
+    return <Skeleton height="h-72" className="rounded-xl" />;
+  }
+  if (error) {
+    return <p className="text-error">{error.message}</p>;
+  }
+  if (!data || data.length === 0) {
+    return null;
+  }
+
+  return <MissionConsumptionChart data={data} />;
+}
 
 export function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -150,15 +170,28 @@ export function Dashboard() {
         </div>
       )}
 
+      {/* Graphique de consommation des missions */}
+      {selectedYear && (
+        <div className="mb-6">
+          <MissionConsumptionChartWrapper year={selectedYear} />
+        </div>
+      )}
+
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={`skel-card-${i}`} className="rounded-xl border border-edge bg-panel p-4">
+            <div
+              key={`skel-card-${i}-${Math.random().toString(36).substring(2, 9)}`}
+              className="rounded-xl border border-edge bg-panel p-4"
+            >
               <div className="h-5 w-32 bg-elevated rounded animate-pulse mb-3" />
               <div className="h-3 w-44 bg-elevated rounded animate-pulse mb-2" />
               <div className="flex flex-wrap gap-[3px] mb-2">
                 {Array.from({ length: 30 }, (_, j) => (
-                  <div key={`skel-dot-${i}-${j}`} className="w-2 h-2 rounded-sm bg-elevated animate-pulse" />
+                  <div
+                    key={`skel-dot-${i}-${j}-${Math.random().toString(36).substring(2, 9)}`}
+                    className="w-2 h-2 rounded-sm bg-elevated animate-pulse"
+                  />
                 ))}
               </div>
               <div className="flex items-center justify-between">

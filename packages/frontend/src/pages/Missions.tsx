@@ -278,16 +278,6 @@ export function Missions() {
               </option>
             ))}
           </Select>
-          <Input
-            label={t("missions.dailyRate")}
-            hint={t("missions.dailyRateHint")}
-            type="number"
-            value={dailyRate}
-            onChange={(e) => setDailyRate(e.target.value)}
-            placeholder="550"
-            suffix={clients?.find((c) => c.id === clientId)?.currency}
-            optional
-          />
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>
               {t("common.cancel")}

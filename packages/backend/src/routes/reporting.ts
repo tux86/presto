@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { db, userSettings } from "../db/index.js";
+import { activityReports, missions } from "../db/schema/pg.schema.js";
 import { logger } from "../lib/logger.js";
 import type { AppEnv } from "../lib/types.js";
 import { parseIntParam } from "../lib/utils.js";
@@ -32,6 +33,51 @@ reporting.get("/", async (c) => {
     }
     throw error;
   }
+});
+
+// Nouvel endpoint pour la consommation des missions
+reporting.get("/mission-consumption", async (c) => {
+  const userId = c.get("userId");
+  const year = parseIntParam(c.req.query("year"), "year", 2000, 2100) ?? new Date().getUTCFullYear();
+
+  // Récupérer les missions avec plannedDays
+  const missionsWithPlannedDays = await db
+    .select({
+      missionId: missions.id,
+      missionName: missions.name,
+      plannedDays: missions.plannedDays,
+      clientId: missions.clientId,
+    })
+    .from(missions)
+    .where(eq(missions.userId, userId));
+
+  // Calculer les jours travaillés par mission (via activity_reports)
+  const daysWorkedByMission = await db
+    .select({
+      missionId: activityReports.missionId,
+      daysWorked: sql<number>`SUM(${activityReports.totalDays})`.as("days_worked"),
+    })
+    .from(activityReports)
+    .where(sql`EXTRACT(YEAR FROM ${activityReports.createdAt}) = ${year} AND ${activityReports.userId} = ${userId}`)
+    .groupBy(activityReports.missionId);
+
+  // Fusionner les données
+  const consumptionData = missionsWithPlannedDays.map((mission) => {
+    const daysWorkedEntry = daysWorkedByMission.find((dw) => dw.missionId === mission.missionId);
+    const daysWorked = daysWorkedEntry?.daysWorked || 0;
+    const isOverconsumed = daysWorked > mission.plannedDays;
+
+    return {
+      missionId: mission.missionId,
+      missionName: mission.missionName,
+      clientId: mission.clientId,
+      plannedDays: mission.plannedDays,
+      daysWorked,
+      isOverconsumed,
+    };
+  });
+
+  return c.json(consumptionData);
 });
 
 export default reporting;

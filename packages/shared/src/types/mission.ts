@@ -11,6 +11,7 @@ export interface Mission {
   startDate: string | null;
   endDate: string | null;
   isActive: boolean;
+  plannedDays: number; // Nombre de jours prévus pour la mission
   createdAt: string;
   updatedAt: string;
   client?: {
@@ -32,6 +33,7 @@ export interface CreateMissionRequest {
   dailyRate?: number;
   startDate?: string;
   endDate?: string;
+  plannedDays?: number; // Optionnel, 0 par défaut
 }
 
 export interface UpdateMissionRequest {
@@ -42,4 +44,5 @@ export interface UpdateMissionRequest {
   startDate?: string | null;
   endDate?: string | null;
   isActive?: boolean;
+  plannedDays?: number; // Optionnel
 }

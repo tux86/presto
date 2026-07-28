@@ -1,0 +1,1 @@
+ALTER TABLE "Mission" ADD COLUMN "planned_days" integer DEFAULT 0 NOT NULL;

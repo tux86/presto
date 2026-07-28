@@ -29,7 +29,7 @@ missionsRouter.get("/", async (c) => {
 
 missionsRouter.post("/", zValidator("json", createMissionSchema), async (c) => {
   const userId = c.get("userId");
-  const { name, clientId, companyId, dailyRate, startDate, endDate } = c.req.valid("json");
+  const { name, clientId, companyId, dailyRate, startDate, endDate, plannedDays } = c.req.valid("json");
 
   await findOwned("client", clientId, userId);
   await findOwned("company", companyId, userId);
@@ -42,6 +42,7 @@ missionsRouter.post("/", zValidator("json", createMissionSchema), async (c) => {
     dailyRate: dailyRate ?? null,
     startDate: startDate ? new Date(startDate) : null,
     endDate: endDate ? new Date(endDate) : null,
+    plannedDays: plannedDays ?? 0, // Valeur par défaut : 0
   });
 
   c.header("Location", `/api/missions/${mission.id}`);
@@ -61,11 +62,12 @@ missionsRouter.patch("/:id", zValidator("json", updateMissionSchema), async (c) 
     await findOwned("company", data.companyId, userId);
   }
 
-  const { startDate, endDate, ...rest } = data;
+  const { startDate, endDate, plannedDays, ...rest } = data;
   await updateReturning(missions, id, {
     ...rest,
     ...(startDate !== undefined && { startDate: startDate ? new Date(startDate) : null }),
     ...(endDate !== undefined && { endDate: endDate ? new Date(endDate) : null }),
+    ...(plannedDays !== undefined && { plannedDays }), // Mise à jour si fourni
     updatedAt: new Date(),
   });
 

@@ -15,6 +15,13 @@
       "when": 1774360291803,
       "tag": "0001_parched_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785230734669,
+      "tag": "0002_empty_maelstrom",
+      "breakpoints": true
     }
   ]
 }

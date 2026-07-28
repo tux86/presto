@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface Option {
@@ -35,7 +35,7 @@ export function SearchableSelect({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const selectedOption = options.find((o) => o.value === value);
 

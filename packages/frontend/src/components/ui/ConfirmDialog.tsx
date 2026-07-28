@@ -1,7 +1,7 @@
 import { TriangleAlert } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 
 interface ConfirmDialogProps {
@@ -26,7 +26,7 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const resolvedConfirmLabel = confirmLabel ?? t("common.confirm");
   const resolvedCancelLabel = cancelLabel ?? t("common.cancel");

@@ -2,12 +2,13 @@ import type { ReportEntry } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { ArrowLeft, Check, Download, EyeOff, FileText, MoreHorizontal, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { CalendarGrid } from "@/components/activity-report/CalendarGrid";
 import { ListView } from "@/components/activity-report/ListView";
 import { ReportInfoPanel } from "@/components/activity-report/ReportInfoPanel";
 import { StatusToggle } from "@/components/activity-report/StatusToggle";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { DebouncedTextarea } from "@/components/ui/DebouncedTextarea";
 import { Skeleton } from "@/components/ui/Skeleton";
 import {
@@ -20,7 +21,6 @@ import {
   useUpdateEntries,
 } from "@/hooks/use-activity-reports";
 import { useConfirm } from "@/hooks/use-confirm";
-import { useT } from "@/i18n";
 import { cn, formatCurrency, getClientCalendarColors, getClientHexColor } from "@/lib/utils";
 
 type ViewMode = "calendar" | "list";
@@ -38,7 +38,7 @@ export function ActivityReportEditor() {
   const updateReport = useUpdateActivityReport();
   const deleteReport = useDeleteActivityReport();
   const { confirm, dialog } = useConfirm();
-  const { t, locale } = useT();
+  const { t, locale } = useTranslation();
 
   const taskTimerRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 

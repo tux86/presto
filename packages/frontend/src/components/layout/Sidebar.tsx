@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
 import { PreferencesControls, PreferencesMenu } from "@/components/layout/PreferencesMenu";
@@ -19,7 +20,6 @@ import { ProfileModal } from "@/components/layout/ProfileModal";
 import { triggerCommandPalette } from "@/components/ui/CommandPalette";
 import { Modal } from "@/components/ui/Modal";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
@@ -42,7 +42,7 @@ function AboutLink({ href, children }: { href: string; children: React.ReactNode
 
 function AboutModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const version = useConfigStore((s) => s.config?.version);
-  const { t } = useT();
+  const { t } = useTranslation();
 
   return (
     <Modal open={open} onClose={() => onOpenChange(false)} size="sm">
@@ -63,7 +63,7 @@ function AboutModal({ open, onOpenChange }: { open: boolean; onOpenChange: (open
 export function Sidebar() {
   const { user, logout } = useAuthStore();
   const authDisabled = useConfigStore((s) => s.config?.authDisabled ?? false);
-  const { t } = useT();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [profileOpen, setProfileOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);

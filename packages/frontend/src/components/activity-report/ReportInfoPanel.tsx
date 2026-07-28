@@ -1,9 +1,9 @@
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { Check, Download, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { StatusToggle } from "@/components/activity-report/StatusToggle";
-import { Button } from "@/components/ui/Button";
-import { useT } from "@/i18n";
+import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 
 interface ReportInfoPanelProps {
@@ -33,7 +33,7 @@ export function ReportInfoPanel({
   clearing,
   downloading,
 }: ReportInfoPanelProps) {
-  const { t, locale } = useT();
+  const { t, locale } = useTranslation();
   const clientCurrency = report.mission?.client?.currency;
   const dailyRate = report.dailyRate ?? report.mission?.dailyRate;
   const revenue = dailyRate != null ? report.totalDays * dailyRate : null;

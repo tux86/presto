@@ -1,4 +1,4 @@
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import { cn, getClientColor } from "@/lib/utils";
 
 interface FilterChip {
@@ -18,7 +18,7 @@ interface FilterChipsProps {
 }
 
 export function FilterChips({ items, value, onChange, allLabel, label, className }: FilterChipsProps) {
-  const { t } = useT();
+  const { t } = useTranslation();
 
   if (items.length < 2) return null;
 

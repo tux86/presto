@@ -1,18 +1,18 @@
 import type { Company } from "@presto/shared";
 import { Building2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/Modal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useCompanies, useCreateCompany, useDeleteCompany, useUpdateCompany } from "@/hooks/use-companies";
 import { useDeleteWithFkGuard } from "@/hooks/use-delete-with-fk-guard";
-import { useT } from "@/i18n";
 
 export function Companies() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,7 +27,7 @@ export function Companies() {
   const createCompany = useCreateCompany();
   const updateCompany = useUpdateCompany();
   const deleteCompany = useDeleteCompany();
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const { handleDelete, dialog } = useDeleteWithFkGuard(deleteCompany, t, {
     confirmTitle: t("companies.deleteTitle"),

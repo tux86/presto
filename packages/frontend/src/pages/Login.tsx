@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ApiError } from "@/api/client";
 import { LogoHorizontal } from "@/components/icons/LogoHorizontal";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useT } from "@/i18n";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
 
@@ -18,7 +18,7 @@ export function Login() {
   const [loading, setLoading] = useState(false);
 
   const { login, register } = useAuthStore();
-  const { t } = useT();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const registrationEnabled = useConfigStore((s) => s.config?.registrationEnabled ?? true);
   const demoMode = useConfigStore((s) => s.config?.demoMode ?? false);

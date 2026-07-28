@@ -1,14 +1,14 @@
 import type { MissionConsumption } from "@presto/shared";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Bar, BarChart, Cell, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useT } from "@/i18n";
 
 interface MissionConsumptionChartProps {
   data: MissionConsumption[];
 }
 
 export function MissionConsumptionChart({ data }: MissionConsumptionChartProps) {
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const chartData = useMemo(() => {
     return data.map((item) => ({

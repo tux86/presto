@@ -1,13 +1,14 @@
 import type { Mission } from "@presto/shared";
 import { Briefcase } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { FilterChips } from "@/components/ui/FilterChips";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -16,7 +17,6 @@ import { useClients } from "@/hooks/use-clients";
 import { useCompanies } from "@/hooks/use-companies";
 import { useDeleteWithFkGuard } from "@/hooks/use-delete-with-fk-guard";
 import { useCreateMission, useDeleteMission, useMissions, useUpdateMission } from "@/hooks/use-missions";
-import { useT } from "@/i18n";
 import { formatCurrency } from "@/lib/utils";
 
 export function Missions() {
@@ -36,7 +36,7 @@ export function Missions() {
   const createMission = useCreateMission();
   const updateMission = useUpdateMission();
   const deleteMission = useDeleteMission();
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const { handleDelete, dialog } = useDeleteWithFkGuard(deleteMission, t, {
     confirmTitle: t("missions.deleteTitle"),

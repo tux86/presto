@@ -1,8 +1,8 @@
 import type { ActivityReport } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
-import { useT } from "@/i18n";
 import { cn, formatCurrency, formatNumber, getClientColor } from "@/lib/utils";
 
 interface ActivityReportCardProps {
@@ -13,7 +13,7 @@ interface ActivityReportCardProps {
 
 export function ActivityReportCard({ report, locale, isCurrent }: ActivityReportCardProps) {
   const navigate = useNavigate();
-  const { t } = useT();
+  const { t } = useTranslation();
   const entries = report.entries ?? [];
   const color = getClientColor(report.mission?.client?.name ?? "", report.mission?.client?.color);
 

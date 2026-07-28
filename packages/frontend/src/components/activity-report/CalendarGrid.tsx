@@ -1,7 +1,7 @@
 import type { ReportEntry } from "@presto/shared";
 import { getDayName, getDayNameFull } from "@presto/shared";
 import { useCallback, useState } from "react";
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import type { CalendarColors } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { CalendarDay } from "./CalendarDay";
@@ -15,7 +15,8 @@ interface CalendarGridProps {
 }
 
 export function CalendarGrid({ entries, colors, onToggle, onTaskChange, readOnly }: CalendarGridProps) {
-  const { t, locale } = useT();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const taskInputRef = useCallback((node: HTMLInputElement | null) => {
     node?.focus();

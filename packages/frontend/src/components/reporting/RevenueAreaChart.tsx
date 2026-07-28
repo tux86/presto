@@ -1,8 +1,8 @@
 import type { ClientColorKey } from "@presto/shared";
 import { getMonthName } from "@presto/shared";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useT } from "@/i18n";
 import { CHART_TOOLTIP_STYLE } from "@/lib/constants";
 import { compactTick, formatCurrency, getClientHexColor } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ interface RevenueAreaChartProps {
 }
 
 export function RevenueAreaChart({ data, clientIds, label, baseCurrency }: RevenueAreaChartProps) {
-  const { locale } = useT();
+  const { locale } = useTranslation();
 
   const chartData = useMemo(() => {
     return data.map((m) => {

@@ -1,11 +1,12 @@
 import { getMonthName } from "@presto/shared";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { ActivityReportCard } from "@/components/activity-report/ActivityReportRow";
 import { Header } from "@/components/layout/Header";
 import { MissionConsumptionChart } from "@/components/reporting/MissionConsumptionChart";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
@@ -14,7 +15,6 @@ import { YearNavigator } from "@/components/ui/YearNavigator";
 import { useActivityReports, useCreateActivityReport } from "@/hooks/use-activity-reports";
 import { useMissionConsumption } from "@/hooks/use-mission-consumption";
 import { useMissions } from "@/hooks/use-missions";
-import { useT } from "@/i18n";
 import { cn, getClientColor } from "@/lib/utils";
 
 // Wrapper pour le graphique de consommation
@@ -62,7 +62,7 @@ export function Dashboard() {
   const { data: reports, isLoading } = useActivityReports({ year: selectedYear });
   const { data: missions } = useMissions();
   const createReport = useCreateActivityReport();
-  const { t, locale } = useT();
+  const { t, locale } = useTranslation();
 
   const companyList = useMemo(() => {
     if (!reports) return [];

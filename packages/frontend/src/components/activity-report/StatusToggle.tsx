@@ -1,4 +1,4 @@
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface StatusToggleProps {
@@ -9,7 +9,7 @@ interface StatusToggleProps {
 }
 
 export function StatusToggle({ isCompleted, onToggleStatus, compact }: StatusToggleProps) {
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const itemClass = compact
     ? "rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer"

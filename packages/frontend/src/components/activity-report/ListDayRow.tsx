@@ -1,6 +1,6 @@
 import type { ReportEntry } from "@presto/shared";
 import { getDayNameFull } from "@presto/shared";
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import type { CalendarColors } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ interface ListDayRowProps {
 export function ListDayRow({ entry, colors, onToggle, onTaskChange }: ListDayRowProps) {
   const date = new Date(entry.date);
   const isSpecial = entry.isWeekend || entry.isHoliday;
-  const { t, locale } = useT();
+  const { t, locale } = useTranslation();
 
   const handleToggle = () => {
     if (!onToggle) return;

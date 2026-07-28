@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
-import { useT } from "./i18n";
 import { ActivityReportEditor } from "./pages/ActivityReportEditor";
 import { Clients } from "./pages/Clients";
 import { Companies } from "./pages/Companies";
@@ -31,7 +31,7 @@ export default function App() {
   const { config, loaded: configLoaded, fetchConfig } = useConfigStore();
   const fetchSettings = usePreferencesStore((s) => s.fetchSettings);
   const settingsLoaded = usePreferencesStore((s) => s.loaded);
-  const { t } = useT();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchConfig();

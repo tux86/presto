@@ -1,6 +1,6 @@
 import { getMonthName } from "@presto/shared";
+import { useTranslation } from "react-i18next";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useT } from "@/i18n";
 import { CHART_COLORS, CHART_TOOLTIP_STYLE } from "@/lib/constants";
 import { compactTick } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ interface MonthlyChartProps {
 }
 
 export function MonthlyChart({ data, dataKey, label, color = CHART_COLORS.indigo, formatValue }: MonthlyChartProps) {
-  const { locale } = useT();
+  const { locale } = useTranslation();
 
   const chartData = data.map((d) => ({
     ...d,

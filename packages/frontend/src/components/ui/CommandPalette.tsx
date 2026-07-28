@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useT } from "@/i18n";
 import { usePreferencesStore } from "@/stores/preferences.store";
 
 const commandPaletteListeners = new Set<() => void>();
@@ -25,7 +25,7 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const setTheme = usePreferencesStore((s) => s.setTheme);
 

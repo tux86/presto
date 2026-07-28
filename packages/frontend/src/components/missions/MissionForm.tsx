@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateMissionRequest, Mission } from "@presto/shared";
+import type { CreateMissionRequest } from "@presto/shared";
 import { createMissionSchema } from "@presto/shared";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
 interface MissionFormProps {
-  defaultValues?: Partial<Mission>;
+  defaultValues?: Partial<CreateMissionRequest>;
   onSubmit: (data: CreateMissionRequest) => Promise<void>;
   isLoading?: boolean;
 }

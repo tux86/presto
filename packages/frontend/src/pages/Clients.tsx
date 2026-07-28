@@ -9,18 +9,18 @@ import {
 } from "@presto/shared";
 import { Users as UsersIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/Modal";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Table } from "@/components/ui/Table";
 import { useClients, useCreateClient, useDeleteClient, useUpdateClient } from "@/hooks/use-clients";
 import { useDeleteWithFkGuard } from "@/hooks/use-delete-with-fk-guard";
-import { useT } from "@/i18n";
 import { CLIENT_COLOR_MAP, cn, getClientColor } from "@/lib/utils";
 
 function CountryFlag({ code }: { code: string }) {
@@ -44,7 +44,7 @@ export function Clients() {
   const createClient = useCreateClient();
   const updateClient = useUpdateClient();
   const deleteClient = useDeleteClient();
-  const { t, locale } = useT();
+  const { t, locale } = useTranslation();
 
   const { handleDelete, dialog } = useDeleteWithFkGuard(deleteClient, t, {
     confirmTitle: t("clients.deleteTitle"),

@@ -1,5 +1,5 @@
+import { useTranslation } from "react-i18next";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { useT } from "@/i18n";
 import { cn, formatCurrency, formatNumber, getClientColor, getClientHexColor } from "@/lib/utils";
 
 interface ClientData {
@@ -19,7 +19,7 @@ interface ClientDonutChartProps {
 }
 
 export function ClientDonutChart({ data, baseCurrency, totalDays }: ClientDonutChartProps) {
-  const { t } = useT();
+  const { t } = useTranslation();
   const sorted = [...data].sort((a, b) => b.convertedRevenue - a.convertedRevenue);
 
   return (

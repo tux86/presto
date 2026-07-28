@@ -1,6 +1,7 @@
 import type { ReportingData } from "@presto/shared";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "@/api/client";
 import { Header } from "@/components/layout/Header";
 import { ClientDonutChart } from "@/components/reporting/ClientDonutChart";
@@ -10,7 +11,6 @@ import { RevenueAreaChart } from "@/components/reporting/RevenueAreaChart";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { YearNavigator } from "@/components/ui/YearNavigator";
-import { useT } from "@/i18n";
 import { CHART_COLORS } from "@/lib/constants";
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 
@@ -31,7 +31,7 @@ export function Reporting() {
   const [year, setYearRaw] = useState(new Date().getFullYear());
   const [filterClientId, setFilterClientId] = useState("");
   const [filterCompanyId, setFilterCompanyId] = useState("");
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const setYear = useCallback((y: number) => {
     setYearRaw(y);

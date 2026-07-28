@@ -1,5 +1,5 @@
 import type { ReportEntry } from "@presto/shared";
-import { useT } from "@/i18n";
+import { useTranslation } from "react-i18next";
 import type { CalendarColors } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +55,7 @@ function getDayNameStyle(kind: DayKind, value: DayValue, c: CalendarColors): str
 }
 
 export function CalendarDay({ entry, dayNumber, dayName, colors, selected, onToggle, onSelect }: CalendarDayProps) {
-  const { t } = useT();
+  const { t } = useTranslation();
   const kind = getDayKind(entry);
   const value: DayValue = entry.value === 1 ? 1 : entry.value === 0.5 ? 0.5 : 0;
 

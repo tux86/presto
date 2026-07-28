@@ -1,10 +1,10 @@
 import { Download } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ApiError, api } from "@/api/client";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/Modal";
-import { useT } from "@/i18n";
 import { cn, downloadBlob } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { useConfigStore } from "@/stores/config.store";
@@ -18,7 +18,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
   const { user, updateProfile, changePassword, deleteAccount } = useAuthStore();
   const authDisabled = useConfigStore((s) => s.config?.authDisabled ?? false);
   const demoMode = useConfigStore((s) => s.config?.demoMode ?? false);
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const [profileForm, setProfileForm] = useState({ firstName: "", lastName: "" });
   const [profileSaving, setProfileSaving] = useState(false);

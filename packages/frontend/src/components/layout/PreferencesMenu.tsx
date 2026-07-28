@@ -2,9 +2,9 @@ import { CURRENCIES, getCurrencyName, getCurrencySymbol } from "@presto/shared";
 import type { LucideIcon } from "lucide-react";
 import { Monitor, Moon, Settings, Sun } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Modal } from "@/components/ui/Modal";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
-import { useT } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { type Locale, type ThemeMode, usePreferencesStore } from "@/stores/preferences.store";
 
@@ -53,7 +53,7 @@ export function SegmentedControl<T extends string>({
 }
 
 export function PreferencesControls() {
-  const { t, locale: currentLocale } = useT();
+  const { t, locale: currentLocale } = useTranslation();
   const theme = usePreferencesStore((s) => s.theme);
   const locale = usePreferencesStore((s) => s.locale);
   const baseCurrency = usePreferencesStore((s) => s.baseCurrency);
@@ -122,7 +122,7 @@ export function PreferencesControls() {
 
 export function PreferencesMenu() {
   const [open, setOpen] = useState(false);
-  const { t } = useT();
+  const { t } = useTranslation();
 
   return (
     <>

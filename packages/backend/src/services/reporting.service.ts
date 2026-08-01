@@ -77,6 +77,17 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
       convertedRevenue: number;
     }
   >();
+  const missionMap = new Map<
+    string,
+    {
+      missionId: string;
+      missionName: string;
+      clientId: string;
+      clientName: string;
+      days: number;
+      allocatedDays: number | null;
+    }
+  >();
 
   for (let i = 0; i < reports.length; i++) {
     const report = reports[i];
@@ -150,6 +161,21 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
       days: compExisting.days + days,
       convertedRevenue: compExisting.convertedRevenue + converted,
     });
+
+    // Mission aggregate
+    const missionId = report.missionId;
+    const missionExisting = missionMap.get(missionId) ?? {
+      missionId: report.mission.id,
+      missionName: report.mission.name,
+      clientId: report.mission.client.id,
+      clientName: report.mission.client.name,
+      days: 0,
+      allocatedDays: report.mission.allocatedDays ?? null,
+    };
+    missionMap.set(missionId, {
+      ...missionExisting,
+      days: missionExisting.days + days,
+    });
   }
 
   // --- Previous year aggregation ---
@@ -197,6 +223,7 @@ export async function getYearlyReport(userId: string, year: number, baseCurrency
     monthlyClientRevenue,
     clientData: Array.from(clientMap.values()),
     companyData: Array.from(companyMap.values()),
+    missionData: Array.from(missionMap.values()),
   };
 }
 

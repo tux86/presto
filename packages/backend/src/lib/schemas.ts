@@ -91,7 +91,7 @@ export const createMissionSchema = z
     dailyRate: z.number().min(0).optional(),
     startDate: dateString.optional(),
     endDate: dateString.optional(),
-    plannedDays: z.number().min(0).optional(), // Optionnel, 0 par défaut
+    allocatedDays: z.number().min(0).optional(),
   })
   .refine((d) => !d.startDate || !d.endDate || d.endDate >= d.startDate, {
     message: "End date must be on or after start date",
@@ -106,8 +106,8 @@ export const updateMissionSchema = z
     dailyRate: z.number().min(0).nullable().optional(),
     startDate: dateString.nullable().optional(),
     endDate: dateString.nullable().optional(),
+    allocatedDays: z.number().min(0).nullable().optional(),
     isActive: z.boolean().optional(),
-    plannedDays: z.number().min(0).optional(), // Optionnel
   })
   .refine((d) => !d.startDate || !d.endDate || d.endDate >= d.startDate, {
     message: "End date must be on or after start date",

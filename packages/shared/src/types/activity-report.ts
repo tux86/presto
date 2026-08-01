@@ -116,4 +116,12 @@ export interface ReportingData {
     days: number;
     convertedRevenue: number;
   }[];
+  missionData: {
+    missionId: string;
+    missionName: string;
+    clientId: string;
+    clientName: string;
+    days: number;
+    allocatedDays: number | null;
+  }[];
 }

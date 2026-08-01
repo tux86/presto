@@ -71,6 +71,7 @@ export async function updateReturning<T extends PgTable>(
 export const MISSION_WITH = {
   client: { columns: { id: true, name: true, color: true, currency: true } },
   company: { columns: { id: true, name: true } },
+  allocatedDays: true,
 } as const;
 
 // biome-ignore lint/suspicious/noExplicitAny: Drizzle relational orderBy callback types are unresolvable without cast

@@ -27,6 +27,7 @@ export function Missions() {
   const [clientId, setClientId] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [dailyRate, setDailyRate] = useState("");
+  const [allocatedDays, setAllocatedDays] = useState("");
   const [filterClientId, setFilterClientId] = useState("");
   const [filterCompanyId, setFilterCompanyId] = useState("");
 
@@ -88,6 +89,7 @@ export function Missions() {
     setClientId("");
     setCompanyId(defaultCompanyId);
     setDailyRate("");
+    setAllocatedDays("");
     setShowModal(true);
   }, [defaultCompanyId]);
 
@@ -104,6 +106,7 @@ export function Missions() {
     setClientId(mission.clientId);
     setCompanyId(mission.companyId);
     setDailyRate(mission.dailyRate?.toString() || "");
+    setAllocatedDays(mission.allocatedDays?.toString() || "");
     setShowModal(true);
   };
 
@@ -116,6 +119,7 @@ export function Missions() {
       clientId,
       companyId,
       dailyRate: dailyRate ? parseFloat(dailyRate) : undefined,
+      allocatedDays: allocatedDays ? parseInt(allocatedDays, 10) : undefined,
     };
 
     if (editing) {
@@ -222,6 +226,15 @@ export function Missions() {
               ),
             },
             {
+              key: "allocatedDays",
+              header: t("missions.allocatedDays"),
+              render: (m) => (
+                <span className="text-muted font-mono">
+                  {m.allocatedDays ? `${m.allocatedDays} ${t("activity.days")}` : "-"}
+                </span>
+              ),
+            },
+            {
               key: "status",
               header: t("missions.status"),
               render: (m) => (
@@ -278,6 +291,25 @@ export function Missions() {
               </option>
             ))}
           </Select>
+          <Input
+            label={t("missions.dailyRate")}
+            hint={t("missions.dailyRateHint")}
+            type="number"
+            value={dailyRate}
+            onChange={(e) => setDailyRate(e.target.value)}
+            placeholder="550"
+            suffix={clients?.find((c) => c.id === clientId)?.currency}
+            optional
+          />
+          <Input
+            label={t("missions.allocatedDays")}
+            hint={t("missions.allocatedDaysHint")}
+            type="number"
+            value={allocatedDays}
+            onChange={(e) => setAllocatedDays(e.target.value)}
+            placeholder="20"
+            optional
+          />
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>
               {t("common.cancel")}

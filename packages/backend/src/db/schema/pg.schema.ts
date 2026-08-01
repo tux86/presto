@@ -113,7 +113,8 @@ export const missions = pgTable(
     startDate: timestamp("startDate", { precision: 3, mode: "date" }),
     endDate: timestamp("endDate", { precision: 3, mode: "date" }),
     isActive: boolean("isActive").notNull().default(true),
-    plannedDays: integer("planned_days").notNull().default(0), // Nombre de jours prévus pour la mission
+    plannedDays: integer("planned_days").notNull().default(0),
+    allocatedDays: doublePrecision("allocatedDays"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },

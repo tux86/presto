@@ -73,6 +73,21 @@ fix(pdf): keep a 31-day month on one page
 Releases are cut automatically from `main`; `feat` bumps the minor, `fix` the patch, and a
 `BREAKING CHANGE:` footer the major. Don't edit `CHANGELOG.md` or the version by hand.
 
+## Releasing
+
+Releases are automatic: `semantic-release` runs on `main` after CI passes, and publishing the
+GitHub release triggers the Docker workflow.
+
+The image always goes to GHCR. Docker Hub is optional and needs three repository settings:
+
+| Setting | Kind | Example |
+|---|---|---|
+| `DOCKERHUB_IMAGE` | variable | `axforge/presto` |
+| `DOCKERHUB_USERNAME` | secret | your Docker Hub user |
+| `DOCKERHUB_TOKEN` | secret | an access token, not the password |
+
+Leave `DOCKERHUB_IMAGE` unset and the workflow quietly publishes to GHCR only.
+
 ## Reporting bugs
 
 Include your Presto version (bottom of the sidebar), how you installed it, and what you expected.

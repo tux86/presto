@@ -10,7 +10,7 @@
   <p>
     <a href="https://github.com/tux86/presto/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI"></a>
     <a href="https://github.com/tux86/presto/releases"><img alt="Release" src="https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=4f46e5"></a>
-    <a href="https://github.com/tux86/presto/pkgs/container/presto"><img alt="Image" src="https://img.shields.io/badge/ghcr.io-presto-4f46e5?style=flat-square&logo=docker&logoColor=white"></a>
+    <a href="https://hub.docker.com/r/axforge/presto"><img alt="Docker Hub" src="https://img.shields.io/docker/v/axforge/presto?sort=semver&style=flat-square&logo=docker&logoColor=white&label=docker&color=4f46e5"></a>
     <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/License-MIT-059669?style=flat-square"></a>
   </p>
 </div>
@@ -64,7 +64,10 @@ curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.yml
 docker compose up -d
 ```
 
-One container, one volume. There is no database service, because the database is a file.
+One container, one volume, no database service — because the database is a file. The image is
+published to both [GHCR](https://github.com/tux86/presto/pkgs/container/presto) and
+[Docker Hub](https://hub.docker.com/r/axforge/presto) for `linux/amd64` and `linux/arm64`, and runs
+as a non-root user.
 
 </details>
 
@@ -157,10 +160,27 @@ the sidebar, not environment variables.
 ## Backups
 
 ```bash
-cp data/presto.db ~/backups/presto-$(date +%F).db
+bun run backup                 # ./backups/presto-YYYY-MM-DD.db
+bun run backup /path/to/out.db
 ```
 
-That is a complete backup. To move to another machine, copy the file.
+That file is a complete, self-contained database — copy it to another machine and point `DATA_DIR`
+at it to restore.
+
+Presto runs SQLite in WAL mode, so plain `cp data/presto.db` while the server is running can miss
+writes still sitting in the log. `bun run backup` uses `VACUUM INTO`, which snapshots under a read
+transaction and compacts the result. With Presto stopped, copying the file is fine too.
+
+<details>
+<summary><b>From a container</b></summary>
+
+```bash
+docker exec presto bun dist/backup.js /data/backup.db
+docker cp presto:/data/backup.db ./presto-backup.db
+docker exec presto rm /data/backup.db
+```
+
+</details>
 
 ## Relationship to v1
 
@@ -177,6 +197,7 @@ bun test               # 156 tests, no database or server needed
 bun run typecheck
 bun run lint:fix
 bun run seed --reset   # sample data to work against
+bun run backup         # snapshot the database
 ```
 
 ```

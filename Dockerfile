@@ -8,9 +8,12 @@ RUN bun install --frozen-lockfile
 COPY tsconfig.json vite.config.ts index.html ./
 COPY public/ public/
 COPY src/ src/
+COPY scripts/backup.ts scripts/backup.ts
 
 RUN bun run build
 RUN bun build src/server/index.ts --target bun --outfile dist/server.js
+# Shipped so `docker exec presto bun dist/backup.js` works without the source tree.
+RUN bun build scripts/backup.ts --target bun --outfile dist/backup.js
 
 # ── Runtime ──────────────────────────────────────────────────────────────────
 # The server is a single bundled file and SQLite is built into Bun, so the
@@ -23,6 +26,7 @@ RUN addgroup -S -g 1001 presto \
  && mkdir -p /data && chown presto:presto /data
 
 COPY --from=build --chown=presto:presto /app/dist/server.js dist/server.js
+COPY --from=build --chown=presto:presto /app/dist/backup.js dist/backup.js
 COPY --from=build --chown=presto:presto /app/dist/ui        dist/ui
 
 ENV PORT=8080 DATA_DIR=/data

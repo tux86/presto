@@ -52,9 +52,21 @@ export function Button({ variant = "primary", size = "md", busy, className, chil
 
 // ── Form fields ──────────────────────────────────────────────────────────────
 
-const CONTROL =
-  "w-full rounded-lg border border-edge bg-panel px-3 py-2 text-sm text-body placeholder:text-placeholder " +
+/**
+ * Sizes are separate strings, not overrides layered on a base.
+ *
+ * Passing `w-auto` alongside a base `w-full` does not work: both utilities end
+ * up in the stylesheet with equal specificity, so the cascade decides, not the
+ * order of the class attribute.
+ */
+const CONTROL_BASE =
+  "rounded-lg border border-edge bg-panel text-body placeholder:text-placeholder " +
   "focus:outline-2 focus:outline-offset-0 focus:outline-accent disabled:opacity-60";
+
+const CONTROL = `w-full px-3 py-2 text-sm ${CONTROL_BASE}`;
+
+/** Toolbar-sized: hugs its content instead of filling the row. */
+const CONTROL_COMPACT = `w-auto px-2.5 py-1.5 text-xs ${CONTROL_BASE}`;
 
 /**
  * Label, control, hint and error as one block.
@@ -95,9 +107,14 @@ export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLText
   return <textarea {...rest} className={cn(CONTROL, "resize-y min-h-20 leading-relaxed", className)} />;
 }
 
-export function Select({ className, children, ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
+export function Select({
+  compact,
+  className,
+  children,
+  ...rest
+}: SelectHTMLAttributes<HTMLSelectElement> & { compact?: boolean }) {
   return (
-    <select {...rest} className={cn(CONTROL, "cursor-pointer", className)}>
+    <select {...rest} className={cn(compact ? CONTROL_COMPACT : CONTROL, "cursor-pointer", className)}>
       {children}
     </select>
   );
@@ -161,6 +178,73 @@ export function Badge({
     <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", tones[tone])}>
       {children}
     </span>
+  );
+}
+
+export interface ChipItem {
+  id: string;
+  label: string;
+  count?: number;
+  /** Tailwind background class for the leading dot, e.g. a client colour. */
+  dot?: string;
+}
+
+/**
+ * A row of filter pills. Better than a dropdown for a handful of options: the
+ * choices, their counts and their colours are all visible without a click.
+ */
+export function FilterChips({
+  label,
+  items,
+  value,
+  onChange,
+  allLabel,
+}: {
+  label: string;
+  items: ChipItem[];
+  value: string;
+  onChange: (id: string) => void;
+  allLabel: string;
+}) {
+  if (items.length < 2) return null;
+
+  const chip = (id: string, content: ReactNode) => (
+    <button
+      key={id || "all"}
+      type="button"
+      aria-pressed={value === id}
+      onClick={() => onChange(id)}
+      className={cn(
+        "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        value === id
+          ? "border-transparent bg-accent text-on-accent"
+          : "border-edge bg-panel text-muted hover:bg-elevated hover:text-heading",
+      )}
+    >
+      {content}
+    </button>
+  );
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="mr-0.5 text-xs text-faint">{label}</span>
+      {chip("", allLabel)}
+      {items.map((item) =>
+        chip(
+          item.id,
+          <>
+            {item.dot ? (
+              <span className={cn("size-2 rounded-full", value === item.id ? "bg-white/70" : item.dot)} />
+            ) : null}
+            {item.label}
+            {item.count !== undefined ? (
+              <span className={value === item.id ? "text-on-accent/70" : "text-faint"}>{item.count}</span>
+            ) : null}
+          </>,
+        ),
+      )}
+    </div>
   );
 }
 

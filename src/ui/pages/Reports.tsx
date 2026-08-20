@@ -7,7 +7,17 @@ import { revenue, totalDays } from "../../core/totals.ts";
 import type { Report } from "../../core/types.ts";
 import { ApiError, api } from "../api.ts";
 import { PageHeader } from "../components/Layout.tsx";
-import { Badge, Button, EmptyState, ErrorText, Field, Modal, ModalActions, Select } from "../components/ui.tsx";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  ErrorText,
+  Field,
+  FilterChips,
+  Modal,
+  ModalActions,
+  Select,
+} from "../components/ui.tsx";
 import { COLORS, cn, colorOf, days as fmtDays, money } from "../format.ts";
 import { useT } from "../prefs.tsx";
 import { useStore } from "../store.tsx";
@@ -232,36 +242,27 @@ export function Reports() {
         }
       />
 
-      {(companies.length > 1 || usedClients.length > 1) && groups.length > 0 ? (
-        <div className="mb-5 flex flex-wrap gap-2">
-          {companies.length > 1 ? (
-            <Select
-              value={companyFilter}
-              onChange={(e) => setCompanyFilter(e.target.value)}
-              className="w-auto py-1.5 text-xs"
-            >
-              <option value="">{`${t("reports.filterCompany")}: ${t("reports.all")}`}</option>
-              {companies.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </Select>
-          ) : null}
-          {usedClients.length > 1 ? (
-            <Select
-              value={clientFilter}
-              onChange={(e) => setClientFilter(e.target.value)}
-              className="w-auto py-1.5 text-xs"
-            >
-              <option value="">{`${t("reports.filterClient")}: ${t("reports.all")}`}</option>
-              {usedClients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </Select>
-          ) : null}
+      {groups.length > 0 ? (
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+          <FilterChips
+            label={t("reports.filterCompany")}
+            allLabel={t("reports.all")}
+            value={companyFilter}
+            onChange={setCompanyFilter}
+            items={companies.map((c) => ({ id: c.id, label: c.name }))}
+          />
+          <FilterChips
+            label={t("reports.filterClient")}
+            allLabel={t("reports.all")}
+            value={clientFilter}
+            onChange={setClientFilter}
+            items={usedClients.map((c) => ({
+              id: c.id,
+              label: c.name,
+              dot: COLORS[colorOf(c.name, c.color)].dot,
+              count: reports.filter((r) => r.year === year && mission(r.missionId)?.clientId === c.id).length,
+            }))}
+          />
         </div>
       ) : null}
 

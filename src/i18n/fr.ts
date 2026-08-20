@@ -7,7 +7,7 @@ export const fr: Dictionary = {
   "nav.clients": "Clients",
   "nav.missions": "Missions",
   "nav.companies": "Sociétés",
-  "nav.year": "Année",
+  "nav.year": "Bilan",
 
   "common.cancel": "Annuler",
   "common.save": "Enregistrer",

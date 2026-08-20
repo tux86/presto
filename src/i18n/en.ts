@@ -12,7 +12,7 @@ export const en = {
   "nav.clients": "Clients",
   "nav.missions": "Missions",
   "nav.companies": "Companies",
-  "nav.year": "Year",
+  "nav.year": "Summary",
 
   "common.cancel": "Cancel",
   "common.save": "Save",

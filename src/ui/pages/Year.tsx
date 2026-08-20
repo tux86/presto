@@ -158,11 +158,7 @@ export function Year() {
           {summary.currencies.length > 1 ? (
             <div className="flex flex-wrap items-center gap-3 rounded-lg border border-edge bg-elevated px-3 py-2">
               <p className="text-xs text-muted">{t("year.multiCurrency")}</p>
-              <Select
-                value={currency ?? ""}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="ml-auto w-auto py-1 text-xs"
-              >
+              <Select compact value={currency ?? ""} onChange={(e) => setCurrency(e.target.value)} className="ml-auto">
                 {summary.currencies.map((c) => (
                   <option key={c} value={c}>
                     {c}

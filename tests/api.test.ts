@@ -361,3 +361,26 @@ describe("health", () => {
     expect(repo.listCompanies(db)).toBeDefined();
   });
 });
+
+describe("PDF export", () => {
+  test("refuses a draft and serves a completed report", async () => {
+    const { missionId } = await seed();
+    const created = await call("POST", "/reports", { missionId, year: 2026, month: 8 });
+    const id = created.body.id;
+    await call("POST", `/reports/${id}/fill`);
+
+    const draft = await call("GET", `/reports/${id}/pdf`);
+    expect(draft.status).toBe(400);
+    expect(draft.body.error).toContain("completed");
+
+    await call("PATCH", `/reports/${id}`, { status: "completed" });
+    const res = await app.request(`/api/reports/${id}/pdf`);
+    expect(res.headers.get("Content-Type")).toBe("application/pdf");
+    expect(res.headers.get("Content-Disposition")).toContain("report-globex-2026-08.pdf");
+    expect(
+      Buffer.from(await res.arrayBuffer())
+        .subarray(0, 5)
+        .toString(),
+    ).toBe("%PDF-");
+  });
+});

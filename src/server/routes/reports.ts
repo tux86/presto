@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { compactDays, compactNotes, copyWeekdayPattern, fillWorkdays, reportGrid } from "../../core/grid.ts";
-import type { Report, ReportStatus } from "../../core/types.ts";
+import { isLocale, type Report, type ReportStatus } from "../../core/types.ts";
 import * as repo from "../../db/repo.ts";
+import { pdfFilename, renderReportPdf } from "../../pdf/report.tsx";
 import type { Env } from "../app.ts";
 import { badRequest, required } from "../errors.ts";
 import { reportInput, reportPatch, yearQuery } from "../schemas.ts";
@@ -134,4 +135,23 @@ export const reports = new Hono<Env>()
 
     const days = copyWeekdayPattern(reportGrid(source), report.year, report.month, report.holidayCountry);
     return c.json(repo.updateReport(c.var.db, id, { days }));
+  })
+
+  /**
+   * The PDF the client receives. Drafts are refused: exporting a half-filled
+   * month is almost always a mistake, and completing it first is one click.
+   */
+  .get("/reports/:id/pdf", async (c) => {
+    const ctx = required(repo.getReportContext(c.var.db, c.req.param("id")), "Report");
+    if (ctx.report.status === "draft") {
+      badRequest("Mark this report as completed before exporting it.");
+    }
+    const raw = c.req.query("locale");
+    const pdf = await renderReportPdf(ctx, isLocale(raw) ? raw : "en");
+    return new Response(new Uint8Array(pdf), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${pdfFilename(ctx)}"`,
+      },
+    });
   });

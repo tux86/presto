@@ -1,15 +1,11 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
   "assist": {
     "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
+    "actions": { "source": { "organizeImports": "on" } }
   },
   "files": {
-    "includes": ["packages/**/*.ts", "packages/**/*.tsx", "scripts/**/*.js", "*.json"]
+    "includes": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "scripts/**/*.ts", "*.json", "*.ts"]
   },
   "formatter": {
     "enabled": true,
@@ -18,30 +14,19 @@
     "lineWidth": 120
   },
   "javascript": {
-    "formatter": {
-      "quoteStyle": "double",
-      "trailingCommas": "all",
-      "semicolons": "always"
-    }
+    "formatter": { "quoteStyle": "double", "trailingCommas": "all", "semicolons": "always" }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "a11y": {
         "noSvgWithoutTitle": "off",
-        "useButtonType": "warn",
         "noStaticElementInteractions": "off",
-        "useKeyWithClickEvents": "off",
-        "noLabelWithoutControl": "warn"
+        "useKeyWithClickEvents": "off"
       },
-      "style": {
-        "noNonNullAssertion": "off"
-      },
-      "suspicious": {
-        "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn"
-      }
+      "style": { "noNonNullAssertion": "off" },
+      "suspicious": { "noExplicitAny": "error" }
     }
   }
 }

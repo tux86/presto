@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/tux86/presto/compare/v2.0.0...v2.0.1) (2026-08-20)
+
+### Bug Fixes
+
+* **ci:** chain the Docker workflow from Release ([#22](https://github.com/tux86/presto/issues/22)) ([94085f3](https://github.com/tux86/presto/commit/94085f3ac266d50f903498ea512542e7c160d306))
+
 ## [2.0.0](https://github.com/tux86/presto/compare/v1.24.0...v2.0.0) (2026-08-20)
 
 ### ⚠ BREAKING CHANGES

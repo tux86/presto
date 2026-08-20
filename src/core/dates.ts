@@ -63,6 +63,15 @@ export function monthName(month: number, locale?: Locale): string {
   return format(utcDate(2000, month, 1), locale, { month: "long" });
 }
 
+/**
+ * Abbreviated month name for chart axes.
+ * Not a truncation of the full name: in French that collapses "Juin" and
+ * "Juillet" to the same three letters.
+ */
+export function monthShort(month: number, locale?: Locale): string {
+  return format(utcDate(2000, month, 1), locale, { month: "short" });
+}
+
 /** Short weekday name (Mon, Lun…). */
 export function dayName(date: Date, locale?: Locale): string {
   return format(date, locale, { weekday: "short" });

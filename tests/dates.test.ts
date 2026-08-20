@@ -8,6 +8,7 @@ import {
   monthDates,
   monthKey,
   monthName,
+  monthShort,
   utcDate,
   weekdayHeaders,
   weekdayIndex,
@@ -98,5 +99,18 @@ describe("formatting", () => {
   test("monthKey is zero-padded and sorts chronologically", () => {
     expect(monthKey(2026, 8)).toBe("2026-08");
     expect(["2026-10", "2026-02"].sort()).toEqual(["2026-02", "2026-10"]);
+  });
+});
+
+describe("monthShort", () => {
+  test("disambiguates months that share a three-letter prefix", () => {
+    // "Juin".slice(0,3) and "Juillet".slice(0,3) are both "Jui".
+    expect(monthShort(6, "fr")).not.toBe(monthShort(7, "fr"));
+  });
+
+  test("is short and localized", () => {
+    expect(monthShort(1, "en")).toBe("Jan");
+    expect(monthShort(9, "en")).toBe("Sep");
+    expect(new Set(Array.from({ length: 12 }, (_, i) => monthShort(i + 1, "fr"))).size).toBe(12);
   });
 });

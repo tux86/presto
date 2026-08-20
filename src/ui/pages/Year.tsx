@@ -1,7 +1,7 @@
 import { BarChart3, ChevronLeft, ChevronRight, Download, FileJson } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { monthName } from "../../core/dates.ts";
+import { monthShort } from "../../core/dates.ts";
 import { averageRate, type YearSummary } from "../../core/reporting.ts";
 import { api, download } from "../api.ts";
 import { PageHeader } from "../components/Layout.tsx";
@@ -65,7 +65,7 @@ export function Year() {
   const monthly = useMemo(
     () =>
       summary?.months.map((m) => ({
-        label: monthName(m.month, locale).slice(0, 3),
+        label: monthShort(m.month, locale),
         days: m.days,
         revenue: currency ? (m.revenue[currency] ?? 0) : 0,
       })) ?? [],
@@ -226,13 +226,23 @@ export function Year() {
                     wrapperStyle={{ fontSize: 12 }}
                     formatter={(key) => (key === "revenue" ? t("year.totalRevenue") : t("year.totalDays"))}
                   />
-                  <Bar yAxisId="days" dataKey="days" fill="var(--th-accent)" radius={[3, 3, 0, 0]} maxBarSize={26} />
+                  {/* Animation off: it adds nothing here, and Recharts' entry
+                      transition does not survive React's StrictMode double render. */}
+                  <Bar
+                    yAxisId="days"
+                    dataKey="days"
+                    fill="var(--th-accent)"
+                    radius={[3, 3, 0, 0]}
+                    maxBarSize={26}
+                    isAnimationActive={false}
+                  />
                   <Bar
                     yAxisId="revenue"
                     dataKey="revenue"
                     fill="var(--th-success)"
                     radius={[3, 3, 0, 0]}
                     maxBarSize={26}
+                    isAnimationActive={false}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -253,6 +263,7 @@ export function Year() {
                       outerRadius="80%"
                       paddingAngle={2}
                       stroke="none"
+                      isAnimationActive={false}
                     >
                       {byClient.map((c) => (
                         <Cell key={`${c.clientId}-${c.companyId}`} fill={hexOf(c.clientName, c.color)} />

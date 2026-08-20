@@ -13,27 +13,33 @@ permissions:
 
 jobs:
   release:
+    name: Semantic release
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          # semantic-release authenticates the push itself with GITHUB_TOKEN.
           persist-credentials: false
 
-      - uses: oven-sh/setup-bun@v2
+      # Node, not Bun: semantic-release checks the runtime version and refuses
+      # to run under Bun's node shim, which reports an unsupported release.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-      - run: bun install --frozen-lockfile
-
-      # Release tooling is pinned here rather than in devDependencies: it runs
-      # only in CI, and semantic-release pulls in a few hundred packages that
-      # nobody needs to install to work on Presto.
+      # Pinned here rather than in devDependencies: this runs only in CI and
+      # pulls in a few hundred packages nobody needs to develop Presto.
+      # conventional-changelog-conventionalcommits is not bundled with
+      # semantic-release and the preset fails to load without it.
       - name: Semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bunx --bun \
+          npx --yes \
             --package semantic-release@25 \
+            --package conventional-changelog-conventionalcommits@9 \
             --package @semantic-release/changelog@7 \
             --package @semantic-release/git@11 \
             -- semantic-release

@@ -19,9 +19,12 @@ export const reporting = new Hono<Env>()
 
   .get("/reporting", (c) => {
     const year = requestedYear(c.req.query("year"));
+    // An empty company parameter means every company, not a missing one.
+    const companyId = c.req.query("company") || undefined;
+
     // Only completed reports count as revenue; drafts are still being edited.
-    const current = repo.listReportContexts(c.var.db, { year, status: "completed" });
-    const previous = repo.listReportContexts(c.var.db, { year: year - 1, status: "completed" });
+    const current = repo.listReportContexts(c.var.db, { year, status: "completed", companyId });
+    const previous = repo.listReportContexts(c.var.db, { year: year - 1, status: "completed", companyId });
 
     // A year still in progress is compared against the same months last year:
     // eight months against twelve is not a decline.
@@ -35,7 +38,8 @@ export const reporting = new Hono<Env>()
   .get("/export/csv", (c) => {
     const year = requestedYear(c.req.query("year"));
     const locale = requestedLocale(c.req.query("locale"));
-    const csv = reportsToCsv(repo.listReportContexts(c.var.db, { year }), locale);
+    const companyId = c.req.query("company") || undefined;
+    const csv = reportsToCsv(repo.listReportContexts(c.var.db, { year, companyId }), locale);
     return new Response(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",

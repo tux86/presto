@@ -9,7 +9,7 @@ import { useStore } from "../store.tsx";
 
 const NAV: { to: string; key: TranslationKey; icon: typeof CalendarDays }[] = [
   { to: "/", key: "nav.reports", icon: CalendarDays },
-  { to: "/year", key: "nav.year", icon: BarChart3 },
+  { to: "/summary", key: "nav.summary", icon: BarChart3 },
   { to: "/clients", key: "nav.clients", icon: Users },
   { to: "/missions", key: "nav.missions", icon: Wrench },
   { to: "/companies", key: "nav.companies", icon: Building2 },

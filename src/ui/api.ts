@@ -80,7 +80,8 @@ export const api = {
   clearReport: (id: string) => send<Report>("POST", `/reports/${id}/clear`),
   copyPrevious: (id: string) => send<Report>("POST", `/reports/${id}/copy-previous`),
 
-  year: (year: number) => request<YearSummary>(`/reporting?year=${year}`),
+  year: (year: number, companyId = "") =>
+    request<YearSummary>(`/reporting?year=${year}&company=${encodeURIComponent(companyId)}`),
 } as const;
 
 /** Trigger a browser download for one of the export endpoints. */

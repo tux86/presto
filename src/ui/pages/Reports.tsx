@@ -61,7 +61,7 @@ function ReportCard({ report, isCurrent }: { report: Report; isCurrent: boolean 
     <Link
       to={`/reports/${report.id}`}
       className={cn(
-        "block rounded-xl border border-edge bg-panel p-4 transition-shadow hover:shadow-md",
+        "flex h-full flex-col rounded-xl border border-edge bg-panel p-4 transition-shadow hover:shadow-md",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         isCurrent && "ring-2 ring-accent/40",
       )}
@@ -78,7 +78,9 @@ function ReportCard({ report, isCurrent }: { report: Report; isCurrent: boolean 
 
       <MiniMonth report={report} color={color.solid} />
 
-      <div className="mt-3 flex items-center justify-between text-sm">
+      {/* mt-auto keeps the totals on the baseline even when a card above has
+          an extra line, so a row of cards reads as a row. */}
+      <div className="mt-auto flex items-center justify-between pt-3 text-sm">
         <span className="tabular text-muted">
           {fmtDays(total)} {t("common.days")}
         </span>
@@ -245,15 +247,15 @@ export function Reports() {
       {groups.length > 0 ? (
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
           <FilterChips
-            label={t("reports.filterCompany")}
-            allLabel={t("reports.all")}
+            label={t("filter.company")}
+            allLabel={t("filter.all")}
             value={companyFilter}
             onChange={setCompanyFilter}
             items={companies.map((c) => ({ id: c.id, label: c.name }))}
           />
           <FilterChips
-            label={t("reports.filterClient")}
-            allLabel={t("reports.all")}
+            label={t("filter.client")}
+            allLabel={t("filter.all")}
             value={clientFilter}
             onChange={setClientFilter}
             items={usedClients.map((c) => ({
@@ -291,13 +293,13 @@ export function Reports() {
                   <h2 className="text-sm font-semibold text-heading">{group.name}</h2>
                   <span className="text-xs text-faint">({group.reports.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                   {group.reports.map((report) => {
                     const isCurrent = report.year === THIS_YEAR && report.month === THIS_MONTH;
                     const attach = isCurrent && !currentAssigned;
                     if (attach) currentAssigned = true;
                     return (
-                      <div key={report.id} ref={attach ? currentRef : undefined}>
+                      <div key={report.id} ref={attach ? currentRef : undefined} className="h-full">
                         <ReportCard report={report} isCurrent={isCurrent} />
                       </div>
                     );

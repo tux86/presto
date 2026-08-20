@@ -11,7 +11,7 @@ import { useT } from "./prefs.tsx";
 import { useStore } from "./store.tsx";
 
 // Charts are the heaviest thing we ship and only one page needs them.
-const Year = lazy(() => import("./pages/Year.tsx").then((m) => ({ default: m.Year })));
+const Summary = lazy(() => import("./pages/Summary.tsx").then((m) => ({ default: m.Summary })));
 
 export function App() {
   const { status, reload } = useStore();
@@ -40,10 +40,10 @@ export function App() {
         <Route path="missions" element={<Missions />} />
         <Route path="companies" element={<Companies />} />
         <Route
-          path="year"
+          path="summary"
           element={
             <Suspense fallback={<Spinner />}>
-              <Year />
+              <Summary />
             </Suspense>
           }
         />

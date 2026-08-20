@@ -446,7 +446,10 @@ export function getReportContext(db: Db, id: string): ReportContext | null {
   return row ? toContext(row) : null;
 }
 
-export function listReportContexts(db: Db, opts: { year?: number; status?: ReportStatus } = {}): ReportContext[] {
+export function listReportContexts(
+  db: Db,
+  opts: { year?: number; status?: ReportStatus; companyId?: string } = {},
+): ReportContext[] {
   const where: string[] = [];
   const params: Record<string, Value> = {};
   if (opts.year !== undefined) {
@@ -456,6 +459,10 @@ export function listReportContexts(db: Db, opts: { year?: number; status?: Repor
   if (opts.status !== undefined) {
     where.push("r.status = $status");
     params.status = opts.status;
+  }
+  if (opts.companyId !== undefined) {
+    where.push("m.companyId = $companyId");
+    params.companyId = opts.companyId;
   }
   const sql = `${CONTEXT_SQL} ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY r.year, r.month`;
   const rows = where.length ? db.query(sql).all(params) : db.query(sql).all();

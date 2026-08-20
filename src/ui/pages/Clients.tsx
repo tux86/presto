@@ -186,9 +186,9 @@ export function Clients() {
       {clients.length === 0 ? (
         <EmptyState icon={<Users className="size-9" strokeWidth={1.5} />} title={t("clients.empty")} />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {clients.map((client) => (
-            <Card key={client.id} className="p-4">
+            <Card key={client.id} className="flex h-full flex-col p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
                   <span

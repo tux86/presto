@@ -133,9 +133,9 @@ export function Companies() {
       {companies.length === 0 ? (
         <EmptyState icon={<Building2 className="size-9" strokeWidth={1.5} />} title={t("companies.empty")} />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {companies.map((company) => (
-            <Card key={company.id} className="p-4">
+            <Card key={company.id} className="flex h-full flex-col p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="truncate font-medium text-heading">{company.name}</div>

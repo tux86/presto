@@ -207,12 +207,12 @@ export function Missions() {
           hint={canCreate ? undefined : t("missions.needsClient")}
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {visible.map((mission) => {
             const c = client(mission.clientId);
             const co = company(mission.companyId);
             return (
-              <Card key={mission.id} className={cn("p-4", !mission.isActive && "opacity-60")}>
+              <Card key={mission.id} className={cn("flex h-full flex-col p-4", !mission.isActive && "opacity-60")}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="truncate font-medium text-heading">{mission.name}</div>
@@ -246,7 +246,7 @@ export function Missions() {
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                <div className="mt-auto flex flex-wrap items-center gap-2 pt-3 text-xs">
                   {mission.dailyRate != null && c ? (
                     <span className="font-semibold tabular text-accent-text">
                       {money(mission.dailyRate, c.currency, locale)}

@@ -412,3 +412,48 @@ describe("holiday calendars for the browser", () => {
     expect(fr.body.holidays["2026-12-25"]).toBe("Noël");
   });
 });
+
+describe("reporting filtered by company", () => {
+  async function twoCompanies() {
+    const { companyId, clientId, missionId } = await seed();
+    const second = await call("POST", "/companies", { name: "Second Entity" });
+    const other = await call("POST", "/missions", {
+      name: "Side work",
+      clientId,
+      companyId: second.body.id,
+      dailyRate: 400,
+    });
+    for (const id of [missionId, other.body.id]) {
+      const r = await call("POST", "/reports", { missionId: id, year: 2026, month: 3 });
+      await call("POST", `/reports/${r.body.id}/fill`);
+      await call("PATCH", `/reports/${r.body.id}`, { status: "completed" });
+    }
+    return { companyId, secondId: second.body.id as string };
+  }
+
+  test("narrows the summary to one company", async () => {
+    const { companyId } = await twoCompanies();
+
+    const all = await call("GET", "/reporting?year=2026");
+    expect(all.body.companies).toHaveLength(2);
+
+    const one = await call("GET", `/reporting?year=2026&company=${companyId}`);
+    expect(one.body.companies).toHaveLength(1);
+    expect(one.body.companies[0].companyId).toBe(companyId);
+    expect(one.body.totalDays).toBeLessThan(all.body.totalDays);
+  });
+
+  test("an empty company parameter means every company", async () => {
+    await twoCompanies();
+    const blank = await call("GET", "/reporting?year=2026&company=");
+    expect(blank.body.companies).toHaveLength(2);
+  });
+
+  test("narrows the CSV export too", async () => {
+    const { secondId } = await twoCompanies();
+    const res = await app.request(`/api/export/csv?year=2026&company=${secondId}`);
+    const text = await res.text();
+    expect(text).toContain("Second Entity");
+    expect(text).not.toContain("Acme Consulting");
+  });
+});

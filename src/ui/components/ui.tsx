@@ -192,6 +192,9 @@ export interface ChipItem {
 /**
  * A row of filter pills. Better than a dropdown for a handful of options: the
  * choices, their counts and their colours are all visible without a click.
+ *
+ * Omit `allLabel` for a picker where one option is always active, such as a
+ * currency, rather than a filter that can be cleared.
  */
 export function FilterChips({
   label,
@@ -204,7 +207,7 @@ export function FilterChips({
   items: ChipItem[];
   value: string;
   onChange: (id: string) => void;
-  allLabel: string;
+  allLabel?: string;
 }) {
   if (items.length < 2) return null;
 
@@ -229,7 +232,7 @@ export function FilterChips({
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       <span className="mr-0.5 text-xs text-faint">{label}</span>
-      {chip("", allLabel)}
+      {allLabel === undefined ? null : chip("", allLabel)}
       {items.map((item) =>
         chip(
           item.id,

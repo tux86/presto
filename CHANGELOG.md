@@ -8,13 +8,7 @@
 
 ### ⚠ BREAKING CHANGES
 
-* on this branch still resolves to 2.0.0.
-* v2 is a full rewrite. Storage moves from PostgreSQL to a
-local SQLite file, authentication and multi-user support are removed
-entirely, and the HTTP API is reshaped. There is no automated migration
-from v1, which remains available at the v1-final tag.
-
-* Merge branch 'main' into v2 ([0a896cb](https://github.com/tux86/presto/commit/0a896cb6ce6c3dd1af3a79a878d98506e2b0a9e6))
+* v2 is a full rewrite. Storage moves from PostgreSQL to a local SQLite file, authentication and multi-user support are removed entirely, and the HTTP API is reshaped. There is no automated migration from v1, which remains available at the `v1-final` tag. ([d3044bd](https://github.com/tux86/presto/commit/d3044bd06156496a94d28591937e2959a01fb4a3))
 
 ### Features
 

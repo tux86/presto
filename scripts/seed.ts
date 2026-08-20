@@ -31,17 +31,18 @@ function rng(seed: number): () => number {
   };
 }
 
+// English: this fixture ships in a repository whose default language is English.
 const DAY_NOTES = [
   "Sprint planning",
-  "Revue de code",
-  "Atelier de cadrage",
-  "Comité de pilotage",
-  "Mise en production",
-  "Recette fonctionnelle",
-  "Reprise de données",
-  "Point d'avancement",
-  "Astreinte",
-  "Rédaction des specs",
+  "Code review",
+  "Scoping workshop",
+  "Steering committee",
+  "Production release",
+  "User acceptance testing",
+  "Data migration",
+  "Progress check-in",
+  "On-call",
+  "Writing specifications",
 ];
 
 interface Rhythm {
@@ -174,7 +175,7 @@ const LAST_YEAR = NOW.year - 1;
 const MISSIONS = [
   {
     key: "altimea",
-    name: "Refonte de la plateforme e-commerce",
+    name: "E-commerce platform rebuild",
     client: "altimea",
     company: "consulting",
     dailyRate: 680,
@@ -195,7 +196,7 @@ const MISSIONS = [
   },
   {
     key: "lauvray",
-    name: "Migration du SI RH",
+    name: "HR system migration",
     client: "lauvray",
     company: "consulting",
     dailyRate: 620,
@@ -209,7 +210,7 @@ const MISSIONS = [
   },
   {
     key: "helvetia",
-    name: "Plateforme data & gouvernance",
+    name: "Data platform and governance",
     client: "helvetia",
     company: "consulting",
     dailyRate: 950,
@@ -221,7 +222,7 @@ const MISSIONS = [
   },
   {
     key: "novaqua",
-    name: "Audit technique et accompagnement",
+    name: "Technical audit and advisory",
     client: "novaqua",
     company: "studio",
     dailyRate: 560,
@@ -237,16 +238,16 @@ const MISSIONS = [
 ];
 
 const CLIENT_NOTES = [
-  "Facturation au 1er du mois suivant, paiement à 30 jours.",
-  "Jours validés avec le chef de projet. Facture jointe séparément.",
-  "Prestation réalisée dans le cadre du contrat-cadre signé le 12/01.",
+  "Invoiced on the 1st of the following month, 30 days net.",
+  "Days agreed with the project lead. Invoice sent separately.",
+  "Delivered under the framework agreement signed on 12 January.",
   null,
 ];
 
 const PRIVATE_NOTES = [
-  "Relancé le 12, paiement reçu le 18.",
-  "Renégocier le TJM au prochain renouvellement.",
-  "Attention : bon de commande à redemander pour le trimestre suivant.",
+  "Chased on the 12th, paid on the 18th.",
+  "Renegotiate the rate at the next renewal.",
+  "Ask for a new purchase order before the next quarter.",
   null,
   null,
 ];

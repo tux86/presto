@@ -1,36 +1,37 @@
 <div align="center">
-  <img src="public/favicon.svg" alt="" width="64" />
+  <img src="public/logo-vertical-light.svg#gh-dark-mode-only" alt="Presto" width="110" />
+  <img src="public/logo-vertical-dark.svg#gh-light-mode-only" alt="Presto" width="110" />
 
-  <h1>Presto</h1>
+  <h3>Monthly activity reports for freelancers and consultants</h3>
 
-  <p><strong>Monthly activity reports for freelancers and consultants.</strong><br/>
-  Track billable days on a calendar, hand your client a clean PDF.</p>
+  <p>Mark the days you worked on a calendar. Hand your client a clean PDF.<br/>
+  One person, one machine, one SQLite file.</p>
 
   <p>
-    <a href="https://github.com/tux86/presto/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI" alt="CI" /></a>
-    <a href="https://github.com/tux86/presto/releases"><img src="https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=blue" alt="Release" /></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT" /></a>
+    <a href="https://github.com/tux86/presto/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI"></a>
+    <a href="https://github.com/tux86/presto/releases"><img alt="Release" src="https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=4f46e5"></a>
+    <a href="https://github.com/tux86/presto/pkgs/container/presto"><img alt="Image" src="https://img.shields.io/badge/ghcr.io-presto-4f46e5?style=flat-square&logo=docker&logoColor=white"></a>
+    <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/License-MIT-059669?style=flat-square"></a>
   </p>
 </div>
 
 <p align="center">
-  <img src="docs/images/editor.jpg" alt="Filling in a month of billable days" width="100%" />
+  <img src="docs/images/editor.jpg" alt="A month of billable days, ready to export" width="100%">
 </p>
-
----
 
 ## What it is
 
-A *compte rendu d'activité* generator. You mark the days you worked on a calendar, and Presto turns
-the month into a PDF your client can accept, plus a yearly view of days and revenue.
+A *compte rendu d'activité* generator. Freelancers and consultants bill by the day; at the end of
+each month somebody has to produce the document that says which days those were. Presto is that
+document, plus the yearly view that tells you how the business is going.
 
-It is built for **one person on one machine**. There are no accounts, no login, no cloud, no
-telemetry. Your data is one SQLite file you can copy, move, and back up yourself.
+It is built for **one person on one machine**. No accounts, no login, no cloud, no telemetry. Your
+data is a single SQLite file you can copy, move and back up yourself.
 
 > [!IMPORTANT]
 > **Presto has no authentication.** Anyone who can reach the port can read and change everything.
-> Run it on `localhost`, or behind a reverse proxy, VPN, or Tailscale that handles access control.
-> Do not put it on a public port.
+> Run it on `localhost`, or behind a reverse proxy, VPN or Tailscale that handles access control.
+> Do not put it on a public port. See [SECURITY.md](SECURITY.md).
 
 ## Quick start
 
@@ -44,9 +45,10 @@ bun start
 Open <http://localhost:3001>. That is the whole setup — no database to provision, no `.env` to fill
 in. Your data lands in `./data/presto.db`.
 
-You need [Bun](https://bun.sh) 1.2 or newer. Nothing else.
+The only prerequisite is [Bun](https://bun.sh) 1.2 or newer.
 
-### Docker
+<details>
+<summary><b>Docker</b></summary>
 
 ```bash
 docker run -d --name presto \
@@ -62,58 +64,95 @@ curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.yml
 docker compose up -d
 ```
 
-One container, one volume. There is no database container, because the database is a file.
+One container, one volume. There is no database service, because the database is a file.
 
-## Using it
+</details>
 
-**Set up, once.** Rename the starter company under **Companies** to your legal entity — the name
-that appears on the PDF. Add a **client** (currency and holiday country live here), then a
-**mission** for the work you do for them, with its daily rate.
+<details>
+<summary><b>Try it with sample data</b></summary>
 
-**Every month.** Create a report for a mission and month. Fill it in:
+```bash
+bun run seed --reset
+```
 
-- Click a day to cycle it through **empty → half day → full day**
-- **Fill workdays** marks every weekday, skipping weekends and that client's public holidays
-- **Copy last month** reuses *which weekdays* you worked, re-applied to this month's calendar
-- Arrow keys move, <kbd>Space</kbd> cycles, <kbd>N</kbd> jumps to the day's note
+Two legal entities, four clients across two currencies and about two years of months. Deterministic,
+so you get the same data every time. Never runs on its own — Presto has no demo mode.
 
-**When it's done.** Mark the report **completed** — it becomes read-only — and export the PDF.
-Reverting to draft is possible but asks first, because your client may already have a copy.
+</details>
 
-Two notes per report, and the difference matters:
+## How it works
 
-| | Where it goes |
+**Set up once.** Rename the starter company under **Companies** to your legal entity — the name that
+appears on the PDF. Add a **client**, which carries its billing currency and its public-holiday
+country. Then a **mission** for the work you do for them, with its daily rate.
+
+**Fill in a month.** Create a report for a mission and a month, then:
+
+| | |
 |---|---|
-| **Client note** | Printed on the PDF the client receives |
-| **Private note** | Stays in your database. Never in the PDF, never in a client-facing export |
+| Click a day | cycles it through **empty → half day → full day** |
+| **Fill workdays** | marks every weekday, skipping weekends and that client's public holidays |
+| **Copy last month** | reuses *which weekdays* you worked, re-applied to this month's calendar |
+| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | move · <kbd>Space</kbd> cycles · <kbd>N</kbd> jumps to the day's note |
+
+Public holidays are marked automatically for the client's country, and Presto asks before letting you
+bill one. Half days are drawn as a diagonal split, so the shape of a month is readable without
+reading any numbers.
 
 <p align="center">
-  <img src="docs/images/reports.jpg" alt="A year of reports grouped by client" width="100%" />
+  <img src="docs/images/reports.jpg" alt="A year of reports, grouped by client" width="100%">
 </p>
 
-**At year end.** The **Year** page shows days billed, revenue, average daily rate, and utilisation
-against the working days in the year, with a breakdown per client and per company. Export the whole
-year as CSV for your accountant, or the whole database as JSON.
+**Send it.** Mark the report **completed** — it becomes read-only — and export the PDF. Reverting to
+draft is possible, but Presto asks first, because your client may already have a copy.
+
+Every report has two notes, and the difference matters:
+
+|  | Where it goes |
+|---|---|
+| **Client note** | printed on the PDF the client receives |
+| **Private note** | stays in your database — never in the PDF, never in a client-facing export |
+
+## The PDF
+
+Generated server-side, one page per month, in English or French. It carries your legal entity and
+its business ID, the client's, the mission, every day of the month with its notes, public holidays
+by name, and the total.
 
 <p align="center">
-  <img src="docs/images/year.jpg" alt="Yearly summary with days, revenue and utilisation" width="100%" />
+  <img src="docs/images/pdf.png" alt="An exported activity report" width="620">
 </p>
 
-If you bill in more than one currency, amounts are shown **per currency** and never converted.
-Presto does not know today's exchange rate and will not pretend to.
+## The year
+
+Days billed, revenue, average daily rate, and utilisation against the working days in the year —
+broken down per client and per legal entity, filterable by either.
+
+A year still in progress is compared against **the same months** of the previous year, not against a
+full twelve: eight months of work is not a 40% collapse.
+
+If you bill in more than one currency, amounts are shown **per currency and never converted**. Presto
+does not know today's exchange rate and will not pretend to.
+
+<p align="center">
+  <img src="docs/images/summary.jpg" alt="Yearly summary with days, revenue and utilisation" width="100%">
+</p>
+
+Export the year as **CSV** for your accountant, or the whole database as **JSON** if you want a
+format you can read without SQLite.
 
 ## Configuration
 
-Everything is optional.
+Everything is optional. Presto runs with no configuration at all.
 
 | Variable | Default | What it does |
 |---|---|---|
 | `PORT` | `3001` (`8080` in Docker) | HTTP port |
-| `DATA_DIR` | `./data` (`/data` in Docker) | Where `presto.db` lives |
-| `APP_NAME` | `Presto` | Name shown in the sidebar |
+| `DATA_DIR` | `./data` (`/data` in Docker) | where `presto.db` lives |
+| `APP_NAME` | `Presto` | name shown in the sidebar and the browser tab |
 
-Theme (light / dark / auto) and language (English / French) are per-browser settings in the sidebar,
-not environment variables.
+Theme (light / dark / follow the system) and language (English / French) are per-browser settings in
+the sidebar, not environment variables.
 
 ## Backups
 
@@ -121,39 +160,28 @@ not environment variables.
 cp data/presto.db ~/backups/presto-$(date +%F).db
 ```
 
-That is a complete backup. To move to another machine, copy the file. The **Year** page also exports
-everything as JSON if you want a format you can read without SQLite.
+That is a complete backup. To move to another machine, copy the file.
 
 ## Coming from v1
 
-Presto v1 stored data in PostgreSQL and had optional multi-user accounts. v2 drops both. To bring
-your data across:
+Presto v1 stored data in PostgreSQL and had optional multi-user accounts. v2 drops both.
 
 1. Start Presto v1 and use **Profile → Export all data** to download the JSON
 2. `bun run import:v1 presto-v1-export.json`
 
 Add `--dry-run` first to see what it would write. The import refuses to run against a database that
-already has data.
-
-v1 remains available at the [`v1-final`](https://github.com/tux86/presto/tree/v1-final) tag.
+already has data. v1 remains available at the [`v1-final`](https://github.com/tux86/presto/tree/v1-final) tag.
 
 ## Development
 
 ```bash
 bun install
 bun run dev            # API on :3001, Vite with HMR on :5173
-bun test               # ~150 tests, no database or server needed
+bun test               # 156 tests, no database or server needed
 bun run typecheck
 bun run lint:fix
-bun run seed --reset   # fill the database with a plausible two-year history
+bun run seed --reset   # sample data to work against
 ```
-
-`bun run seed` is for trying Presto out and for working on it — two entities, four
-clients in two currencies, and a couple of years of months. It is deterministic, so the
-same command always produces the same data. It is never run automatically and is not in
-the Docker image; Presto has no demo mode.
-
-### How it fits together
 
 ```
 src/
@@ -165,15 +193,14 @@ src/
   i18n/    English and French, shared by the UI and the PDF
 ```
 
-One rule: **`core/` imports nothing from `db/`, `server/`, `pdf/`, or `ui/`.** That is what lets the
-logic that can actually get your invoice wrong be tested without a database, and it is where almost
+One rule: **`core/` imports nothing from `db/`, `server/`, `pdf/` or `ui/`.** That is what lets the
+logic which can actually get an invoice wrong be tested without a database, and it is where nearly
 all of the tests point.
 
 Storage is raw SQL against `bun:sqlite`. Migrations are an ordered array of SQL strings in
 `src/db/schema.ts`, tracked by `PRAGMA user_version` — append one, never edit one that has shipped.
 
-Commits follow [Conventional Commits](https://www.conventionalcommits.org/); releases are cut
-automatically from `main`.
+See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 ## Stack
 
@@ -182,4 +209,4 @@ date-holidays · Zod · Biome · TypeScript
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © [tux86](https://github.com/tux86)

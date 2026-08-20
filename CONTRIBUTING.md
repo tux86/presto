@@ -75,8 +75,13 @@ Releases are cut automatically from `main`; `feat` bumps the minor, `fix` the pa
 
 ## Releasing
 
-Releases are automatic: `semantic-release` runs on `main` after CI passes, and publishing the
-GitHub release triggers the Docker workflow.
+Releases are automatic: `semantic-release` runs on `main` after CI passes, and calls the Docker
+workflow directly when it cuts a version.
+
+It is chained rather than triggered by `release: published`, because GitHub suppresses events
+created with the built-in `GITHUB_TOKEN` — a release published by CI never starts another workflow.
+v1 worked around this with a `RELEASE_TOKEN` personal access token, which is no longer needed and
+can be deleted.
 
 The image always goes to GHCR. Docker Hub is optional and needs three repository settings:
 

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { countryFlag, countryName } from "../src/core/countries.ts";
 import { utcDate } from "../src/core/dates.ts";
-import { countryFlag, countryName, holidayCountries, holidayName, isHoliday } from "../src/core/holidays.ts";
+import { forCountry, holidayCountries, holidayMap, holidayName, isHoliday } from "../src/core/holidays.ts";
 
 describe("holidayName", () => {
   test("finds French public holidays", () => {
@@ -36,6 +37,23 @@ describe("holidayName", () => {
   test("isHoliday mirrors holidayName", () => {
     expect(isHoliday(utcDate(2026, 12, 25), "FR")).toBe(true);
     expect(isHoliday(utcDate(2026, 12, 26), "FR")).toBe(false);
+  });
+});
+
+describe("forCountry and holidayMap", () => {
+  test("forCountry resolves an ISO date to a holiday name", () => {
+    const fr = forCountry("FR");
+    expect(fr("2026-07-14")).toBeTruthy();
+    expect(fr("2026-07-15")).toBeNull();
+    expect(fr("not-a-date")).toBeNull();
+  });
+
+  test("holidayMap covers the whole year and localizes names", () => {
+    const map = holidayMap("FR", 2026, "fr");
+    expect(map["2026-12-25"]).toBe("Noël");
+    expect(map["2026-07-14"]).toBeTruthy();
+    expect(map["2026-07-15"]).toBeUndefined();
+    expect(Object.keys(map).length).toBeGreaterThan(5);
   });
 });
 

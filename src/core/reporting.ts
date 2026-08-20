@@ -1,7 +1,6 @@
-import { daysInMonth, isWeekend, utcDate } from "./dates.ts";
-import { isHoliday } from "./holidays.ts";
+import { daysInMonth, isoDate, isWeekend, utcDate } from "./dates.ts";
 import { reportTotal, revenue } from "./totals.ts";
-import type { ClientColor, ReportContext } from "./types.ts";
+import { type ClientColor, type HolidayLookup, NO_HOLIDAYS, type ReportContext } from "./types.ts";
 
 /**
  * Yearly aggregation.
@@ -35,6 +34,9 @@ export interface ClientSummary {
   clientId: string;
   clientName: string;
   color: ClientColor | null;
+  /** The entity that billed this work: the same client can appear under two. */
+  companyId: string;
+  companyName: string;
   currency: string;
   days: number;
   revenue: number;
@@ -66,17 +68,14 @@ export function effectiveRate(ctx: ReportContext): number | null {
   return ctx.report.dailyRate ?? ctx.mission.dailyRate;
 }
 
-/**
- * Working days in a year, excluding weekends and public holidays.
- * The holiday calendar is the one used by most of the year's reports.
- */
-export function workdaysInYear(year: number, country: string | null): number {
+/** Working days in a year, excluding weekends and public holidays. */
+export function workdaysInYear(year: number, holidays: HolidayLookup = NO_HOLIDAYS): number {
   let count = 0;
   for (let month = 1; month <= 12; month++) {
     for (let day = 1; day <= daysInMonth(year, month); day++) {
       const date = utcDate(year, month, day);
       if (isWeekend(date)) continue;
-      if (country && isHoliday(date, country)) continue;
+      if (holidays(isoDate(date))) continue;
       count++;
     }
   }
@@ -118,12 +117,16 @@ function summarizePrevious(reports: ReportContext[]): PreviousYear | null {
 
 /**
  * Build the yearly view from completed reports.
+ *
  * `previousReports` are last year's, used only for the year-over-year deltas.
+ * `holidaysFor` is injected rather than imported so this module — and the
+ * browser bundle that imports it — stays free of the holiday database.
  */
 export function summarizeYear(
   year: number,
   reports: ReportContext[],
   previousReports: ReportContext[] = [],
+  holidaysFor: (country: string) => HolidayLookup = () => NO_HOLIDAYS,
 ): YearSummary {
   const byCurrency: Record<string, { revenue: number; days: number }> = {};
   const months: MonthSummary[] = Array.from({ length: 12 }, (_, i) => ({
@@ -161,6 +164,8 @@ export function summarizeYear(
       clientId: client.id,
       clientName: client.name,
       color: client.color,
+      companyId: company.id,
+      companyName: company.name,
       currency,
       days: 0,
       revenue: 0,
@@ -197,7 +202,7 @@ export function summarizeYear(
   return {
     year,
     totalDays: Math.round(totalDays * 2) / 2,
-    workdaysInYear: workdaysInYear(year, dominantCountry(reports)),
+    workdaysInYear: workdaysInYear(year, holidaysFor(dominantCountry(reports) ?? "")),
     currencies,
     byCurrency,
     months,

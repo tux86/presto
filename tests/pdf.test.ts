@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { fillWorkdays } from "../src/core/grid.ts";
+import { forCountry } from "../src/core/holidays.ts";
+
+const FR = forCountry("FR");
+
 import { pdfFilename, renderReportPdf } from "../src/pdf/report.tsx";
 import { context } from "./fixtures.ts";
 import { extractPdfText } from "./pdf-text.ts";
@@ -61,7 +65,7 @@ describe("renderReportPdf", () => {
   });
 
   test("names public holidays from the client's country", async () => {
-    const july = context({ report: { year: 2026, month: 7, days: fillWorkdays(2026, 7, "FR") } });
+    const july = context({ report: { year: 2026, month: 7, days: fillWorkdays(2026, 7, FR) } });
     const text = extractPdfText(await renderReportPdf(july, "en"));
     expect(text).toContain("Bastille Day");
   });
@@ -89,7 +93,7 @@ describe("renderReportPdf", () => {
       report: {
         year: 2026,
         month: 1,
-        days: fillWorkdays(2026, 1, "FR"),
+        days: fillWorkdays(2026, 1, FR),
         note: "Invoiced on the 1st of the following month. Payment terms 30 days net, per the framework agreement.",
       },
     });
@@ -100,7 +104,7 @@ describe("renderReportPdf", () => {
 
   test("fits a 31-day month in French too, where labels are longer", async () => {
     const full = context({
-      report: { year: 2026, month: 8, days: fillWorkdays(2026, 8, "FR"), note: "Facture envoyée le 1er septembre." },
+      report: { year: 2026, month: 8, days: fillWorkdays(2026, 8, FR), note: "Facture envoyée le 1er septembre." },
     });
     expect(extractPdfText(await renderReportPdf(full, "fr"))).toContain("Page 1 sur 1");
   });

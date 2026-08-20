@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
+import { forCountry } from "../src/core/holidays.ts";
 import { averageRate, effectiveRate, summarizeYear, workdaysInYear } from "../src/core/reporting.ts";
 import { context, fullDays } from "./fixtures.ts";
+
+const FR = forCountry("FR");
 
 describe("effectiveRate", () => {
   test("prefers the report's snapshot over the mission's current rate", () => {
@@ -18,9 +21,9 @@ describe("effectiveRate", () => {
 
 describe("workdaysInYear", () => {
   test("counts weekdays minus that country's public holidays", () => {
-    expect(workdaysInYear(2026, "FR")).toBe(252);
-    expect(workdaysInYear(2026, null)).toBe(261); // weekdays only
-    expect(workdaysInYear(2026, "FR")).toBeLessThan(workdaysInYear(2026, null));
+    expect(workdaysInYear(2026, FR)).toBe(252);
+    expect(workdaysInYear(2026)).toBe(261); // weekdays only
+    expect(workdaysInYear(2026, FR)).toBeLessThan(workdaysInYear(2026));
   });
 });
 

@@ -1,5 +1,5 @@
 import { buildMonthGrid, type Day, isWorkday } from "./grid.ts";
-import type { DayValue, Report } from "./types.ts";
+import type { DayValue, HolidayLookup, Report } from "./types.ts";
 
 /** Days billed in a month. Halves count as 0.5. */
 export function totalDays(days: Record<string, DayValue>): number {
@@ -14,8 +14,8 @@ export function reportTotal(report: Report): number {
 }
 
 /** Days in the month that are neither weekend nor public holiday. */
-export function workdayCount(year: number, month: number, country: string): number {
-  return buildMonthGrid(year, month, country).filter(isWorkday).length;
+export function workdayCount(year: number, month: number, holidays: HolidayLookup): number {
+  return buildMonthGrid(year, month, holidays).filter(isWorkday).length;
 }
 
 export function gridWorkdayCount(grid: Day[]): number {

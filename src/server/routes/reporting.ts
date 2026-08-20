@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { reportsToCsv } from "../../core/csv.ts";
+import { forCountry } from "../../core/holidays.ts";
 import { summarizeYear } from "../../core/reporting.ts";
 import { isLocale } from "../../core/types.ts";
 import * as repo from "../../db/repo.ts";
@@ -21,7 +22,7 @@ export const reporting = new Hono<Env>()
     // Only completed reports count as revenue; drafts are still being edited.
     const current = repo.listReportContexts(c.var.db, { year, status: "completed" });
     const previous = repo.listReportContexts(c.var.db, { year: year - 1, status: "completed" });
-    return c.json(summarizeYear(year, current, previous));
+    return c.json(summarizeYear(year, current, previous, (country) => forCountry(country)));
   })
 
   /** Spreadsheet export. Includes drafts — the year is not over yet. */

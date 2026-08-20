@@ -7,6 +7,22 @@ export function isLocale(v: unknown): v is Locale {
   return typeof v === "string" && (LOCALES as readonly string[]).includes(v);
 }
 
+/**
+ * Resolves an ISO date to a public-holiday name, or null.
+ *
+ * Passed in rather than imported so the grid stays free of the holiday
+ * database: the server builds one from `date-holidays`, the browser builds one
+ * from the date-to-name map the server sent it.
+ */
+export type HolidayLookup = (iso: string) => string | null;
+
+export const NO_HOLIDAYS: HolidayLookup = () => null;
+
+/** Build a lookup from a plain date-to-name map. */
+export function lookupFrom(map: Record<string, string>): HolidayLookup {
+  return (iso) => map[iso] ?? null;
+}
+
 export const REPORT_STATUSES = ["draft", "completed"] as const;
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
 

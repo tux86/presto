@@ -1,6 +1,7 @@
 import { Document, Page, renderToBuffer, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { dayName, monthName } from "../core/dates.ts";
 import { type Day, isWorkday, reportGrid } from "../core/grid.ts";
+import { forCountry } from "../core/holidays.ts";
 import { reportTotal } from "../core/totals.ts";
 import type { Locale, ReportContext } from "../core/types.ts";
 import { dayUnit, type Translate, translator } from "../i18n/index.ts";
@@ -138,7 +139,7 @@ function DayRow({ day, index, locale, t }: { day: Day; index: number; locale: Lo
 function ReportDocument({ ctx, locale }: { ctx: ReportContext; locale: Locale }) {
   const t = translator(locale);
   const { report, mission, client, company } = ctx;
-  const grid = reportGrid(report, locale);
+  const grid = reportGrid(report, forCountry(report.holidayCountry, locale), locale);
   const total = reportTotal(report);
 
   return (

@@ -384,3 +384,22 @@ describe("PDF export", () => {
     ).toBe("%PDF-");
   });
 });
+
+describe("holiday calendars for the browser", () => {
+  test("state ships holiday dates for the countries in use", async () => {
+    await seed();
+    const { body } = await call("GET", "/state");
+    expect(body.holidays.FR).toBeArray();
+    expect(body.holidays.FR.length).toBeGreaterThan(5);
+    expect(body.holidays.FR.every((d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d))).toBe(true);
+  });
+
+  test("report detail ships named holidays in the requested locale", async () => {
+    const { missionId } = await seed();
+    const created = await call("POST", "/reports", { missionId, year: 2026, month: 12 });
+    const en = await call("GET", `/reports/${created.body.id}?locale=en`);
+    const fr = await call("GET", `/reports/${created.body.id}?locale=fr`);
+    expect(en.body.holidays["2026-12-25"]).toBe("Christmas Day");
+    expect(fr.body.holidays["2026-12-25"]).toBe("Noël");
+  });
+});

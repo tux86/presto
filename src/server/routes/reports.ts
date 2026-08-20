@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { compactDays, compactNotes, copyWeekdayPattern, fillWorkdays, reportGrid } from "../../core/grid.ts";
+import { forCountry, holidayMap } from "../../core/holidays.ts";
 import { isLocale, type Report, type ReportStatus } from "../../core/types.ts";
 import * as repo from "../../db/repo.ts";
 import { pdfFilename, renderReportPdf } from "../../pdf/report.tsx";
@@ -54,7 +55,11 @@ export const reports = new Hono<Env>()
 
   .get("/reports/:id", (c) => {
     const ctx = required(repo.getReportContext(c.var.db, c.req.param("id")), "Report");
-    return c.json(ctx);
+    const raw = c.req.query("locale");
+    const locale = isLocale(raw) ? raw : "en";
+    // Named and localized, so the editor can label each holiday without the
+    // holiday database being present in the browser.
+    return c.json({ ...ctx, holidays: holidayMap(ctx.report.holidayCountry, ctx.report.year, locale) });
   })
 
   .post("/reports", async (c) => {
@@ -107,7 +112,7 @@ export const reports = new Hono<Env>()
     const id = c.req.param("id");
     const report = required(repo.getReport(c.var.db, id), "Report");
     assertEditable(report, { days: {} });
-    const days = fillWorkdays(report.year, report.month, report.holidayCountry);
+    const days = fillWorkdays(report.year, report.month, forCountry(report.holidayCountry));
     return c.json(repo.updateReport(c.var.db, id, { days }));
   })
 
@@ -133,7 +138,8 @@ export const reports = new Hono<Env>()
     if (!source) badRequest("There is no report for the previous month on this mission.");
     if (Object.keys(source.days).length === 0) badRequest("Last month's report is empty — nothing to copy.");
 
-    const days = copyWeekdayPattern(reportGrid(source), report.year, report.month, report.holidayCountry);
+    const holidays = forCountry(report.holidayCountry);
+    const days = copyWeekdayPattern(reportGrid(source, holidays), report.year, report.month, holidays);
     return c.json(repo.updateReport(c.var.db, id, { days }));
   })
 

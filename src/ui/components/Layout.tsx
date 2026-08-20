@@ -1,0 +1,173 @@
+import { BarChart3, Building2, CalendarDays, Menu, Moon, Sun, SunMoon, Users, Wrench, X } from "lucide-react";
+import { type ReactNode, useState } from "react";
+import { NavLink, Outlet } from "react-router-dom";
+import type { Locale } from "../../core/types.ts";
+import type { TranslationKey } from "../../i18n/index.ts";
+import { cn } from "../format.ts";
+import { type Theme, usePrefs } from "../prefs.tsx";
+import { useStore } from "../store.tsx";
+
+const NAV: { to: string; key: TranslationKey; icon: typeof CalendarDays }[] = [
+  { to: "/", key: "nav.reports", icon: CalendarDays },
+  { to: "/year", key: "nav.year", icon: BarChart3 },
+  { to: "/clients", key: "nav.clients", icon: Users },
+  { to: "/missions", key: "nav.missions", icon: Wrench },
+  { to: "/companies", key: "nav.companies", icon: Building2 },
+];
+
+const THEMES: { value: Theme; icon: typeof Sun; key: TranslationKey }[] = [
+  { value: "light", icon: Sun, key: "theme.light" },
+  { value: "dark", icon: Moon, key: "theme.dark" },
+  { value: "auto", icon: SunMoon, key: "theme.auto" },
+];
+
+function Preferences() {
+  const { theme, setTheme, locale, setLocale, t } = usePrefs();
+  return (
+    <div className="space-y-3 border-t border-edge px-3 py-3">
+      <div>
+        <span className="mb-1.5 block text-[11px] font-medium text-faint">{t("settings.theme")}</span>
+        <div className="flex gap-1 rounded-lg bg-elevated p-1">
+          {THEMES.map(({ value, icon: Icon, key }) => (
+            <button
+              key={value}
+              type="button"
+              title={t(key)}
+              aria-label={t(key)}
+              aria-pressed={theme === value}
+              onClick={() => setTheme(value)}
+              className={cn(
+                "flex flex-1 cursor-pointer items-center justify-center rounded-md py-1.5 transition-colors",
+                theme === value ? "bg-panel text-heading shadow-sm" : "text-muted hover:text-heading",
+              )}
+            >
+              <Icon className="size-3.5" />
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <span className="mb-1.5 block text-[11px] font-medium text-faint">{t("settings.language")}</span>
+        <div className="flex gap-1 rounded-lg bg-elevated p-1">
+          {(["en", "fr"] as Locale[]).map((value) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={locale === value}
+              onClick={() => setLocale(value)}
+              className={cn(
+                "flex-1 cursor-pointer rounded-md py-1.5 text-xs font-medium uppercase transition-colors",
+                locale === value ? "bg-panel text-heading shadow-sm" : "text-muted hover:text-heading",
+              )}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { app } = useStore();
+  const { t } = usePrefs();
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="px-4 py-5">
+        <div className="text-lg font-semibold tracking-tight text-heading">{app.name}</div>
+        <div className="text-xs text-faint">{t("app.tagline")}</div>
+      </div>
+
+      <nav className="flex-1 space-y-0.5 px-2">
+        {NAV.map(({ to, key, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === "/"}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                isActive ? "bg-accent-soft text-accent-text" : "text-muted hover:bg-elevated hover:text-heading",
+              )
+            }
+          >
+            <Icon className="size-4" />
+            {t(key)}
+          </NavLink>
+        ))}
+      </nav>
+
+      <Preferences />
+      {app.version ? <div className="px-4 pb-3 text-[11px] text-faint">v{app.version}</div> : null}
+    </div>
+  );
+}
+
+export function Layout() {
+  const [open, setOpen] = useState(false);
+  const { app } = useStore();
+
+  return (
+    <div className="min-h-dvh lg:flex">
+      <aside className="hidden w-56 shrink-0 border-r border-edge bg-panel lg:block">
+        <div className="sticky top-0 h-dvh">
+          <SidebarContent />
+        </div>
+      </aside>
+
+      {/* Mobile */}
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-edge bg-panel px-4 py-3 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Menu"
+          className="cursor-pointer text-muted hover:text-heading"
+        >
+          <Menu className="size-5" />
+        </button>
+        <span className="font-semibold text-heading">{app.name}</span>
+      </header>
+
+      {open ? (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="absolute inset-0 cursor-default bg-black/40"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute inset-y-0 left-0 w-64 border-r border-edge bg-panel">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+              className="absolute top-4 right-3 cursor-pointer text-faint hover:text-heading"
+            >
+              <X className="size-4" />
+            </button>
+            <SidebarContent onNavigate={() => setOpen(false)} />
+          </div>
+        </div>
+      ) : null}
+
+      <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
+  return (
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight text-heading sm:text-2xl">{title}</h1>
+        {subtitle ? <p className="mt-0.5 text-sm text-muted">{subtitle}</p> : null}
+      </div>
+      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+    </div>
+  );
+}

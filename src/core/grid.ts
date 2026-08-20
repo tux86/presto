@@ -1,6 +1,5 @@
 import { dayName, isoDate, isWeekend, monthDates, weekdayIndex } from "./dates.ts";
-import { holidayName } from "./holidays.ts";
-import type { DayValue, Locale, Report } from "./types.ts";
+import type { DayValue, HolidayLookup, Locale, Report } from "./types.ts";
 
 /** One calendar day, with everything the UI and the PDF need to render it. */
 export interface Day {
@@ -32,7 +31,7 @@ export function isWorkday(day: Pick<Day, "isWeekend" | "holiday">): boolean {
 export function buildMonthGrid(
   year: number,
   month: number,
-  country: string,
+  holidays: HolidayLookup,
   days: Record<string, DayValue> = {},
   dayNotes: Record<string, string> = {},
   locale?: Locale,
@@ -40,22 +39,23 @@ export function buildMonthGrid(
   return monthDates(year, month).map((date) => {
     const day = date.getUTCDate();
     const key = String(day);
+    const iso = isoDate(date);
     return {
       day,
       date,
-      iso: isoDate(date),
+      iso,
       weekday: weekdayIndex(date),
       label: dayName(date, locale),
       isWeekend: isWeekend(date),
-      holiday: holidayName(date, country, locale),
+      holiday: holidays(iso),
       value: days[key] ?? 0,
       note: dayNotes[key] ?? "",
     };
   });
 }
 
-export function reportGrid(report: Report, locale?: Locale): Day[] {
-  return buildMonthGrid(report.year, report.month, report.holidayCountry, report.days, report.dayNotes, locale);
+export function reportGrid(report: Report, holidays: HolidayLookup, locale?: Locale): Day[] {
+  return buildMonthGrid(report.year, report.month, holidays, report.days, report.dayNotes, locale);
 }
 
 /** Drop zero values and empty notes so the stored maps stay sparse. */
@@ -77,9 +77,9 @@ export function compactNotes(notes: Record<string, string>): Record<string, stri
 }
 
 /** Every workday in the month set to a full day. Weekends and holidays stay empty. */
-export function fillWorkdays(year: number, month: number, country: string): Record<string, DayValue> {
+export function fillWorkdays(year: number, month: number, holidays: HolidayLookup): Record<string, DayValue> {
   const out: Record<string, DayValue> = {};
-  for (const day of buildMonthGrid(year, month, country)) {
+  for (const day of buildMonthGrid(year, month, holidays)) {
     if (isWorkday(day)) out[String(day.day)] = 1;
   }
   return out;
@@ -96,7 +96,7 @@ export function copyWeekdayPattern(
   source: Day[],
   year: number,
   month: number,
-  country: string,
+  holidays: HolidayLookup,
 ): Record<string, DayValue> {
   const byWeekday = new Map<number, Map<DayValue, number>>();
   for (const day of source) {
@@ -120,7 +120,7 @@ export function copyWeekdayPattern(
   }
 
   const out: Record<string, DayValue> = {};
-  for (const day of buildMonthGrid(year, month, country)) {
+  for (const day of buildMonthGrid(year, month, holidays)) {
     if (!isWorkday(day)) continue;
     const value = pattern.get(day.weekday);
     if (value) out[String(day.day)] = value;

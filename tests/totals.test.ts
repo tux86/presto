@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { fillWorkdays } from "../src/core/grid.ts";
+import { forCountry } from "../src/core/holidays.ts";
+
+const FR = forCountry("FR");
+const US = forCountry("US");
+const DE = forCountry("DE");
+
 import { completionPercent, revenue, totalDays, workdayCount } from "../src/core/totals.ts";
 
 describe("totalDays", () => {
@@ -25,20 +31,20 @@ describe("totalDays", () => {
 describe("workdayCount", () => {
   test("excludes weekends and public holidays", () => {
     // July 2026: 23 weekdays, minus Bastille Day on a Tuesday.
-    expect(workdayCount(2026, 7, "FR")).toBe(22);
+    expect(workdayCount(2026, 7, FR)).toBe(22);
   });
 
   test("differs by country for the same month", () => {
     // January 2026 has 22 weekdays. France loses New Year's Day; the US loses
     // that plus MLK Day. July 2026 is a wash: 4 July falls on a Saturday.
-    expect(workdayCount(2026, 1, "FR")).toBe(21);
-    expect(workdayCount(2026, 1, "US")).toBe(20);
-    expect(workdayCount(2026, 7, "DE")).toBe(23);
+    expect(workdayCount(2026, 1, FR)).toBe(21);
+    expect(workdayCount(2026, 1, US)).toBe(20);
+    expect(workdayCount(2026, 7, DE)).toBe(23);
   });
 
   test("matches the number of days fillWorkdays sets", () => {
     for (const month of [1, 2, 5, 8, 12]) {
-      expect(Object.keys(fillWorkdays(2026, month, "FR"))).toHaveLength(workdayCount(2026, month, "FR"));
+      expect(Object.keys(fillWorkdays(2026, month, FR))).toHaveLength(workdayCount(2026, month, FR));
     }
   });
 });

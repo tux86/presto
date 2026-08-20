@@ -1,5 +1,5 @@
 import { BarChart3, Building2, CalendarDays, Menu, Moon, Sun, SunMoon, Users, Wrench, X } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import type { Locale } from "../../core/types.ts";
 import type { TranslationKey } from "../../i18n/index.ts";
@@ -69,6 +69,39 @@ function Preferences() {
   );
 }
 
+/**
+ * The logo, or the configured name when APP_NAME has been changed — shipping
+ * the Presto wordmark for an app someone has renamed would be wrong.
+ *
+ * Two images rather than one themed SVG, so the swap needs no JavaScript. The
+ * file suffix describes the logo's own colour, not the theme it belongs to:
+ * the *light* logo is the one that goes on a *dark* background.
+ */
+function Wordmark({ name, className }: { name: string; className?: string }) {
+  if (name !== "Presto") {
+    return <span className={cn("text-lg font-semibold tracking-tight text-heading", className)}>{name}</span>;
+  }
+  return (
+    <>
+      <img
+        src="/logo-horizontal-dark.svg"
+        alt="Presto"
+        width={95}
+        height={24}
+        className={cn("h-6 w-auto dark:hidden", className)}
+      />
+      <img
+        src="/logo-horizontal-light.svg"
+        alt=""
+        aria-hidden
+        width={95}
+        height={24}
+        className={cn("hidden h-6 w-auto dark:block", className)}
+      />
+    </>
+  );
+}
+
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { app } = useStore();
   const { t } = usePrefs();
@@ -76,8 +109,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="px-4 py-5">
-        <div className="text-lg font-semibold tracking-tight text-heading">{app.name}</div>
-        <div className="text-xs text-faint">{t("app.tagline")}</div>
+        <Wordmark name={app.name} />
+        <div className="mt-1.5 text-xs text-faint">{t("app.tagline")}</div>
       </div>
 
       <nav className="flex-1 space-y-0.5 px-2">
@@ -110,6 +143,11 @@ export function Layout() {
   const [open, setOpen] = useState(false);
   const { app } = useStore();
 
+  // Follow APP_NAME in the browser tab, not just the sidebar.
+  useEffect(() => {
+    document.title = app.name;
+  }, [app.name]);
+
   return (
     <div className="min-h-dvh lg:flex">
       <aside className="hidden w-56 shrink-0 border-r border-edge bg-panel lg:block">
@@ -128,7 +166,7 @@ export function Layout() {
         >
           <Menu className="size-5" />
         </button>
-        <span className="font-semibold text-heading">{app.name}</span>
+        <Wordmark name={app.name} className="h-5" />
       </header>
 
       {open ? (

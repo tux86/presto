@@ -29,7 +29,13 @@ export function Editor() {
   const [view, setView] = useState<View>("calendar");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Edits are buffered and sent as one PATCH. Days and notes used to travel on
+  // separate requests, so a cell click landing inside the note debounce
+  // replaced local state with a server copy that predated the note — and since
+  // the note inputs are uncontrolled, the text stayed on screen while the save
+  // was silently dropped.
+  const pending = useRef<{ days?: Record<string, DayValue>; dayNotes?: Record<string, string> }>({});
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Refetched when the locale changes: holiday names arrive localized.
   useEffect(() => {
@@ -43,22 +49,83 @@ export function Editor() {
     };
   }, [id, locale]);
 
-  useEffect(() => () => void (noteTimer.current && clearTimeout(noteTimer.current)), []);
-
-  /** Apply the server's answer to both the page and the shared store. */
+  /**
+   * Apply the server's answer.
+   * Content fields are kept local while edits are still buffered, so a reply
+   * that predates them cannot roll the user's typing back.
+   */
   const applyReport = useCallback(
     (report: ReportContext["report"]) => {
-      setCtx((current) => (current ? { ...current, report } : current));
+      setCtx((current) => {
+        if (!current) return current;
+        const buffered = pending.current;
+        return {
+          ...current,
+          report: {
+            ...report,
+            days: buffered.days ?? report.days,
+            dayNotes: buffered.dayNotes ?? report.dayNotes,
+          },
+        };
+      });
       upsertReport(report);
     },
     [upsertReport],
   );
 
+  /** Send whatever is buffered, if anything. */
+  const commit = useCallback(
+    async (reportId: string) => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+      }
+      const patch = pending.current;
+      if (Object.keys(patch).length === 0) return;
+      pending.current = {};
+      setError(null);
+      try {
+        const saved = await api.updateReport(reportId, patch);
+        applyReport(saved);
+      } catch (e) {
+        setError(e instanceof ApiError ? e.message : String(e));
+      }
+    },
+    [applyReport],
+  );
+
+  const schedule = useCallback(
+    (reportId: string) => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => void commit(reportId), 400);
+    },
+    [commit],
+  );
+
+  // Flush on the way out rather than dropping the timer, which lost the last
+  // edit whenever someone typed a note and immediately navigated away.
+  const commitRef = useRef(commit);
+  commitRef.current = commit;
+  const reportId = ctx?.report.id;
+  useEffect(
+    () => () => {
+      if (reportId) void commitRef.current(reportId);
+    },
+    [reportId],
+  );
+
+  /**
+   * Run one of the whole-report actions.
+   * Buffered edits are flushed first: fill, clear and copy replace the day map
+   * wholesale, so a pending note left in the buffer would be written back on
+   * top of the result.
+   */
   const run = useCallback(
     async (key: string, action: () => Promise<ReportContext["report"]>) => {
       setBusy(key);
       setError(null);
       try {
+        if (ctx) await commitRef.current(ctx.report.id);
         applyReport(await action());
       } catch (e) {
         setError(e instanceof ApiError ? e.message : String(e));
@@ -66,7 +133,7 @@ export function Editor() {
         setBusy(null);
       }
     },
-    [applyReport],
+    [applyReport, ctx],
   );
 
   const grid = useMemo(
@@ -103,9 +170,10 @@ export function Editor() {
       // Paint immediately; the server is one hop away on localhost but the
       // grid should never feel like it is waiting.
       setCtx({ ...ctx, report: { ...ctx.report, days } });
-      void run("cell", () => api.updateReport(ctx.report.id, { days }));
+      pending.current.days = days;
+      schedule(ctx.report.id);
     },
-    [ctx, grid, confirm, t, run],
+    [ctx, grid, confirm, t, schedule],
   );
 
   const setNote = useCallback(
@@ -116,12 +184,10 @@ export function Editor() {
       else delete dayNotes[String(day)];
 
       setCtx({ ...ctx, report: { ...ctx.report, dayNotes } });
-      if (noteTimer.current) clearTimeout(noteTimer.current);
-      noteTimer.current = setTimeout(() => {
-        void run("note", () => api.updateReport(ctx.report.id, { dayNotes }));
-      }, 600);
+      pending.current.dayNotes = dayNotes;
+      schedule(ctx.report.id);
     },
-    [ctx, run],
+    [ctx, schedule],
   );
 
   const toggleStatus = useCallback(async () => {
@@ -147,6 +213,9 @@ export function Editor() {
       danger: true,
     });
     if (!ok) return;
+    // Drop buffered edits so the unmount flush cannot PATCH a deleted report.
+    pending.current = {};
+    if (saveTimer.current) clearTimeout(saveTimer.current);
     await api.deleteReport(ctx.report.id);
     removeReport(ctx.report.id);
     navigate("/");

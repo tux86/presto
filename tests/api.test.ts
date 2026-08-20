@@ -457,3 +457,85 @@ describe("reporting filtered by company", () => {
     expect(text).not.toContain("Acme Consulting");
   });
 });
+
+describe("company default invariant", () => {
+  test("a partial patch does not clear the default", async () => {
+    const state = await call("GET", "/state");
+    const first = state.body.companies[0].id;
+    await call("POST", "/companies", { name: "Second" });
+
+    // Renaming must not touch isDefault, even though the field is absent.
+    const { status } = await call("PATCH", `/companies/${first}`, { name: "Renamed" });
+    expect(status).toBe(200);
+
+    const after = (await call("GET", "/companies")).body;
+    expect(after.filter((c: { isDefault: boolean }) => c.isDefault)).toHaveLength(1);
+    expect(after.find((c: { id: string }) => c.id === first).isDefault).toBe(true);
+  });
+
+  test("a partial patch does not blank the other fields", async () => {
+    const created = await call("POST", "/companies", { name: "Acme", address: "1 Rue", businessId: "SIRET" });
+    const { body } = await call("PATCH", `/companies/${created.body.id}`, { name: "Acme SAS" });
+    expect(body).toMatchObject({ name: "Acme SAS", address: "1 Rue", businessId: "SIRET" });
+  });
+
+  test("unsetting the last default re-elects one", async () => {
+    const state = await call("GET", "/state");
+    const first = state.body.companies[0].id;
+    await call("PATCH", `/companies/${first}`, { isDefault: false });
+
+    const after = (await call("GET", "/companies")).body;
+    expect(after.filter((c: { isDefault: boolean }) => c.isDefault)).toHaveLength(1);
+  });
+});
+
+describe("day keys are checked against the month", () => {
+  test("refuses a 31st in a 30-day month", async () => {
+    const { missionId } = await seed();
+    const april = await call("POST", "/reports", { missionId, year: 2026, month: 4 });
+    const { status, body } = await call("PATCH", `/reports/${april.body.id}`, { days: { "31": 1 } });
+    expect(status).toBe(400);
+    expect(body.error).toContain("only 30 days");
+
+    // A day that would be billed but never rendered is the whole point.
+    expect((await call("GET", `/reports/${april.body.id}`)).body.report.days).toEqual({});
+  });
+
+  test("refuses a 30th in February and accepts the 28th", async () => {
+    const { missionId } = await seed();
+    const feb = await call("POST", "/reports", { missionId, year: 2026, month: 2 });
+    expect((await call("PATCH", `/reports/${feb.body.id}`, { days: { "30": 1 } })).status).toBe(400);
+    expect((await call("PATCH", `/reports/${feb.body.id}`, { days: { "28": 1 } })).status).toBe(200);
+  });
+
+  test("checks day notes too", async () => {
+    const { missionId } = await seed();
+    const april = await call("POST", "/reports", { missionId, year: 2026, month: 4 });
+    expect((await call("PATCH", `/reports/${april.body.id}`, { dayNotes: { "31": "x" } })).status).toBe(400);
+  });
+
+  test("allows the 31st in a 31-day month", async () => {
+    const { missionId } = await seed();
+    const may = await call("POST", "/reports", { missionId, year: 2026, month: 5 });
+    expect((await call("PATCH", `/reports/${may.body.id}`, { days: { "31": 1 } })).status).toBe(200);
+  });
+});
+
+describe("holiday coverage", () => {
+  test("state announces which years its calendars cover", async () => {
+    await seed();
+    const { body } = await call("GET", "/state");
+    const thisYear = new Date().getUTCFullYear();
+    expect(body.holidayYears).toContain(thisYear);
+    expect(body.holidayYears).toContain(thisYear + 1);
+    expect(body.holidayYears).toContain(thisYear - 1);
+  });
+
+  test("a report in an older year extends the coverage", async () => {
+    const { missionId } = await seed();
+    await call("POST", "/reports", { missionId, year: 2019, month: 3 });
+    const { body } = await call("GET", "/state");
+    expect(body.holidayYears).toContain(2019);
+    expect(body.holidays.FR.some((d: string) => d.startsWith("2019"))).toBe(true);
+  });
+});

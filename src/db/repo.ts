@@ -156,6 +156,19 @@ function boolCol(v: boolean | undefined): number | undefined {
 
 export type CompanyInput = Omit<Company, "id">;
 
+/**
+ * Exactly one company is the default, always.
+ * Elects the alphabetically first when nothing is marked — after a delete, or
+ * after the last default was unset.
+ */
+function ensureOneDefault(db: Db): void {
+  db.query(
+    `UPDATE company SET isDefault = 1
+     WHERE id = (SELECT id FROM company ORDER BY name COLLATE NOCASE LIMIT 1)
+       AND NOT EXISTS (SELECT 1 FROM company WHERE isDefault = 1)`,
+  ).run();
+}
+
 export function listCompanies(db: Db): Company[] {
   return db
     .query("SELECT * FROM company ORDER BY isDefault DESC, name COLLATE NOCASE")
@@ -183,8 +196,7 @@ export function createCompany(db: Db, input: CompanyInput): Company {
       isDefault: input.isDefault ? 1 : 0,
       createdAt: now(),
     });
-    // The first company is always the default, whatever the caller asked for.
-    db.query("UPDATE company SET isDefault = 1 WHERE (SELECT COUNT(*) FROM company) = 1").run();
+    ensureOneDefault(db);
   })();
   return getCompany(db, id)!;
 }
@@ -196,16 +208,15 @@ export function updateCompany(db: Db, id: string, patch: Partial<CompanyInput>):
       ...patch,
       isDefault: boolCol(patch.isDefault),
     } as Record<string, Value>);
+    // Clearing the last default would otherwise leave the install with none.
+    ensureOneDefault(db);
   })();
   return getCompany(db, id);
 }
 
 export function deleteCompany(db: Db, id: string): void {
   db.query("DELETE FROM company WHERE id = $id").run({ id });
-  // Never leave the set without a default.
-  db.query(
-    "UPDATE company SET isDefault = 1 WHERE id = (SELECT id FROM company ORDER BY name LIMIT 1) AND NOT EXISTS (SELECT 1 FROM company WHERE isDefault = 1)",
-  ).run();
+  ensureOneDefault(db);
 }
 
 /** Create a starter company so a fresh install is immediately usable. */

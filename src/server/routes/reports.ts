@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { daysInMonth } from "../../core/dates.ts";
 import { compactDays, compactNotes, copyWeekdayPattern, fillWorkdays, reportGrid } from "../../core/grid.ts";
 import { forCountry, holidayMap } from "../../core/holidays.ts";
 import { isLocale, type Report, type ReportStatus } from "../../core/types.ts";
@@ -26,6 +27,23 @@ function assertEditable(
   if (patch.status === "draft") return;
   if (patch.days !== undefined || patch.dayNotes !== undefined || patch.note !== undefined) {
     badRequest("This report is completed. Revert it to draft before editing.");
+  }
+}
+
+/**
+ * Day keys are validated as 1–31 by the schema, which cannot know the month.
+ * A "31" stored on a 30-day April never renders in the grid or the PDF table,
+ * but `totalDays` still counts it — so the summary, the CSV and the PDF footer
+ * would all bill a day that appears nowhere.
+ */
+function assertDaysInMonth(report: Report, patch: { days?: object; dayNotes?: object }) {
+  const last = daysInMonth(report.year, report.month);
+  for (const map of [patch.days, patch.dayNotes]) {
+    for (const key of Object.keys(map ?? {})) {
+      if (Number(key) > last) {
+        badRequest(`${report.year}-${String(report.month).padStart(2, "0")} has only ${last} days.`);
+      }
+    }
   }
 }
 
@@ -89,6 +107,7 @@ export const reports = new Hono<Env>()
     const report = required(repo.getReport(c.var.db, id), "Report");
     const patch = reportPatch.parse(await c.req.json());
     assertEditable(report, patch);
+    assertDaysInMonth(report, patch);
 
     return c.json(
       repo.updateReport(c.var.db, id, {

@@ -35,22 +35,25 @@ const UI_DIR = "./dist/ui";
 function holidayCalendars(
   clients: { holidayCountry: string }[],
   reports: { year: number; holidayCountry: string }[],
-): Record<string, string[]> {
+): { holidays: Record<string, string[]>; holidayYears: number[] } {
   const thisYear = new Date().getUTCFullYear();
-  const years = new Set<number>([thisYear, thisYear + 1]);
+  const years = new Set<number>([thisYear - 1, thisYear, thisYear + 1]);
   for (const report of reports) years.add(report.year);
 
   const countries = new Set<string>();
   for (const client of clients) countries.add(client.holidayCountry);
   for (const report of reports) countries.add(report.holidayCountry);
 
-  const out: Record<string, string[]> = {};
+  const holidays: Record<string, string[]> = {};
   for (const country of countries) {
     const dates: string[] = [];
     for (const year of years) dates.push(...Object.keys(holidayMap(country, year)));
-    out[country] = dates.sort();
+    holidays[country] = dates.sort();
   }
-  return out;
+
+  // Announced so the UI can tell "no holidays that year" from "that year was
+  // never sent", and refetch rather than shading holidays as ordinary days.
+  return { holidays, holidayYears: [...years].sort((a, b) => a - b) };
 }
 
 export function createApp(db: Db) {
@@ -88,7 +91,7 @@ export function createApp(db: Db) {
         clients,
         missions: repo.listMissions(c.var.db),
         reports,
-        holidays: holidayCalendars(clients, reports),
+        ...holidayCalendars(clients, reports),
       });
     })
     .get("/health", (c) => c.json({ status: "ok", version: config.version }))

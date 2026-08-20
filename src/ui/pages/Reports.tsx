@@ -95,7 +95,7 @@ function ReportCard({ report, isCurrent }: { report: Report; isCurrent: boolean 
 
 function NewReportModal({ open, onClose, year }: { open: boolean; onClose: () => void; year: number }) {
   const { t, locale } = useT();
-  const { missions, client, upsertReport } = useStore();
+  const { missions, client, upsertReport, coversHolidayYear, reload } = useStore();
   const [missionId, setMissionId] = useState("");
   const [month, setMonth] = useState(THIS_MONTH);
   const [reportYear, setReportYear] = useState(year);
@@ -117,6 +117,10 @@ function NewReportModal({ open, onClose, year }: { open: boolean; onClose: () =>
     setError(null);
     try {
       upsertReport(await api.createReport({ missionId, year: reportYear, month }));
+      // The server only ships holiday calendars for years it knew about. A
+      // report in a new year needs a refetch, or its mini-month would shade
+      // public holidays as ordinary unworked days for the rest of the session.
+      if (!coversHolidayYear(reportYear)) await reload();
       onClose();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : String(e));

@@ -22,7 +22,12 @@ export const companyInput = z.object({
   businessId: optionalText(100),
   isDefault: z.boolean().default(false),
 });
-export const companyPatch = companyInput.partial();
+
+// `.partial()` makes keys optional but keeps `.default(false)` on isDefault,
+// so a PATCH omitting the field would still arrive as `isDefault: false` and
+// silently clear the default company. Overridden rather than respelled: the
+// other fields are transforms, which `.partial()` does short-circuit.
+export const companyPatch = companyInput.partial().extend({ isDefault: z.boolean().optional() });
 
 export const clientInput = z.object({
   name,

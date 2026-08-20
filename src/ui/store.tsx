@@ -14,6 +14,8 @@ interface Store extends AppState {
   mission: (id: string) => Mission | undefined;
   /** Holiday lookup for a country, from the dates the server sent. */
   holidaysFor: (country: string) => HolidayLookup;
+  /** Whether the shipped calendars cover a year. */
+  coversHolidayYear: (year: number) => boolean;
 
   upsertCompany: (company: Company) => void;
   removeCompany: (id: string) => void;
@@ -33,6 +35,7 @@ const EMPTY: AppState = {
   missions: [],
   reports: [],
   holidays: {},
+  holidayYears: [],
 };
 
 const StoreContext = createContext<Store | null>(null);
@@ -82,6 +85,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       status,
       reload,
       client: (id) => state.clients.find((c) => c.id === id),
+      coversHolidayYear: (year) => state.holidayYears.includes(year),
       holidaysFor: (country) => {
         const dates = new Set(state.holidays[country] ?? []);
         // The dashboard shades holidays but never names them, so "" is enough

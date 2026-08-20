@@ -52,6 +52,8 @@ export interface AppState {
   reports: Report[];
   /** Public-holiday dates per country, so the browser can shade a calendar. */
   holidays: Record<string, string[]>;
+  /** Years those calendars cover. Anything outside needs a refetch. */
+  holidayYears: number[];
 }
 
 /** A report with its relations, plus named holidays for its month. */

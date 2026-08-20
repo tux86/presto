@@ -1,0 +1,133 @@
+import { describe, expect, test } from "bun:test";
+import { averageRate, effectiveRate, summarizeYear, workdaysInYear } from "../src/core/reporting.ts";
+import { context, fullDays } from "./fixtures.ts";
+
+describe("effectiveRate", () => {
+  test("prefers the report's snapshot over the mission's current rate", () => {
+    expect(effectiveRate(context({ report: { dailyRate: 700 }, mission: { dailyRate: 650 } }))).toBe(700);
+  });
+
+  test("falls back to the mission when the report has no snapshot", () => {
+    expect(effectiveRate(context({ report: { dailyRate: null }, mission: { dailyRate: 650 } }))).toBe(650);
+  });
+
+  test("is null when neither has a rate", () => {
+    expect(effectiveRate(context({ report: { dailyRate: null }, mission: { dailyRate: null } }))).toBeNull();
+  });
+});
+
+describe("workdaysInYear", () => {
+  test("counts weekdays minus that country's public holidays", () => {
+    expect(workdaysInYear(2026, "FR")).toBe(252);
+    expect(workdaysInYear(2026, null)).toBe(261); // weekdays only
+    expect(workdaysInYear(2026, "FR")).toBeLessThan(workdaysInYear(2026, null));
+  });
+});
+
+describe("summarizeYear", () => {
+  test("an empty year produces zeroes, not undefined", () => {
+    const s = summarizeYear(2026, []);
+    expect(s.totalDays).toBe(0);
+    expect(s.currencies).toEqual([]);
+    expect(s.months).toHaveLength(12);
+    expect(s.months[0]!.days).toBe(0);
+    expect(s.previous).toBeNull();
+  });
+
+  test("aggregates days and revenue", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(20) } }),
+      context({ report: { id: "b", month: 2, days: fullDays(18) } }),
+    ]);
+    expect(s.totalDays).toBe(38);
+    expect(s.byCurrency.EUR).toEqual({ revenue: 24700, days: 38 });
+    expect(s.months[0]!.days).toBe(20);
+    expect(s.months[0]!.revenue.EUR).toBe(13000);
+    expect(s.months[2]!.days).toBe(0);
+  });
+
+  test("keeps currencies separate instead of converting them", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(10) } }),
+      context({
+        report: { id: "b", month: 1, days: fullDays(10), dailyRate: 800 },
+        client: { id: "cl2", name: "Initech", currency: "USD" },
+        mission: { id: "m2", clientId: "cl2" },
+      }),
+    ]);
+    expect(s.byCurrency.EUR!.revenue).toBe(6500);
+    expect(s.byCurrency.USD!.revenue).toBe(8000);
+    expect(s.months[0]!.revenue).toEqual({ EUR: 6500, USD: 8000 });
+    // Ordered by revenue, highest first.
+    expect(s.currencies).toEqual(["USD", "EUR"]);
+    expect(s.totalDays).toBe(20);
+  });
+
+  test("splits a client billed through two of your companies", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(10) } }),
+      context({
+        report: { id: "b", month: 2, days: fullDays(10) },
+        mission: { id: "m2", companyId: "co2" },
+        company: { id: "co2", name: "Second Entity", isDefault: false },
+      }),
+    ]);
+    expect(s.clients).toHaveLength(2);
+    expect(s.companies).toHaveLength(2);
+    expect(s.clients.every((c) => c.clientName === "Globex")).toBe(true);
+  });
+
+  test("merges reports for the same client and company", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(10) } }),
+      context({ report: { id: "b", month: 2, days: fullDays(5) } }),
+    ]);
+    expect(s.clients).toHaveLength(1);
+    expect(s.clients[0]!.days).toBe(15);
+    expect(s.clients[0]!.revenue).toBe(9750);
+  });
+
+  test("treats a missing rate as zero revenue but still counts the days", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(10), dailyRate: null }, mission: { dailyRate: null } }),
+    ]);
+    expect(s.totalDays).toBe(10);
+    expect(s.byCurrency.EUR!.revenue).toBe(0);
+  });
+
+  test("summarizes the previous year for comparison", () => {
+    const s = summarizeYear(
+      2026,
+      [context({ report: { id: "a", month: 1, days: fullDays(10) } })],
+      [
+        context({ report: { id: "p1", year: 2025, month: 1, days: fullDays(20) } }),
+        context({
+          report: { id: "p2", year: 2025, month: 2, days: fullDays(5) },
+          client: { id: "cl2", name: "Initech" },
+          mission: { id: "m2", clientId: "cl2" },
+        }),
+      ],
+    );
+    expect(s.previous).toEqual({ totalDays: 25, byCurrency: { EUR: 16250 }, clientCount: 2 });
+  });
+
+  test("half-days survive aggregation without float drift", () => {
+    const s = summarizeYear(2026, [context({ report: { id: "a", month: 1, days: { "1": 0.5, "2": 0.5, "3": 0.5 } } })]);
+    expect(s.totalDays).toBe(1.5);
+    expect(s.byCurrency.EUR!.revenue).toBe(975);
+  });
+});
+
+describe("averageRate", () => {
+  test("divides revenue by days for one currency", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(10) } }),
+      context({ report: { id: "b", month: 2, days: fullDays(10), dailyRate: 750 } }),
+    ]);
+    expect(averageRate(s, "EUR")).toBe(700);
+  });
+
+  test("is zero for a currency with no activity", () => {
+    expect(averageRate(summarizeYear(2026, []), "EUR")).toBe(0);
+  });
+});

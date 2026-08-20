@@ -6,6 +6,10 @@
  * label table inside the PDF service, and the two drifted.
  */
 export const en = {
+  "about.releaseNotes": "Release notes",
+  "about.source": "Source",
+  "about.license": "MIT",
+
   "nav.reports": "Reports",
   "nav.clients": "Clients",
   "nav.missions": "Missions",

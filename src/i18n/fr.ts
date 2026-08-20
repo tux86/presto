@@ -1,6 +1,10 @@
 import type { Dictionary } from "./en.ts";
 
 export const fr: Dictionary = {
+  "about.releaseNotes": "Notes de version",
+  "about.source": "Source",
+  "about.license": "MIT",
+
   "nav.reports": "Comptes rendus",
   "nav.clients": "Clients",
   "nav.missions": "Missions",

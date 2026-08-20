@@ -15,6 +15,43 @@ const NAV: { to: string; key: TranslationKey; icon: typeof CalendarDays }[] = [
   { to: "/companies", key: "nav.companies", icon: Building2 },
 ];
 
+const REPO = "https://github.com/tux86/presto";
+
+/**
+ * Version and the three links a self-hosted user actually needs: what changed,
+ * where the code is, and under what licence. Inline rather than behind an
+ * "About" dialog — three links do not warrant a modal.
+ */
+function About({ version }: { version: string }) {
+  const { t } = usePrefs();
+  const links = [
+    version ? { href: `${REPO}/releases/tag/v${version}`, label: t("about.releaseNotes") } : null,
+    { href: REPO, label: t("about.source") },
+    { href: `${REPO}/blob/main/LICENSE`, label: t("about.license") },
+  ].filter((l) => l !== null);
+
+  return (
+    <div className="px-4 pt-3 pb-4">
+      {version ? <div className="mb-1 font-mono text-[11px] text-faint">v{version}</div> : null}
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] leading-relaxed">
+        {links.map((link, i) => (
+          <span key={link.href} className="inline-flex items-center gap-1.5">
+            {i > 0 ? <span className="text-faint/50">·</span> : null}
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded text-faint transition-colors hover:text-body focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {link.label}
+            </a>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const THEMES: { value: Theme; icon: typeof Sun; key: TranslationKey }[] = [
   { value: "light", icon: Sun, key: "theme.light" },
   { value: "dark", icon: Moon, key: "theme.dark" },
@@ -141,7 +178,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <Preferences />
-      {app.version ? <div className="px-4 pb-3 text-[11px] text-faint">v{app.version}</div> : null}
+      <About version={app.version} />
     </div>
   );
 }

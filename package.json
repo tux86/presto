@@ -28,6 +28,7 @@
     "build": "vite build",
     "serve": "bun src/server/index.ts",
     "test": "bun test",
+    "seed": "bun scripts/seed.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",

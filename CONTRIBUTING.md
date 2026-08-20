@@ -12,6 +12,15 @@ bun run dev     # API on :3001, Vite with HMR on :5173
 
 You need [Bun](https://bun.sh) 1.2 or newer. There is no database to provision.
 
+For something to actually look at:
+
+```bash
+bun run seed --reset
+```
+
+Two entities, four clients across two currencies, and roughly two years of months —
+deterministic, so a screenshot or a bug report stays reproducible.
+
 ## Before you open a pull request
 
 ```bash

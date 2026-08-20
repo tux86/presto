@@ -1,9 +1,24 @@
 name: Docker
 
 on:
+  # Called by the Release workflow. A release published with GITHUB_TOKEN does
+  # not emit a `release` event — GitHub suppresses it to prevent recursion — so
+  # chaining is what actually publishes an image, not the trigger below.
+  workflow_call:
+    inputs:
+      version:
+        description: Version to publish, without the leading v.
+        required: true
+        type: string
+  # Safety net for a release created by hand, and a manual re-publish.
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish, e.g. 2.0.0. Empty builds the current ref as :edge.
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -15,6 +30,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Build the tag being published, not whatever main happens to be.
+          ref: ${{ inputs.version && format('v{0}', inputs.version) || github.ref }}
+
+      - name: Resolve version
+        id: v
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="$INPUT_VERSION"
+          if [ -z "$version" ]; then version="${RELEASE_TAG#v}"; fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-qemu-action@v3
 
@@ -59,14 +87,14 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ steps.targets.outputs.images }}
-          # A manual run has no version to derive tags from, so it publishes
-          # `edge` rather than producing an empty tag list and failing.
+          # A dispatch with no version has nothing to derive semver from, so it
+          # publishes `edge` rather than producing an empty tag list.
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
-            type=raw,value=edge,enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=semver,pattern={{version}},value=${{ steps.v.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.v.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.v.outputs.version }}
+            type=raw,value=latest,enable=${{ steps.v.outputs.version != '' }}
+            type=raw,value=edge,enable=${{ steps.v.outputs.version == '' }}
           labels: |
             org.opencontainers.image.title=Presto
             org.opencontainers.image.description=Monthly activity reports for freelancers and consultants
@@ -85,7 +113,7 @@ jobs:
 
       # Keeps the Docker Hub page from being an empty box.
       - name: Sync Docker Hub description
-        if: vars.DOCKERHUB_IMAGE != '' && github.event_name == 'release'
+        if: vars.DOCKERHUB_IMAGE != '' && steps.v.outputs.version != ''
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}

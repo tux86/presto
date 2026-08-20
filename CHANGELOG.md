@@ -1,3 +1,43 @@
+## [2.0.0](https://github.com/tux86/presto/compare/v1.24.0...v2.0.0) (2026-08-20)
+
+### ⚠ BREAKING CHANGES
+
+* on this branch still resolves to 2.0.0.
+* v2 is a full rewrite. Storage moves from PostgreSQL to a
+local SQLite file, authentication and multi-user support are removed
+entirely, and the HTTP API is reshaped. There is no automated migration
+from v1, which remains available at the v1-final tag.
+
+* Merge branch 'main' into v2 ([0a896cb](https://github.com/tux86/presto/commit/0a896cb6ce6c3dd1af3a79a878d98506e2b0a9e6))
+
+### Features
+
+* **core:** pure domain logic for grids, totals, reporting and CSV ([2c87a3f](https://github.com/tux86/presto/commit/2c87a3f187af87dcd3c2e1a1c67c3f9d7d560084))
+* **db:** store data in a local SQLite file, no ORM ([f6f1ac1](https://github.com/tux86/presto/commit/f6f1ac12f304184ce14b9e444cc9bcc9c5c17c4b))
+* **pdf:** render the client-facing report from the shared dictionary ([7f88d78](https://github.com/tux86/presto/commit/7f88d78c6e85a2c7ce634efac145e48063f64f64))
+* **server:** expose the whole dataset over a small HTTP API ([f44e2ff](https://github.com/tux86/presto/commit/f44e2ff799016361e71e85c44c963dee23549740))
+* **summary:** filter by company, and rename the page to match its title ([3a51314](https://github.com/tux86/presto/commit/3a51314b88130bf9e3774d6144532cf952dd6f02))
+* **ui:** put the version and project links back in the sidebar ([69b028c](https://github.com/tux86/presto/commit/69b028c3d97e8c4d094bda6a05553cd6ef5d378d))
+* **ui:** rebuild the interface with one in-memory store ([3393f22](https://github.com/tux86/presto/commit/3393f2205010edb95cf86755f5eed29a02db4a9a))
+* verified container image, Docker Hub publishing, and safe backups ([93a5ae0](https://github.com/tux86/presto/commit/93a5ae0cf36d6a3c4c3a2d415d8b09c0d579432c))
+
+### Bug Fixes
+
+* **ci:** make the release job actually able to run ([079d598](https://github.com/tux86/presto/commit/079d5980f9ff8875823d39c11ce2046ac828d2eb))
+* five defects found by review of the v2 branch ([0c25270](https://github.com/tux86/presto/commit/0c25270d41530376d5595ed7f48b66adef3f7e85))
+* **reporting:** keep company rows and year comparisons honest ([8fe66dd](https://github.com/tux86/presto/commit/8fe66dd8d0d4cfa859815142ce531f33c289c6c5))
+* **ui:** render chart series and disambiguate French month labels ([c5a0fa5](https://github.com/tux86/presto/commit/c5a0fa589e9cad62bb09eff79c02a9724277f6b6))
+* **ui:** restore the logo in the sidebar and mobile header ([5e80ee3](https://github.com/tux86/presto/commit/5e80ee34da72083c41478349eba28f8ee3524282))
+* **ui:** use filter chips instead of full-width dropdowns ([6ce314c](https://github.com/tux86/presto/commit/6ce314c6f149a5503928969ba00ebd13a018f9ac))
+
+### Refactoring
+
+* **ui:** give the logo room and drop the redundant tagline ([82c16af](https://github.com/tux86/presto/commit/82c16af23a2c3fa73cab91b61a2e355d53390242))
+
+### Chores
+
+* scaffold v2 as a single package on Bun + SQLite ([d3044bd](https://github.com/tux86/presto/commit/d3044bd06156496a94d28591937e2959a01fb4a3))
+
 ## [1.24.0](https://github.com/tux86/presto/compare/v1.23.3...v1.24.0) (2026-03-24)
 
 ### Features

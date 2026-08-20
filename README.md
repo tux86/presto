@@ -141,11 +141,17 @@ v1 remains available at the [`v1-final`](https://github.com/tux86/presto/tree/v1
 
 ```bash
 bun install
-bun run dev        # API on :3001, Vite with HMR on :5173
-bun test           # ~150 tests, no database or server needed
+bun run dev            # API on :3001, Vite with HMR on :5173
+bun test               # ~150 tests, no database or server needed
 bun run typecheck
 bun run lint:fix
+bun run seed --reset   # fill the database with a plausible two-year history
 ```
+
+`bun run seed` is for trying Presto out and for working on it — two entities, four
+clients in two currencies, and a couple of years of months. It is deterministic, so the
+same command always produces the same data. It is never run automatically and is not in
+the Docker image; Presto has no demo mode.
 
 ### How it fits together
 

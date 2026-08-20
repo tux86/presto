@@ -130,6 +130,7 @@ export const fr: Dictionary = {
   "year.utilization": "Taux d'occupation",
   "year.utilizationHint": "{days} sur {workdays} jours ouvrés en {year}",
   "year.vsPrevious": "vs {year}",
+  "year.vsPreviousPeriod": "vs la même période {year}",
   "year.byMonth": "Par mois",
   "year.byClient": "Par client",
   "year.byCompany": "Par société",

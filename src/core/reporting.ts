@@ -45,14 +45,21 @@ export interface ClientSummary {
 export interface CompanySummary {
   companyId: string;
   companyName: string;
+  /** Keyed by company + currency, like clients: days and revenue always agree. */
+  currency: string;
   days: number;
-  revenue: Record<string, number>;
+  revenue: number;
 }
 
 export interface PreviousYear {
   totalDays: number;
   byCurrency: Record<string, number>;
   clientCount: number;
+  /**
+   * True when the comparison was trimmed to the months elapsed this year.
+   * Comparing eight months against twelve is not a decline.
+   */
+  partial: boolean;
 }
 
 function add(map: Record<string, number>, key: string, amount: number): void {
@@ -99,7 +106,7 @@ function dominantCountry(reports: ReportContext[]): string | null {
   return best;
 }
 
-function summarizePrevious(reports: ReportContext[]): PreviousYear | null {
+function summarizePrevious(reports: ReportContext[], partial: boolean): PreviousYear | null {
   if (reports.length === 0) return null;
   const byCurrency: Record<string, number> = {};
   const clients = new Set<string>();
@@ -112,7 +119,7 @@ function summarizePrevious(reports: ReportContext[]): PreviousYear | null {
     if (amount !== null) add(byCurrency, ctx.client.currency, amount);
   }
   for (const key of Object.keys(byCurrency)) byCurrency[key] = round(byCurrency[key]!);
-  return { totalDays, byCurrency, clientCount: clients.size };
+  return { totalDays, byCurrency, clientCount: clients.size, partial };
 }
 
 /**
@@ -122,12 +129,25 @@ function summarizePrevious(reports: ReportContext[]): PreviousYear | null {
  * `holidaysFor` is injected rather than imported so this module — and the
  * browser bundle that imports it — stays free of the holiday database.
  */
+export interface SummaryOptions {
+  /** Resolves a country to its holiday calendar. Injected to keep this module pure. */
+  holidaysFor?: (country: string) => HolidayLookup;
+  /**
+   * Trim the previous year to this month when comparing, so a year in progress
+   * is measured against the same months rather than a full twelve.
+   */
+  throughMonth?: number;
+}
+
 export function summarizeYear(
   year: number,
   reports: ReportContext[],
   previousReports: ReportContext[] = [],
-  holidaysFor: (country: string) => HolidayLookup = () => NO_HOLIDAYS,
+  options: SummaryOptions = {},
 ): YearSummary {
+  const { holidaysFor = () => NO_HOLIDAYS, throughMonth } = options;
+  const comparable =
+    throughMonth === undefined ? previousReports : previousReports.filter((c) => c.report.month <= throughMonth);
   const byCurrency: Record<string, { revenue: number; days: number }> = {};
   const months: MonthSummary[] = Array.from({ length: 12 }, (_, i) => ({
     month: i + 1,
@@ -174,15 +194,17 @@ export function summarizeYear(
     clientRow.revenue += amount;
     clients.set(clientKey, clientRow);
 
-    const companyRow = companies.get(company.id) ?? {
+    const companyKey = `${company.id}|${currency}`;
+    const companyRow = companies.get(companyKey) ?? {
       companyId: company.id,
       companyName: company.name,
+      currency,
       days: 0,
-      revenue: {},
+      revenue: 0,
     };
     companyRow.days += days;
-    add(companyRow.revenue, currency, amount);
-    companies.set(company.id, companyRow);
+    companyRow.revenue += amount;
+    companies.set(companyKey, companyRow);
   }
 
   for (const bucket of Object.values(byCurrency)) bucket.revenue = round(bucket.revenue);
@@ -191,9 +213,7 @@ export function summarizeYear(
     for (const key of Object.keys(month.revenue)) month.revenue[key] = round(month.revenue[key]!);
   }
   for (const row of clients.values()) row.revenue = round(row.revenue);
-  for (const row of companies.values()) {
-    for (const key of Object.keys(row.revenue)) row.revenue[key] = round(row.revenue[key]!);
-  }
+  for (const row of companies.values()) row.revenue = round(row.revenue);
 
   const currencies = Object.keys(byCurrency).sort(
     (a, b) => (byCurrency[b]?.revenue ?? 0) - (byCurrency[a]?.revenue ?? 0) || a.localeCompare(b),
@@ -207,8 +227,10 @@ export function summarizeYear(
     byCurrency,
     months,
     clients: [...clients.values()].sort((a, b) => b.revenue - a.revenue || a.clientName.localeCompare(b.clientName)),
-    companies: [...companies.values()].sort((a, b) => b.days - a.days || a.companyName.localeCompare(b.companyName)),
-    previous: summarizePrevious(previousReports),
+    companies: [...companies.values()].sort(
+      (a, b) => b.revenue - a.revenue || a.companyName.localeCompare(b.companyName),
+    ),
+    previous: summarizePrevious(comparable, throughMonth !== undefined),
   };
 }
 

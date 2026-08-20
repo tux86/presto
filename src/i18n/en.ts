@@ -135,6 +135,7 @@ export const en = {
   "year.utilization": "Utilisation",
   "year.utilizationHint": "{days} of {workdays} working days in {year}",
   "year.vsPrevious": "vs {year}",
+  "year.vsPreviousPeriod": "vs the same months of {year}",
   "year.byMonth": "By month",
   "year.byClient": "By client",
   "year.byCompany": "By company",

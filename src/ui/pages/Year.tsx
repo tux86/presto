@@ -77,6 +77,11 @@ export function Year() {
     [summary, currency],
   );
 
+  const byCompany = useMemo(
+    () => summary?.companies.filter((c) => !currency || c.currency === currency) ?? [],
+    [summary, currency],
+  );
+
   const nav = (
     <>
       <div className="flex items-center gap-1 rounded-lg border border-edge bg-panel p-1">
@@ -132,6 +137,12 @@ export function Year() {
   const revenueDelta = bucket ? delta(bucket.revenue, previousRevenue) : null;
   const daysDelta = summary.previous ? delta(summary.totalDays, summary.previous.totalDays) : null;
 
+  /** "+12% vs 2025", or "vs the same months of 2025" while the year is running. */
+  const versus = (change: string | null) =>
+    change === null
+      ? undefined
+      : `${change} ${t(summary.previous?.partial ? "year.vsPreviousPeriod" : "year.vsPrevious", { year: year - 1 })}`;
+
   return (
     <div>
       <PageHeader title={t("year.title")} subtitle={String(year)} actions={nav} />
@@ -162,18 +173,12 @@ export function Year() {
           ) : null}
 
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Kpi
-              label={t("year.totalDays")}
-              value={fmtDays(summary.totalDays)}
-              hint={daysDelta ? t("year.vsPrevious", { year: year - 1 }).replace("vs", `${daysDelta} vs`) : undefined}
-            />
+            <Kpi label={t("year.totalDays")} value={fmtDays(summary.totalDays)} hint={versus(daysDelta)} />
             <Kpi
               label={t("year.totalRevenue")}
               accent
               value={bucket && currency ? money(bucket.revenue, currency, locale) : "—"}
-              hint={
-                revenueDelta ? t("year.vsPrevious", { year: year - 1 }).replace("vs", `${revenueDelta} vs`) : undefined
-              }
+              hint={versus(revenueDelta)}
             />
             <Kpi
               label={t("year.averageRate")}
@@ -298,15 +303,15 @@ export function Year() {
             <Card className="p-4 sm:p-5">
               <h2 className="mb-4 text-sm font-semibold text-heading">{t("year.byCompany")}</h2>
               <ul className="space-y-2.5">
-                {summary.companies.map((c) => {
-                  const amount = currency ? (c.revenue[currency] ?? 0) : 0;
-                  const share = summary.totalDays > 0 ? (c.days / summary.totalDays) * 100 : 0;
+                {byCompany.map((c) => {
+                  const total = byCompany.reduce((sum, row) => sum + row.days, 0);
+                  const share = total > 0 ? (c.days / total) * 100 : 0;
                   return (
-                    <li key={c.companyId}>
+                    <li key={`${c.companyId}-${c.currency}`}>
                       <div className="flex items-baseline justify-between gap-2 text-sm">
                         <span className="truncate text-body">{c.companyName}</span>
                         <span className="shrink-0 font-medium tabular text-heading">
-                          {currency ? money(amount, currency, locale) : "—"}
+                          {money(c.revenue, c.currency, locale)}
                         </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2">

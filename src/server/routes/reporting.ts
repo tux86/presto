@@ -22,7 +22,13 @@ export const reporting = new Hono<Env>()
     // Only completed reports count as revenue; drafts are still being edited.
     const current = repo.listReportContexts(c.var.db, { year, status: "completed" });
     const previous = repo.listReportContexts(c.var.db, { year: year - 1, status: "completed" });
-    return c.json(summarizeYear(year, current, previous, (country) => forCountry(country)));
+
+    // A year still in progress is compared against the same months last year:
+    // eight months against twelve is not a decline.
+    const now = new Date();
+    const throughMonth = year === now.getUTCFullYear() ? now.getUTCMonth() + 1 : undefined;
+
+    return c.json(summarizeYear(year, current, previous, { holidaysFor: forCountry, throughMonth }));
   })
 
   /** Spreadsheet export. Includes drafts — the year is not over yet. */

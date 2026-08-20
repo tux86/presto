@@ -330,6 +330,15 @@ describe("reporting and export", () => {
     expect(body.year).toBe(new Date().getUTCFullYear());
   });
 
+  test("compares the running year against the same months, not a full one", async () => {
+    const thisYear = new Date().getUTCFullYear();
+    const { body: running } = await call("GET", `/reporting?year=${thisYear}`);
+    expect(running.previous?.partial ?? true).toBe(true);
+
+    const { body: finished } = await call("GET", `/reporting?year=${thisYear - 1}`);
+    expect(finished.previous?.partial ?? false).toBe(false);
+  });
+
   test("CSV export is a downloadable attachment including drafts", async () => {
     const { missionId } = await seed();
     const r = await call("POST", "/reports", { missionId, year: 2026, month: 1 });

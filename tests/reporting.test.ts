@@ -66,6 +66,42 @@ describe("summarizeYear", () => {
     expect(s.totalDays).toBe(20);
   });
 
+  test("compares only the elapsed months when the year is still running", () => {
+    const lastYear = [
+      context({ report: { id: "p1", year: 2025, month: 1, days: fullDays(20) } }),
+      context({ report: { id: "p2", year: 2025, month: 8, days: fullDays(20) } }),
+    ];
+
+    // A finished year is compared against all twelve months.
+    expect(summarizeYear(2026, [], lastYear).previous).toMatchObject({ totalDays: 40, partial: false });
+
+    // A year in progress is compared against the same months only, so eight
+    // months of work does not read as a collapse against a full twelve.
+    expect(summarizeYear(2026, [], lastYear, { throughMonth: 3 }).previous).toMatchObject({
+      totalDays: 20,
+      partial: true,
+    });
+  });
+
+  test("company rows are split by currency so days and revenue agree", () => {
+    const s = summarizeYear(2026, [
+      context({ report: { id: "a", month: 1, days: fullDays(10) } }),
+      context({
+        report: { id: "b", month: 2, days: fullDays(10), dailyRate: 900 },
+        client: { id: "cl2", name: "Helvetia", currency: "CHF" },
+        mission: { id: "m2", clientId: "cl2" },
+      }),
+    ]);
+
+    // One company, two currencies, two rows — never 20 days next to a
+    // single-currency amount.
+    expect(s.companies).toHaveLength(2);
+    const eur = s.companies.find((c) => c.currency === "EUR")!;
+    const chf = s.companies.find((c) => c.currency === "CHF")!;
+    expect(eur).toMatchObject({ companyName: "Acme Consulting", days: 10, revenue: 6500 });
+    expect(chf).toMatchObject({ companyName: "Acme Consulting", days: 10, revenue: 9000 });
+  });
+
   test("splits a client billed through two of your companies", () => {
     const s = summarizeYear(2026, [
       context({ report: { id: "a", month: 1, days: fullDays(10) } }),
@@ -111,7 +147,7 @@ describe("summarizeYear", () => {
         }),
       ],
     );
-    expect(s.previous).toEqual({ totalDays: 25, byCurrency: { EUR: 16250 }, clientCount: 2 });
+    expect(s.previous).toEqual({ totalDays: 25, byCurrency: { EUR: 16250 }, clientCount: 2, partial: false });
   });
 
   test("half-days survive aggregation without float drift", () => {

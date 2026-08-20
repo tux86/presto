@@ -2,47 +2,22 @@ name: CI
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - "*.md"
-      - "docs/**"
-      - "LICENSE"
-      - ".github/dependabot.yml"
-      - ".github/workflows/docker.yml"
-      - ".husky/**"
-      - ".vscode/**"
-      - ".env.example"
-      - "docker-compose*.yml"
-      - "Dockerfile"
+    branches: [main, v2]
   pull_request:
-    branches: [main]
-    paths-ignore:
-      - "*.md"
-      - "docs/**"
-      - "LICENSE"
-      - ".github/dependabot.yml"
-      - ".github/workflows/docker.yml"
-      - ".husky/**"
-      - ".vscode/**"
-      - ".env.example"
-      - "docker-compose*.yml"
-      - "Dockerfile"
+    branches: [main, v2]
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  lint-and-typecheck:
-    name: Lint, Type-check and Build
+  check:
+    name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2
 
       - name: Cache Bun dependencies
         uses: actions/cache@v5
@@ -51,62 +26,15 @@ jobs:
           key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
           restore-keys: bun-${{ runner.os }}-
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - run: bun install --frozen-lockfile
 
-      - name: Lint
-        run: bun run lint
+      - run: bun run lint
 
-      - name: Typecheck
-        run: bun run typecheck
+      - run: bun run typecheck
 
-      - name: Build
-        run: bun run build
+      # No service containers: the tests run against an in-memory SQLite database.
+      - run: bun test
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
+      - run: bun run build
 
-    services:
-      postgres:
-        image: postgres:17-alpine
-        env:
-          POSTGRES_USER: presto
-          POSTGRES_PASSWORD: presto_ci_password
-          POSTGRES_DB: presto_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U presto -d presto_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Cache Bun dependencies
-        uses: actions/cache@v5
-        with:
-          path: ~/.bun/install/cache
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          restore-keys: bun-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Create .env.test
-        run: |
-          cat > packages/backend/.env.test << 'EOF'
-          DATABASE_URL=postgresql://presto:presto_ci_password@localhost:5432/presto_test
-          JWT_SECRET=test-jwt-secret-for-ci-minimum-32-characters-long
-          REGISTRATION_ENABLED=true
-          RATE_LIMIT_MAX=0
-          EOF
-
-      - name: Run tests
-        run: bun run test
+      - run: bun run build:server

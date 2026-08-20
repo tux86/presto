@@ -1,136 +1,70 @@
 # Presto
 
-Activity report time-tracking app. Monorepo with 3 packages.
+Activity report (CRA) generator for one freelancer. Single user, local-first.
 
-## Tech Stack
+## Stack
 
-- **Runtime:** Bun
-- **Frontend:** React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts
-- **Backend:** Hono 4, Drizzle ORM, @react-pdf/renderer
-- **Database:** PostgreSQL (Drizzle ORM)
-- **Shared:** TypeScript types + utilities (dates, country-specific holidays via `date-holidays`)
-- **Testing:** Bun test runner, Hono `app.request()` (222 API E2E tests)
-- **Language:** TypeScript 5.7, strict mode
-
-## Project Structure
-
-```
-packages/
-  backend/     # Hono API server (port 3001 dev, 8080 Docker)
-  frontend/    # React SPA (port 5173 dev, proxies /api → backend)
-  shared/      # Shared types and utils (@presto/shared)
-```
+- **Runtime:** Bun (TypeScript runs directly; no server build step in dev)
+- **Server:** Hono, ~15 routes, no middleware beyond an error handler
+- **Storage:** SQLite via `bun:sqlite`, raw SQL, no ORM
+- **Frontend:** React 19, Vite, Tailwind CSS 4, React Router, Recharts
+- **PDF:** `@react-pdf/renderer`, rendered server-side
+- **Lint/format:** Biome · **Tests:** `bun test`
 
 ## Commands
 
 ```bash
-bun install                # Install all dependencies
-bun run dev                # Start backend + frontend
-bun run dev:backend        # Backend only (hot reload)
-bun run dev:frontend       # Frontend only
-bun run build              # Build all packages
-bun run typecheck          # Type-check all packages
-bun run lint               # Lint + format check (Biome)
-bun run lint:fix           # Auto-fix lint + format issues
-bun run test               # Run API E2E tests (requires presto_test PostgreSQL DB)
-bun run db:generate        # Generate Drizzle migrations
-bun run db:migrate         # Apply migrations programmatically
-bun run db:reset           # Wipe all data (for dev)
-bun run db:seed            # Seed sample data (run db:reset first)
-bun run db:studio          # Open Drizzle Studio
-docker compose up -d       # Start PostgreSQL (dev)
+bun run dev          # API :3001 + Vite :5173
+bun start            # build UI, then serve everything from :3001
+bun test             # ~150 tests, no database needed
+bun run typecheck
+bun run lint:fix
+bun run build        # UI only
+bun run build:server # single-file server bundle (Docker)
+bun run import:v1 <export.json> [--dry-run]
 ```
 
-## Docker
+## Structure
 
-- `docker-compose.yml` — dev: PostgreSQL (DB explorer: `bun run db:studio` → Drizzle Studio)
-- `docker-compose.production.yml` — production: PostgreSQL + Presto app (:8080)
-- `Dockerfile` — multi-stage build, single image, migrations run programmatically at startup
+```
+src/core/    pure logic: dates, holidays, grid, totals, yearly rollup, CSV
+src/db/      schema + migrations + queries
+src/pdf/     the client-facing document
+src/server/  routes, config, validation
+src/ui/      React app
+src/i18n/    en.ts (source of truth) + fr.ts, shared by UI and PDF
+```
 
-## Path Aliases
+**The one architectural rule:** `src/core/` imports nothing from `db/`, `server/`, `pdf/`, or `ui/`.
+Tests point at `core/` and `pdf/`; the HTTP layer gets smoke tests only.
 
-- Frontend: `@/*` → `packages/frontend/src/*`
+## Things that are the way they are on purpose
 
-## Backend Patterns
+- **No auth, no users, no multi-tenancy.** One person, one machine. Do not add ownership checks.
+- **No `ReportEntry` table.** A month's work is two sparse JSON columns on `report`, keyed by
+  day-of-month. Nothing queries across days.
+- **Weekend and holiday flags are computed, never stored.** Changing a client's holiday country
+  must correct every report that uses it.
+- **`buildMonthGrid` takes a `HolidayLookup`, not a country string.** `date-holidays` is over a
+  megabyte and must never reach the browser bundle. The server sends holiday dates with
+  `/api/state` and named holidays with the report detail.
+- **No currency conversion.** Revenue is grouped per currency. Do not add an FX API.
+- **Theme and language live in `localStorage`**, not the database.
+- **Completed reports are frozen** except the private note and the status itself.
+- **`note` is printed on the client's PDF; `privateNote` never leaves the machine.** Keep them
+  visually distinct in the UI, and keep the PDF test that asserts the private note is absent.
 
-- **Routes:** all prefixed with `/api`: `auth`, `clients`, `missions`, `activity-reports`, `reporting`, `settings`, `health`, `config`
-- **Errors:** throw `HTTPException` from `hono/http-exception` — `c.json()` is acceptable for structured error responses (e.g., FK_CONSTRAINT pattern)
-- **ORM:** Drizzle ORM with PostgreSQL in `src/db/index.ts` — exports `db`, table references, and relations
-- **Schema:** `src/db/schema/pg.schema.ts` — single schema file
-- **Ownership checks:** use `findOwned(model, id, userId)` from `db/helpers.ts` — returns the record, throws 404
-- **Status guards:** use `ensureDraft(report)` from `lib/helpers.ts` — throws 400 if report is completed
-- **Utilities:** `slugify()` in `lib/helpers.ts` for filename-safe strings; `sanitizeUser()` in `lib/utils.ts` for safe user objects (allowlist approach)
-- **Query helpers:** `insertReturning()`, `updateReturning()` in `db/helpers.ts` — use PostgreSQL RETURNING clause, both accept optional `trx` param for transactions
-- **FK guard:** `checkDependents(table, fkColumn, id)` in `db/helpers.ts` — counts dependent rows before delete
-- **Relational includes:** use `REPORT_WITH` / `REPORT_WITH_PDF` constants from `db/helpers.ts`
-- **Config:** all env vars accessed via `lib/config.ts` — never read `process.env` directly in routes
-- **IDs:** nanoid (21-char alphanumeric) generated in JS via `db/id.ts`
+## Conventions
 
-## Frontend Patterns
+- Migrations: append to `MIGRATIONS` in `src/db/schema.ts`; never edit a shipped entry.
+- New strings go in `src/i18n/en.ts` first — `fr.ts` is typed against it.
+- Errors: throw `HTTPException`, or the helpers in `src/server/errors.ts`
+  (`notFound`, `badRequest`, `required`, `assertUnused`).
+- IDs: `newId()` in `src/db/index.ts` (21 hex chars from `crypto.randomUUID`).
+- Conventional Commits, enforced by commitlint. Releases are automatic from `main`.
 
-- **State:** Zustand stores in `stores/` for global state (auth, config, preferences)
-- **Data fetching:** TanStack Query hooks per resource in `hooks/` (e.g., `use-activity-reports.ts`)
-- **Components:** shared UI in `components/ui/`, feature components in `components/{feature}/`
-- **Pages:** one file per route in `pages/`
-- **i18n:** `useT()` hook returns `{ t, locale }` — translation files in `i18n/fr.ts` and `i18n/en.ts`
-- **Responsive:** `useIsMobile()` hook + Tailwind breakpoints (375px+, 768px+, 1024px+)
-- **Styling:** Tailwind utility classes, `cn()` helper for conditional classes
-- **Download helper:** `downloadBlob(response, fallbackFilename)` in `lib/utils.ts` for file downloads from API responses
-- **Delete pattern:** `useDeleteWithFkGuard()` hook in `hooks/` — confirm → delete → FK_CONSTRAINT error dialog
-- **Chart constants:** `CHART_COLORS`, `CHART_TOOLTIP_STYLE` in `lib/constants.ts`
+## Workflow rules
 
-## Testing
-
-- **Framework:** Bun test runner with `app.request()` (in-process, no server needed)
-- **Location:** `packages/backend/tests/` — 15 test suites, 222 tests
-- **Database:** PostgreSQL test database (`presto_test`) — fresh migrations each run
-- **Setup:** preload script (`setup.ts`) runs Drizzle migrations before tests
-- **Ordering:** single entry file (`api.test.ts`) imports all suites sequentially (Bun doesn't guarantee alphabetical file discovery order)
-- **Config:** `bunfig.toml` configures preload, `--env-file .env.test` loads test env vars
-- **CI:** dedicated `test` job in CI workflow with PostgreSQL service container
-
-## Code Quality
-
-- **Linter/Formatter:** Biome (`biome.json`) — double quotes, semicolons, trailing commas, 2-space indent, 120 char line width
-- **Pre-commit hook:** Biome auto-formats staged files — don't manually format
-- **Commit convention:** Conventional Commits enforced by Husky + commitlint (`feat:`, `fix:`, `chore:`, etc.)
-- **Commit-msg hook:** Validates commit message format
-
-## CI/CD
-
-- **CI** (`.github/workflows/ci.yml`): two parallel jobs — `lint-and-typecheck` (lint → typecheck → build) + `test` (PostgreSQL service container) on PR/push to `main`
-- **Release** (`.github/workflows/release.yml`): semantic-release after CI passes on `main` — auto version bump, CHANGELOG, GitHub Release
-- **Docker** (`.github/workflows/docker.yml`): builds + pushes single `presto` image to GHCR on release
-
-## User Preferences
-
-- **Store:** `preferences.store.ts` — Zustand in-memory store, synced to server via `GET/PATCH /api/settings`
-- **Scope:** theme (light/dark/auto), locale (en/fr/de/es/pt), baseCurrency (ISO 4217)
-- **DB table:** `UserSettings` (PK = `userId`, FK cascade to users) — auto-created on first `GET /api/settings`
-- **Defaults for new users:** `DEFAULT_THEME`, `DEFAULT_LOCALE`, `DEFAULT_BASE_CURRENCY` env vars
-- **Currency:** per-client field (billing) + per-user baseCurrency (reporting aggregation)
-- **Multi-currency reporting:** revenues converted to baseCurrency via open.er-api.com (1h cache with retry)
-- **Holiday country:** per-client field (all countries via `date-holidays` library)
-- **Config store** (`config.store.ts`) remains read-only server config (appName, authDisabled, registrationEnabled)
-- **UI:** `PreferencesMenu` component in sidebar — gear icon popover with segmented controls + currency selector
-
-## Environment
-
-- **`.env`** (root) — dev config: database, JWT, app settings. All `dev`, `db:*` scripts load from here.
-- **`packages/backend/.env.test`** — test config: PostgreSQL test database. Used only by `bun run test`.
-- **`.env.example`** (root) — template with all available env vars.
-
-## Workflow Rules
-
-- **No code review:** Do not review or critique existing code unless explicitly asked. Focus on the task at hand.
-- **Update E2E tests:** When modifying backend routes or API behavior, always update the corresponding E2E tests in `packages/backend/tests/` to cover the changes.
-
-## Key Conventions
-
-- i18n: English (default), French, German, Spanish, Portuguese
-- Auth is optional, disabled via `AUTH_DISABLED=true` env var
-- Registration is controllable via `REGISTRATION_ENABLED` env var (defaults to `true`)
-- `JWT_SECRET` must be at least 32 characters; known weak defaults are rejected at startup
-- Registration password requires min 8 chars + uppercase + lowercase + digit + special character
-- Drizzle schema in `src/db/schema/pg.schema.ts` — PostgreSQL only
-- Completed reports are read-only — no entry editing, auto-fill, or clear. Only PDF export is allowed.
+- **No unsolicited code review.** Do not critique existing code unless asked.
+- **Update tests with behaviour.** Changing `core/` or a route means updating `tests/`.
+- **Every dependency must justify itself.** Prefer stdlib and Bun built-ins.

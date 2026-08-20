@@ -32,7 +32,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "import:v1": "bun scripts/import-v1.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build:server": "bun build src/server/index.ts --target bun --outfile dist/server.js"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.6.1",

@@ -1,52 +1,36 @@
-# ── Stage 1: Builder ─────────────────────────────────────
-FROM oven/bun:1-debian AS builder
+# ── Build ────────────────────────────────────────────────────────────────────
+FROM oven/bun:1-debian AS build
 WORKDIR /app
 
-COPY package.json bun.lock tsconfig.base.json ./
-COPY packages/shared/package.json packages/shared/package.json
-COPY packages/backend/package.json packages/backend/package.json
-COPY packages/frontend/package.json packages/frontend/package.json
-
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-COPY packages/shared/ packages/shared/
-COPY packages/frontend/ packages/frontend/
-COPY packages/backend/ packages/backend/
+COPY tsconfig.json vite.config.ts index.html ./
+COPY public/ public/
+COPY src/ src/
 
-RUN cd packages/frontend && bun run build
+RUN bun run build
+RUN bun build src/server/index.ts --target bun --outfile dist/server.js
 
-RUN cd packages/backend && \
-    VERSION=$(node -p "require('./package.json').version") && \
-    bun build src/index.ts --outdir dist --target bun --define "__APP_VERSION__=\"$VERSION\""
-
-# ── Stage 2: Runtime ─────────────────────────────────────
+# ── Runtime ──────────────────────────────────────────────────────────────────
+# The server is a single bundled file and SQLite is built into Bun, so the
+# runtime image carries no node_modules at all.
 FROM oven/bun:1-alpine
-
-RUN addgroup -S -g 1001 presto && \
-    adduser -S -u 1001 -G presto -H presto
-
 WORKDIR /app
 
-# Install runtime DB driver. The bundled dist/index.js is self-contained
-# but needs the native pg driver package available at runtime.
-RUN echo '{"dependencies":{"pg":"^8.18.0"}}' > package.json && \
-    bun install --production && \
-    rm package.json
+RUN addgroup -S -g 1001 presto \
+ && adduser -S -u 1001 -G presto -H presto \
+ && mkdir -p /data && chown presto:presto /data
 
-# Copy built artifacts into a flat production layout:
-#   /app/dist/index.js      — backend bundle
-#   /app/public/             — frontend static files
-#   /app/dist/migrations/    — Drizzle SQL migration files
-COPY --from=builder --link /app/packages/backend/dist dist
-COPY --from=builder --link /app/packages/frontend/dist public
-COPY --from=builder --link /app/packages/backend/src/db/migrations dist/migrations
+COPY --from=build --chown=presto:presto /app/dist/server.js dist/server.js
+COPY --from=build --chown=presto:presto /app/dist/ui        dist/ui
 
-ENV PORT=8080
-USER presto
+ENV PORT=8080 DATA_DIR=/data
 EXPOSE 8080
+VOLUME ["/data"]
+USER presto
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD bun -e "fetch('http://localhost:8080/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD bun -e "fetch('http://localhost:'+(process.env.PORT||8080)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-# Migrations run programmatically inside the app at startup
-CMD ["bun", "./dist/index.js"]
+CMD ["bun", "dist/server.js"]

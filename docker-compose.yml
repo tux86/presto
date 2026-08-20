@@ -1,0 +1,13 @@
+services:
+  presto:
+    image: ghcr.io/tux86/presto:latest
+    # Presto has no authentication. Keep this bound to localhost, or put it
+    # behind a reverse proxy, VPN or Tailscale. Never expose it to the internet.
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - presto-data:/data
+    restart: unless-stopped
+
+volumes:
+  presto-data:

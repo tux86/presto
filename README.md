@@ -1,196 +1,178 @@
 <div align="center">
-  <img src="packages/frontend/public/favicon.svg" alt="Presto" width="64" />
+  <img src="public/favicon.svg" alt="" width="64" />
 
   <h1>Presto</h1>
 
-  <p><strong>Self-hosted activity report generator for freelancers and consultants.</strong><br/>
-  Track clients, missions, and billable days. Export professional PDF reports in one click.</p>
+  <p><strong>Monthly activity reports for freelancers and consultants.</strong><br/>
+  Track billable days on a calendar, hand your client a clean PDF.</p>
 
-  [![CI](https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/tux86/presto/actions/workflows/ci.yml)
-  [![Release](https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=blue)](https://github.com/tux86/presto/releases)
-  [![Docker Hub](https://img.shields.io/docker/v/axforge/presto?sort=semver&style=flat-square&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/axforge/presto)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Bun](https://img.shields.io/badge/Bun-runtime-f9f1e1?style=flat-square&logo=bun&logoColor=black)](https://bun.sh/)
+  <p>
+    <a href="https://github.com/tux86/presto/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI" alt="CI" /></a>
+    <a href="https://github.com/tux86/presto/releases"><img src="https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=blue" alt="Release" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT" /></a>
+  </p>
 </div>
 
-<br/>
-
 <p align="center">
-  <img src="docs/images/demo-dashboard.png" alt="Presto — Activity Reports Dashboard" width="100%" />
-</p>
-<p align="center">
-  <img src="docs/images/demo-activity-report.png" alt="Presto — Activity Report Editor" width="100%" />
-</p>
-<p align="center">
-  <img src="docs/images/demo-reporting.png" alt="Presto — Reporting & Revenue Charts" width="100%" />
+  <img src="docs/images/editor.jpg" alt="Filling in a month of billable days" width="100%" />
 </p>
 
 ---
 
-## Why Presto?
+## What it is
 
-Most time-tracking tools are built for teams. Presto is built for **independent freelancers and consultants** who need one thing: a clean monthly activity report they can send to their client.
+A *compte rendu d'activité* generator. You mark the days you worked on a calendar, and Presto turns
+the month into a PDF your client can accept, plus a yearly view of days and revenue.
 
-- **Single Docker image** — no separate frontend/backend/worker containers to manage
-- **PDF-ready activity reports** — calendar view with billable days, ready to print or email
-- **Works without auth** — disable login for single-user setups, no account needed
-- **Your data, your server** — fully self-hosted, no cloud dependency, MIT licensed
+It is built for **one person on one machine**. There are no accounts, no login, no cloud, no
+telemetry. Your data is one SQLite file you can copy, move, and back up yourself.
 
----
+> [!IMPORTANT]
+> **Presto has no authentication.** Anyone who can reach the port can read and change everything.
+> Run it on `localhost`, or behind a reverse proxy, VPN, or Tailscale that handles access control.
+> Do not put it on a public port.
 
-## Features
-
-### Activity Reports
-- Calendar-based day tracking with **half-day precision** (0, 0.5, or 1 per day)
-- **Auto-fill workdays** — one click fills all weekdays, skipping weekends and public holidays
-- **Country-specific holidays** — per-client holiday calendar (all countries supported via [`date-holidays`](https://github.com/commenthol/date-holidays))
-- **Draft / Completed workflow** — lock reports to prevent accidental edits
-- Report notes for delivery comments or internal tracking
-- Clear all entries or revert completed reports back to draft
-
-### Company, Client & Mission Management
-- Create **companies** (your own legal entities) with name, address, and business ID
-- Set a default company used automatically on new reports
-- Organize work by **client** and **mission** (project/contract)
-- Per-client **currency** (all ISO 4217 currencies) and **holiday country**
-- Optional client fields: email, phone, address, business ID (SIRET, VAT, etc.)
-- Daily rate tracking per mission with date ranges
-- Active/inactive mission status
-
-### PDF Export
-- Professional, print-ready reports generated server-side with [`@react-pdf/renderer`](https://react-pdf.org/)
-- Multilingual output — export in **English**, **French**, **German**, **Spanish**, or **Portuguese**
-- Includes company info, client details, mission name, calendar grid, totals, and notes
-- Filename auto-generated from client, mission, and period
-
-### Revenue Dashboards & Multi-Currency
-- Yearly overview with **total days**, **total revenue**, and **average daily rate**
-- Monthly breakdown charts (days worked + revenue per month)
-- Per-client revenue distribution
-- **Multi-currency support** — per-client billing currency with automatic conversion to your base currency via [open.er-api.com](https://www.exchangerate-api.com/)
-- Configurable base currency per user (any ISO 4217 code)
-
-### Authentication & Account Management
-- **Optional auth** — disable for single-user setups (`AUTH_DISABLED=true`)
-- JWT-based authentication with bcrypt password hashing
-- User registration with password policies (min 8 chars, uppercase, lowercase, digit, special character)
-- Registration can be disabled after initial setup (`REGISTRATION_ENABLED=false`)
-- **Change password** and **delete account** from the profile modal
-- **Export all data** — download your entire account as a JSON file
-- Per-IP rate limiting on auth endpoints
-- Secure headers (CSP, HSTS) and CORS configuration
-- Multi-user support with full data isolation (ownership checks on all resources)
-
-### User Experience
-- **Dark / Light / Auto theme** — system-aware with manual override
-- **5 languages** — English, French, German, Spanish, Portuguese
-- **Command palette** — quick navigation and actions via keyboard shortcut
-- **Responsive design** — mobile (375px+), tablet (768px+), desktop (1024px+)
-- Searchable select components for clients, missions, and currencies
-- User preferences synced to server (theme, locale, base currency)
-
-### Deployment
-- **Single Docker image** — backend + frontend served together
-- Auto-runs database migrations on startup
-- Built-in health check endpoint (`/api/health`)
-- **PostgreSQL** — powered by Drizzle ORM
-- Configurable via environment variables (see below)
-
----
-
-## Quick Start
-
-### Docker Compose (recommended)
-
-```bash
-curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.production.yml
-
-# Required: generate secrets before starting
-export POSTGRES_PASSWORD="$(openssl rand -base64 32)"
-export JWT_SECRET="$(openssl rand -base64 48)"
-
-docker compose -f docker-compose.production.yml up -d
-```
-
-Open [http://localhost:8080](http://localhost:8080) and create your account.
-
-### Docker Run
-
-```bash
-docker run -d \
-  --name presto \
-  -p 8080:8080 \
-  -e DATABASE_URL="postgresql://user:pass@host:5432/presto" \
-  -e JWT_SECRET="$(openssl rand -base64 48)" \
-  axforge/presto:latest
-```
-
-> Requires an existing PostgreSQL database. Migrations run automatically on startup.
-
-### Single-User Mode
-
-To skip login entirely, set `AUTH_DISABLED=true`. A default user is auto-created and all requests are associated with it.
-
----
-
-## Configuration
-
-| Variable | Default | Description |
-|---|---|---|
-| `DATABASE_URL` | **(required)** | PostgreSQL connection string |
-| `JWT_SECRET` | **(required)** | Secret for signing JWT tokens (min 32 chars) |
-| `AUTH_DISABLED` | `false` | Disable authentication for single-user mode |
-| `REGISTRATION_ENABLED` | `true` | Allow new user registration |
-| `PORT` | `8080` | HTTP server port |
-| `APP_NAME` | `Presto` | Application name shown in the UI |
-| `DEMO_DATA` | `false` | Seed demo data on first startup (when DB is empty). Shows credentials on login page and hides registration. |
-| `CORS_ORIGINS` | — | Comma-separated allowed origins |
-| `RATE_LIMIT_MAX` | `20` | Max auth requests per window |
-| `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window in ms (default: 15 min) |
-| `DEFAULT_THEME` | `light` | Default theme for new users (`light`, `dark`, `auto`) |
-| `DEFAULT_LOCALE` | `en` | Default language (`en`, `fr`, `de`, `es`, `pt`) |
-| `DEFAULT_BASE_CURRENCY` | `EUR` | Default base currency (ISO 4217) |
-
----
-
-## Tech Stack
-
-| Layer | Technologies |
-|---|---|
-| **Runtime** | [Bun](https://bun.sh/) |
-| **Frontend** | React 19, Vite 6, Tailwind CSS 4, Zustand, TanStack Query, React Router 7, Recharts |
-| **Backend** | Hono 4, Drizzle ORM, @react-pdf/renderer |
-| **Database** | PostgreSQL 17 |
-| **Language** | TypeScript 5.7 (strict mode) |
-| **Testing** | Bun test runner, 222 API E2E tests |
-| **CI/CD** | GitHub Actions, semantic-release, Docker Hub |
-
----
-
-## Development
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup, project structure, and guidelines.
+## Quick start
 
 ```bash
 git clone https://github.com/tux86/presto.git
 cd presto
 bun install
-cp .env.example .env          # edit: set POSTGRES_PASSWORD + JWT_SECRET
-docker compose up -d           # start PostgreSQL
-bun run db:migrate
-bun run dev                    # http://localhost:5173
+bun start
 ```
 
-### Testing
+Open <http://localhost:3001>. That is the whole setup — no database to provision, no `.env` to fill
+in. Your data lands in `./data/presto.db`.
 
-222 API E2E tests using Bun's test runner with Hono's `app.request()` — no running server needed.
+You need [Bun](https://bun.sh) 1.2 or newer. Nothing else.
+
+### Docker
 
 ```bash
-bun run test
+docker run -d --name presto \
+  -p 127.0.0.1:8080:8080 \
+  -v presto-data:/data \
+  ghcr.io/tux86/presto:latest
 ```
 
----
+Or with the bundled Compose file:
+
+```bash
+curl -O https://raw.githubusercontent.com/tux86/presto/main/docker-compose.yml
+docker compose up -d
+```
+
+One container, one volume. There is no database container, because the database is a file.
+
+## Using it
+
+**Set up, once.** Rename the starter company under **Companies** to your legal entity — the name
+that appears on the PDF. Add a **client** (currency and holiday country live here), then a
+**mission** for the work you do for them, with its daily rate.
+
+**Every month.** Create a report for a mission and month. Fill it in:
+
+- Click a day to cycle it through **empty → half day → full day**
+- **Fill workdays** marks every weekday, skipping weekends and that client's public holidays
+- **Copy last month** reuses *which weekdays* you worked, re-applied to this month's calendar
+- Arrow keys move, <kbd>Space</kbd> cycles, <kbd>N</kbd> jumps to the day's note
+
+**When it's done.** Mark the report **completed** — it becomes read-only — and export the PDF.
+Reverting to draft is possible but asks first, because your client may already have a copy.
+
+Two notes per report, and the difference matters:
+
+| | Where it goes |
+|---|---|
+| **Client note** | Printed on the PDF the client receives |
+| **Private note** | Stays in your database. Never in the PDF, never in a client-facing export |
+
+<p align="center">
+  <img src="docs/images/reports.jpg" alt="A year of reports grouped by client" width="100%" />
+</p>
+
+**At year end.** The **Year** page shows days billed, revenue, average daily rate, and utilisation
+against the working days in the year, with a breakdown per client and per company. Export the whole
+year as CSV for your accountant, or the whole database as JSON.
+
+<p align="center">
+  <img src="docs/images/year.jpg" alt="Yearly summary with days, revenue and utilisation" width="100%" />
+</p>
+
+If you bill in more than one currency, amounts are shown **per currency** and never converted.
+Presto does not know today's exchange rate and will not pretend to.
+
+## Configuration
+
+Everything is optional.
+
+| Variable | Default | What it does |
+|---|---|---|
+| `PORT` | `3001` (`8080` in Docker) | HTTP port |
+| `DATA_DIR` | `./data` (`/data` in Docker) | Where `presto.db` lives |
+| `APP_NAME` | `Presto` | Name shown in the sidebar |
+
+Theme (light / dark / auto) and language (English / French) are per-browser settings in the sidebar,
+not environment variables.
+
+## Backups
+
+```bash
+cp data/presto.db ~/backups/presto-$(date +%F).db
+```
+
+That is a complete backup. To move to another machine, copy the file. The **Year** page also exports
+everything as JSON if you want a format you can read without SQLite.
+
+## Coming from v1
+
+Presto v1 stored data in PostgreSQL and had optional multi-user accounts. v2 drops both. To bring
+your data across:
+
+1. Start Presto v1 and use **Profile → Export all data** to download the JSON
+2. `bun run import:v1 presto-v1-export.json`
+
+Add `--dry-run` first to see what it would write. The import refuses to run against a database that
+already has data.
+
+v1 remains available at the [`v1-final`](https://github.com/tux86/presto/tree/v1-final) tag.
+
+## Development
+
+```bash
+bun install
+bun run dev        # API on :3001, Vite with HMR on :5173
+bun test           # ~150 tests, no database or server needed
+bun run typecheck
+bun run lint:fix
+```
+
+### How it fits together
+
+```
+src/
+  core/    pure logic — calendars, holidays, totals, yearly rollup, CSV
+  db/      SQLite schema, migrations, queries
+  pdf/     the document your client receives
+  server/  Hono routes, static file serving
+  ui/      React app
+  i18n/    English and French, shared by the UI and the PDF
+```
+
+One rule: **`core/` imports nothing from `db/`, `server/`, `pdf/`, or `ui/`.** That is what lets the
+logic that can actually get your invoice wrong be tested without a database, and it is where almost
+all of the tests point.
+
+Storage is raw SQL against `bun:sqlite`. Migrations are an ordered array of SQL strings in
+`src/db/schema.ts`, tracked by `PRAGMA user_version` — append one, never edit one that has shipped.
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/); releases are cut
+automatically from `main`.
+
+## Stack
+
+Bun · Hono · SQLite · React 19 · Vite · Tailwind CSS 4 · Recharts · @react-pdf/renderer ·
+date-holidays · Zod · Biome · TypeScript
 
 ## License
 

@@ -79,8 +79,9 @@ function Preferences() {
  */
 function Wordmark({ name, className }: { name: string; className?: string }) {
   if (name !== "Presto") {
-    return <span className={cn("text-lg font-semibold tracking-tight text-heading", className)}>{name}</span>;
+    return <span className={cn("text-xl font-semibold tracking-tight text-heading", className)}>{name}</span>;
   }
+  // 95 × 24 in the file; height drives the size and width follows the ratio.
   return (
     <>
       <img
@@ -88,7 +89,7 @@ function Wordmark({ name, className }: { name: string; className?: string }) {
         alt="Presto"
         width={95}
         height={24}
-        className={cn("h-6 w-auto dark:hidden", className)}
+        className={cn("w-auto dark:hidden", className)}
       />
       <img
         src="/logo-horizontal-light.svg"
@@ -96,7 +97,7 @@ function Wordmark({ name, className }: { name: string; className?: string }) {
         aria-hidden
         width={95}
         height={24}
-        className={cn("hidden h-6 w-auto dark:block", className)}
+        className={cn("hidden w-auto dark:block", className)}
       />
     </>
   );
@@ -108,9 +109,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="px-4 py-5">
-        <Wordmark name={app.name} />
-        <div className="mt-1.5 text-xs text-faint">{t("app.tagline")}</div>
+      {/* No tagline: the first nav item already says what this is. */}
+      <div className="px-5 pt-7 pb-6">
+        <NavLink
+          to="/"
+          onClick={onNavigate}
+          className="inline-block rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <Wordmark name={app.name} className="h-8" />
+        </NavLink>
       </div>
 
       <nav className="flex-1 space-y-0.5 px-2">
@@ -166,7 +173,7 @@ export function Layout() {
         >
           <Menu className="size-5" />
         </button>
-        <Wordmark name={app.name} className="h-5" />
+        <Wordmark name={app.name} className="h-7" />
       </header>
 
       {open ? (

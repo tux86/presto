@@ -1,8 +1,6 @@
 import type { Dictionary } from "./en.ts";
 
 export const fr: Dictionary = {
-  "app.tagline": "Comptes rendus d'activité",
-
   "nav.reports": "Comptes rendus",
   "nav.clients": "Clients",
   "nav.missions": "Missions",

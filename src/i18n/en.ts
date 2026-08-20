@@ -6,8 +6,6 @@
  * label table inside the PDF service, and the two drifted.
  */
 export const en = {
-  "app.tagline": "Activity reports",
-
   "nav.reports": "Reports",
   "nav.clients": "Clients",
   "nav.missions": "Missions",

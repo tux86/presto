@@ -22,7 +22,6 @@ bun run lint:fix
 bun run build        # UI only
 bun run build:server # single-file server bundle (Docker)
 bun run seed --reset # deterministic demo data for development
-bun run import:v1 <export.json> [--dry-run]
 ```
 
 ## Structure

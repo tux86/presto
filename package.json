@@ -32,7 +32,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "import:v1": "bun scripts/import-v1.ts",
     "prepare": "husky",
     "build:server": "bun build src/server/index.ts --target bun --outfile dist/server.js"
   },

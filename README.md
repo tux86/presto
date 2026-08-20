@@ -162,15 +162,11 @@ cp data/presto.db ~/backups/presto-$(date +%F).db
 
 That is a complete backup. To move to another machine, copy the file.
 
-## Coming from v1
+## Relationship to v1
 
-Presto v1 stored data in PostgreSQL and had optional multi-user accounts. v2 drops both.
-
-1. Start Presto v1 and use **Profile → Export all data** to download the JSON
-2. `bun run import:v1 presto-v1-export.json`
-
-Add `--dry-run` first to see what it would write. The import refuses to run against a database that
-already has data. v1 remains available at the [`v1-final`](https://github.com/tux86/presto/tree/v1-final) tag.
+v2 is a rewrite: PostgreSQL and multi-user accounts are gone, and there is **no automated migration**
+from v1. v1 remains available at the [`v1-final`](https://github.com/tux86/presto/tree/v1-final) tag
+if you need to get data out of it.
 
 ## Development
 

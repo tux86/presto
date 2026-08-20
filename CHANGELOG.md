@@ -1,3 +1,9 @@
+## [1.24.0](https://github.com/tux86/presto/compare/v1.23.3...v1.24.0) (2026-03-24)
+
+### Features
+
+* add private notes and PDF notes to activity reports ([b43399b](https://github.com/tux86/presto/commit/b43399b852b9b55f9b289dd8fc000d66faea27d8))
+
 ## [1.23.3](https://github.com/tux86/presto/compare/v1.23.2...v1.23.3) (2026-03-13)
 
 ### Bug Fixes

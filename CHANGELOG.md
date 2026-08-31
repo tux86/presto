@@ -1,3 +1,9 @@
+## [2.1.2](https://github.com/tux86/presto/compare/v2.1.1...v2.1.2) (2026-08-31)
+
+### Reverts
+
+* restore the original half-day cell ([0810788](https://github.com/tux86/presto/commit/081078813459e6ae777d88c10bd0fb09928e28cf))
+
 ## [2.1.1](https://github.com/tux86/presto/compare/v2.1.0...v2.1.1) (2026-08-31)
 
 ### Bug Fixes

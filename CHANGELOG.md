@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/tux86/presto/compare/v2.0.1...v2.1.0) (2026-08-31)
+
+### Features
+
+* **ui:** blur every amount behind a privacy toggle ([c2e6f06](https://github.com/tux86/presto/commit/c2e6f0668479eac7397a12fc43c48330e23d0021))
+
 ## [2.0.1](https://github.com/tux86/presto/compare/v2.0.0...v2.0.1) (2026-08-20)
 
 ### Bug Fixes

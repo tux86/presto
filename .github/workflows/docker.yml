@@ -84,7 +84,7 @@ jobs:
 
       - name: Derive tags and labels
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ steps.targets.outputs.images }}
           # A dispatch with no version has nothing to derive semver from, so it

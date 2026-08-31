@@ -154,8 +154,10 @@ Everything is optional. Presto runs with no configuration at all.
 | `DATA_DIR` | `./data` (`/data` in Docker) | where `presto.db` lives |
 | `APP_NAME` | `Presto` | name shown in the sidebar and the browser tab |
 
-Theme (light / dark / follow the system) and language (English / French) are per-browser settings in
-the sidebar, not environment variables.
+Theme (light / dark / follow the system), language (English / French) and **privacy mode** are
+per-browser settings in the sidebar, not environment variables. Privacy mode blurs every amount —
+daily rates, revenue, the summary figures — for screen sharing and screenshots; days, utilisation
+and the shape of the charts stay readable.
 
 ## Backups
 

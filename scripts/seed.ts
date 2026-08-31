@@ -102,21 +102,23 @@ function buildMonth(
 }
 
 // ── The story ────────────────────────────────────────────────────────────────
-// A freelance consultant billing through two entities. One long engagement
-// winds down as a Swiss one ramps up, which is what makes the yearly view
-// interesting: two currencies, two companies, overlapping months.
+// Julien Vasseur, a fictional freelance consultant billing through two
+// entities. One long engagement winds down as a Swiss one ramps up, which is
+// what makes the yearly view interesting: two currencies, two companies,
+// overlapping months. Every name here is invented — these fixtures end up in
+// the screenshots of a public README.
 
 const COMPANIES = [
   {
     key: "consulting",
-    name: "Karray Consulting",
+    name: "Vasseur Consulting",
     address: "12 rue des Petites Écuries, 75010 Paris",
     businessId: "SIRET 892 456 731 00018",
     isDefault: true,
   },
   {
     key: "studio",
-    name: "WK Studio",
+    name: "JV Studio",
     address: "12 rue des Petites Écuries, 75010 Paris",
     businessId: "SIRET 519 874 203 00027",
     isDefault: false,

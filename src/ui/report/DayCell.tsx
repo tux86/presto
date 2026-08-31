@@ -46,7 +46,7 @@ export const DayCell = forwardRef<HTMLButtonElement, Props>(function DayCell(
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         readOnly ? "cursor-default" : "cursor-pointer active:scale-[0.97]",
         day.value === 1 && `${c.solid} border-transparent`,
-        day.value === 0.5 && `border-edge ${filled && ""}`,
+        day.value === 0.5 && "border-edge bg-elevated",
         day.value === 0 && !off && "border-edge bg-elevated hover:border-edge-strong hover:bg-inset",
         day.value === 0 && day.isWeekend && "border-transparent bg-weekend",
         day.value === 0 && day.holiday && "border-edge bg-holiday",
@@ -56,8 +56,14 @@ export const DayCell = forwardRef<HTMLButtonElement, Props>(function DayCell(
     >
       {day.value === 0.5 ? (
         <span aria-hidden className="pointer-events-none absolute inset-0">
-          <span className={cn("absolute inset-0", c.solid)} style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
-          <span className="absolute inset-0 bg-elevated" style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} />
+          {/* Softened, not solid: the day number is centred on the seam, so
+              whatever sits under it has to take the same text colour as the
+              empty half. At full saturation half of every glyph went dark on
+              dark. */}
+          <span
+            className={cn("absolute inset-0 opacity-40", c.solid)}
+            style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
+          />
         </span>
       ) : null}
 

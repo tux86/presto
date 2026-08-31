@@ -112,8 +112,16 @@ jobs:
           cache-to: type=gha,mode=max
 
       # Keeps the Docker Hub page from being an empty box.
+      #
+      # Requiring a version here meant the description could only ever come
+      # from a tag, so a README fix reached Docker Hub only on the back of an
+      # unrelated code release. A versionless dispatch now syncs as well — but
+      # only from the default branch, so an `edge` build off a feature branch
+      # cannot overwrite the public page with work in progress.
       - name: Sync Docker Hub description
-        if: vars.DOCKERHUB_IMAGE != '' && steps.v.outputs.version != ''
+        if: >-
+          vars.DOCKERHUB_IMAGE != '' &&
+          (steps.v.outputs.version != '' || github.ref == 'refs/heads/main')
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}

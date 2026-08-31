@@ -54,7 +54,7 @@ export function ListView({ grid, color, readOnly, onSetValue, onSetNote }: Props
               {day.value === 0.5 ? (
                 <span
                   aria-hidden
-                  className={cn("absolute inset-0 opacity-40", c.solid)}
+                  className={cn("absolute inset-0", c.solid)}
                   style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
                 />
               ) : null}

@@ -86,10 +86,7 @@ export function Grid({ grid, color, readOnly, onSetValue, onSetNote }: Props) {
         </span>
         <span className="flex items-center gap-1.5">
           <span className="relative size-3.5 overflow-hidden rounded border border-edge">
-            <span
-              className={cn("absolute inset-0 opacity-40", c.solid)}
-              style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
-            />
+            <span className={cn("absolute inset-0", c.solid)} style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
             <span className="absolute inset-0 bg-elevated" style={{ clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} />
           </span>
           {t("editor.legendHalf")}

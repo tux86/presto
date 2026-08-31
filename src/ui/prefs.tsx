@@ -9,6 +9,8 @@ const KEY = "presto.prefs";
 interface Stored {
   theme: Theme;
   locale: Locale;
+  /** Blur every amount on screen, for screen sharing and screenshots. */
+  hideAmounts: boolean;
 }
 
 function read(): Stored {
@@ -17,9 +19,10 @@ function read(): Stored {
     return {
       theme: raw.theme === "dark" || raw.theme === "auto" ? raw.theme : "light",
       locale: isLocale(raw.locale) ? raw.locale : defaultLocale(),
+      hideAmounts: raw.hideAmounts === true,
     };
   } catch {
-    return { theme: "light", locale: defaultLocale() };
+    return { theme: "light", locale: defaultLocale(), hideAmounts: false };
   }
 }
 
@@ -40,6 +43,7 @@ document.documentElement.lang = initial.locale;
 interface Prefs extends Stored {
   setTheme: (theme: Theme) => void;
   setLocale: (locale: Locale) => void;
+  toggleHideAmounts: () => void;
   t: Translate;
 }
 
@@ -48,6 +52,7 @@ const PrefsContext = createContext<Prefs | null>(null);
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(initial.theme);
   const [locale, setLocaleState] = useState<Locale>(initial.locale);
+  const [hideAmounts, setHideAmounts] = useState(initial.hideAmounts);
 
   const persist = useCallback((next: Stored) => {
     try {
@@ -61,19 +66,25 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
     (next: Theme) => {
       setThemeState(next);
       applyTheme(next);
-      persist({ theme: next, locale });
+      persist({ theme: next, locale, hideAmounts });
     },
-    [locale, persist],
+    [locale, hideAmounts, persist],
   );
 
   const setLocale = useCallback(
     (next: Locale) => {
       setLocaleState(next);
       document.documentElement.lang = next;
-      persist({ theme, locale: next });
+      persist({ theme, locale: next, hideAmounts });
     },
-    [theme, persist],
+    [theme, hideAmounts, persist],
   );
+
+  const toggleHideAmounts = useCallback(() => {
+    const next = !hideAmounts;
+    setHideAmounts(next);
+    persist({ theme, locale, hideAmounts: next });
+  }, [theme, locale, hideAmounts, persist]);
 
   // Follow the system only while the user has asked us to.
   useEffect(() => {
@@ -85,8 +96,8 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const value = useMemo<Prefs>(
-    () => ({ theme, locale, setTheme, setLocale, t: translator(locale) }),
-    [theme, locale, setTheme, setLocale],
+    () => ({ theme, locale, hideAmounts, setTheme, setLocale, toggleHideAmounts, t: translator(locale) }),
+    [theme, locale, hideAmounts, setTheme, setLocale, toggleHideAmounts],
   );
 
   return <PrefsContext value={value}>{children}</PrefsContext>;

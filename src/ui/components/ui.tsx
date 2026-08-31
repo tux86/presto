@@ -10,7 +10,7 @@ import {
   useRef,
 } from "react";
 import { cn } from "../format.ts";
-import { useT } from "../prefs.tsx";
+import { usePrefs, useT } from "../prefs.tsx";
 
 // ── Button ───────────────────────────────────────────────────────────────────
 
@@ -351,4 +351,31 @@ export function ModalActions({ children }: { children: ReactNode }) {
 export function ErrorText({ error }: { error: string | null }) {
   if (!error) return null;
   return <p className="mt-3 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>;
+}
+
+// ── Secret ───────────────────────────────────────────────────────────────────
+
+/**
+ * Wraps an amount so privacy mode blurs it — the "hide balance" button of a
+ * banking app, aimed at screen sharing and screenshots.
+ *
+ * The blur is deliberately strong: a light one stays readable when a screenshot
+ * is upscaled. Selection is disabled so a blurred figure cannot be highlighted
+ * and read from the clipboard, but the value does remain in the DOM — this
+ * hides amounts from a viewer, it does not defend against the person at the
+ * keyboard.
+ */
+export function Secret({ children, className }: { children: ReactNode; className?: string }) {
+  const { hideAmounts } = usePrefs();
+  return (
+    <span
+      className={cn(
+        "inline-block transition-[filter] duration-200",
+        hideAmounts && "pointer-events-none blur-[6px] select-none",
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
 }

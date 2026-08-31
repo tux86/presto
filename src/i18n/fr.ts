@@ -35,6 +35,9 @@ export const fr: Dictionary = {
   "theme.auto": "Auto",
   "settings.theme": "Thème",
   "settings.language": "Langue",
+  "settings.privacy": "Confidentialité",
+  "privacy.hide": "Masquer les montants",
+  "privacy.show": "Afficher les montants",
 
   "reports.title": "Comptes rendus d'activité",
   "reports.subtitle": "{year}",

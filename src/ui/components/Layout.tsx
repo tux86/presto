@@ -1,4 +1,17 @@
-import { BarChart3, Building2, CalendarDays, Menu, Moon, Sun, SunMoon, Users, Wrench, X } from "lucide-react";
+import {
+  BarChart3,
+  Building2,
+  CalendarDays,
+  Eye,
+  EyeOff,
+  Menu,
+  Moon,
+  Sun,
+  SunMoon,
+  Users,
+  Wrench,
+  X,
+} from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import type { Locale } from "../../core/types.ts";
@@ -52,6 +65,37 @@ function About({ version }: { version: string }) {
   );
 }
 
+/**
+ * The "hide balance" button of a banking app: one click blurs every amount on
+ * screen before a screen share or a screenshot. It lives in the sidebar next to
+ * the other preferences, and again in the mobile header where the sidebar is a
+ * menu away — a toggle you have to go looking for is one you use too late.
+ */
+function PrivacyToggle({ iconOnly = false }: { iconOnly?: boolean }) {
+  const { hideAmounts, toggleHideAmounts, t } = usePrefs();
+  const Icon = hideAmounts ? EyeOff : Eye;
+  const label = t(hideAmounts ? "privacy.show" : "privacy.hide");
+
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      aria-pressed={hideAmounts}
+      onClick={toggleHideAmounts}
+      className={cn(
+        "flex cursor-pointer items-center justify-center gap-2 rounded-lg transition-colors",
+        iconOnly ? "p-1.5" : "w-full bg-elevated px-2.5 py-1.5 text-xs font-medium",
+        hideAmounts ? "text-accent-text" : "text-muted hover:text-heading",
+        !iconOnly && hideAmounts && "bg-accent-soft",
+      )}
+    >
+      <Icon className={iconOnly ? "size-5" : "size-3.5"} />
+      {iconOnly ? null : label}
+    </button>
+  );
+}
+
 const THEMES: { value: Theme; icon: typeof Sun; key: TranslationKey }[] = [
   { value: "light", icon: Sun, key: "theme.light" },
   { value: "dark", icon: Moon, key: "theme.dark" },
@@ -101,6 +145,10 @@ function Preferences() {
             </button>
           ))}
         </div>
+      </div>
+      <div>
+        <span className="mb-1.5 block text-[11px] font-medium text-faint">{t("settings.privacy")}</span>
+        <PrivacyToggle />
       </div>
     </div>
   );
@@ -211,6 +259,9 @@ export function Layout() {
           <Menu className="size-5" />
         </button>
         <Wordmark name={app.name} className="h-7" />
+        <div className="ml-auto">
+          <PrivacyToggle iconOnly />
+        </div>
       </header>
 
       {open ? (

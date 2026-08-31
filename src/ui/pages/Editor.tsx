@@ -7,7 +7,7 @@ import { completionPercent, gridWorkdayCount, revenue, totalDays } from "../../c
 import { type DayValue, lookupFrom, type ReportContext } from "../../core/types.ts";
 import { ApiError, api, download, type ReportDetail } from "../api.ts";
 import { useConfirm } from "../components/Confirm.tsx";
-import { Button, Card, ErrorText, Spinner } from "../components/ui.tsx";
+import { Button, Card, ErrorText, Secret, Spinner } from "../components/ui.tsx";
 import { cn, colorOf, days as fmtDays, hexOf, money, percent } from "../format.ts";
 import { useT } from "../prefs.tsx";
 import { Grid } from "../report/Grid.tsx";
@@ -285,11 +285,11 @@ export function Editor() {
               <div className="mt-4 border-t border-edge pt-3">
                 <div className="text-xs text-muted">{t("editor.revenue")}</div>
                 <div className="text-lg font-semibold tabular text-accent-text">
-                  {money(earned, client.currency, locale)}
+                  <Secret>{money(earned, client.currency, locale)}</Secret>
                 </div>
                 {rate ? (
                   <div className="text-xs text-faint">
-                    {money(rate, client.currency, locale)} · {t("editor.rate").toLowerCase()}
+                    <Secret>{money(rate, client.currency, locale)}</Secret> · {t("editor.rate").toLowerCase()}
                   </div>
                 ) : null}
               </div>

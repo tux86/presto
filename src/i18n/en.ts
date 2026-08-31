@@ -40,6 +40,9 @@ export const en = {
   "theme.auto": "Auto",
   "settings.theme": "Theme",
   "settings.language": "Language",
+  "settings.privacy": "Privacy",
+  "privacy.hide": "Hide amounts",
+  "privacy.show": "Show amounts",
 
   "reports.title": "Activity reports",
   "reports.subtitle": "{year}",

@@ -5,9 +5,9 @@ import { monthShort } from "../../core/dates.ts";
 import { averageRate, type YearSummary } from "../../core/reporting.ts";
 import { api, download } from "../api.ts";
 import { PageHeader } from "../components/Layout.tsx";
-import { Button, Card, EmptyState, ErrorText, FilterChips, Spinner } from "../components/ui.tsx";
+import { Button, Card, EmptyState, ErrorText, FilterChips, Secret, Spinner } from "../components/ui.tsx";
 import { cn, colorOf, compact, days as fmtDays, hexOf, money, percent } from "../format.ts";
-import { useT } from "../prefs.tsx";
+import { usePrefs } from "../prefs.tsx";
 import { useStore } from "../store.tsx";
 
 const THIS_YEAR = new Date().getFullYear();
@@ -20,14 +20,28 @@ const TOOLTIP = {
   color: "var(--th-body)",
 } as const;
 
-function Kpi({ label, value, hint, accent }: { label: string; value: string; hint?: string; accent?: boolean }) {
+function Kpi({
+  label,
+  value,
+  hint,
+  accent,
+  secret,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  accent?: boolean;
+  secret?: boolean;
+}) {
   return (
     <Card className="p-4">
       <div className="text-xs font-medium text-muted">{label}</div>
       <div className={cn("mt-1 text-2xl font-semibold tabular", accent ? "text-accent-text" : "text-heading")}>
-        {value}
+        {secret ? <Secret>{value}</Secret> : value}
       </div>
-      {hint ? <div className="mt-0.5 text-xs text-faint">{hint}</div> : null}
+      {/* The hint follows the value: "-46% versus last year" is a revenue
+          figure too, and leaving it readable would defeat the point. */}
+      {hint ? <div className="mt-0.5 text-xs text-faint">{secret ? <Secret>{hint}</Secret> : hint}</div> : null}
     </Card>
   );
 }
@@ -40,7 +54,7 @@ function delta(current: number, previous: number): string | null {
 }
 
 export function Summary() {
-  const { t, locale } = useT();
+  const { t, locale, hideAmounts } = usePrefs();
   const { companies } = useStore();
   const [year, setYear] = useState(THIS_YEAR);
   const [company, setCompany] = useState("");
@@ -190,11 +204,13 @@ export function Summary() {
             <Kpi
               label={t("summary.totalRevenue")}
               accent
+              secret
               value={bucket && currency ? money(bucket.revenue, currency, locale) : "—"}
               hint={versus(revenueDelta)}
             />
             <Kpi
               label={t("summary.averageRate")}
+              secret
               value={currency ? money(averageRate(summary, currency), currency, locale) : "—"}
             />
             <Kpi
@@ -229,7 +245,7 @@ export function Summary() {
                     yAxisId="revenue"
                     orientation="right"
                     tickFormatter={compact}
-                    tick={{ fontSize: 11, fill: "var(--th-faint)" }}
+                    tick={{ fontSize: 11, fill: "var(--th-faint)", className: hideAmounts ? "blur-[3px]" : undefined }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -237,7 +253,11 @@ export function Summary() {
                     contentStyle={TOOLTIP}
                     cursor={{ fill: "var(--th-elevated)" }}
                     formatter={(value, key) =>
-                      key === "revenue" && currency ? money(Number(value), currency, locale) : fmtDays(Number(value))
+                      key === "revenue" && currency ? (
+                        <Secret>{money(Number(value), currency, locale)}</Secret>
+                      ) : (
+                        fmtDays(Number(value))
+                      )
                     }
                   />
                   <Legend
@@ -291,7 +311,9 @@ export function Summary() {
                     </Pie>
                     <Tooltip
                       contentStyle={TOOLTIP}
-                      formatter={(value) => (currency ? money(Number(value), currency, locale) : String(value))}
+                      formatter={(value) =>
+                        currency ? <Secret>{money(Number(value), currency, locale)}</Secret> : String(value)
+                      }
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -307,9 +329,9 @@ export function Summary() {
                     <span className="ml-auto shrink-0 tabular text-muted">
                       {fmtDays(c.days)} {t("common.days")}
                     </span>
-                    <span className="w-24 shrink-0 text-right font-medium tabular text-heading">
+                    <Secret className="w-24 shrink-0 text-right font-medium tabular text-heading">
                       {money(c.revenue, c.currency, locale)}
-                    </span>
+                    </Secret>
                   </li>
                 ))}
               </ul>
@@ -326,9 +348,9 @@ export function Summary() {
                       <li key={`${c.companyId}-${c.currency}`}>
                         <div className="flex items-baseline justify-between gap-2 text-sm">
                           <span className="truncate text-body">{c.companyName}</span>
-                          <span className="shrink-0 font-medium tabular text-heading">
+                          <Secret className="shrink-0 font-medium tabular text-heading">
                             {money(c.revenue, c.currency, locale)}
-                          </span>
+                          </Secret>
                         </div>
                         <div className="mt-1 flex items-center gap-2">
                           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-inset">

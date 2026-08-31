@@ -14,6 +14,7 @@ import {
   Input,
   Modal,
   ModalActions,
+  Secret,
   Select,
 } from "../components/ui.tsx";
 import { COLORS, cn, colorOf, money } from "../format.ts";
@@ -248,9 +249,9 @@ export function Missions() {
 
                 <div className="mt-auto flex flex-wrap items-center gap-2 pt-3 text-xs">
                   {mission.dailyRate != null && c ? (
-                    <span className="font-semibold tabular text-accent-text">
+                    <Secret className="font-semibold tabular text-accent-text">
                       {money(mission.dailyRate, c.currency, locale)}
-                    </span>
+                    </Secret>
                   ) : null}
                   <span className="text-faint">{co?.name}</span>
                   {!mission.isActive ? <Badge>{t("missions.inactive")}</Badge> : null}

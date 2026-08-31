@@ -16,6 +16,7 @@ import {
   FilterChips,
   Modal,
   ModalActions,
+  Secret,
   Select,
 } from "../components/ui.tsx";
 import { COLORS, cn, colorOf, days as fmtDays, money } from "../format.ts";
@@ -85,7 +86,7 @@ function ReportCard({ report, isCurrent }: { report: Report; isCurrent: boolean 
           {fmtDays(total)} {t("common.days")}
         </span>
         {earned !== null && c ? (
-          <span className="font-semibold tabular text-accent-text">{money(earned, c.currency, locale)}</span>
+          <Secret className="font-semibold tabular text-accent-text">{money(earned, c.currency, locale)}</Secret>
         ) : null}
       </div>
       {isCurrent ? <p className="mt-2 text-[11px] font-medium text-accent-text">{t("reports.thisMonth")}</p> : null}

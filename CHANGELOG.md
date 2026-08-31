@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/tux86/presto/compare/v2.1.0...v2.1.1) (2026-08-31)
+
+### Bug Fixes
+
+* **ci:** let a manual dispatch sync the Docker Hub description ([e908b1a](https://github.com/tux86/presto/commit/e908b1af0f30070bf89d4cc75942299d01f7a33f))
+* **ui:** make the day number readable on a half day ([ff3eac9](https://github.com/tux86/presto/commit/ff3eac9172c3e3cee1cc226dbd7febeed801e976))
+
 ## [2.1.0](https://github.com/tux86/presto/compare/v2.0.1...v2.1.0) (2026-08-31)
 
 ### Features

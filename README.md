@@ -10,7 +10,6 @@
   <p>
     <a href="https://github.com/tux86/presto/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/tux86/presto/ci.yml?branch=main&style=flat-square&label=CI"></a>
     <a href="https://github.com/tux86/presto/releases"><img alt="Release" src="https://img.shields.io/github/v/release/tux86/presto?style=flat-square&color=4f46e5"></a>
-    <a href="https://hub.docker.com/r/axforge/presto"><img alt="Docker Hub" src="https://img.shields.io/docker/v/axforge/presto?sort=semver&style=flat-square&logo=docker&logoColor=white&label=docker&color=4f46e5"></a>
     <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/License-MIT-059669?style=flat-square"></a>
   </p>
 </div>
@@ -65,9 +64,9 @@ docker compose up -d
 ```
 
 One container, one volume, no database service — because the database is a file. The image is
-published to both [GHCR](https://github.com/tux86/presto/pkgs/container/presto) and
-[Docker Hub](https://hub.docker.com/r/axforge/presto) for `linux/amd64` and `linux/arm64`, and runs
-as a non-root user.
+published to [GHCR](https://github.com/tux86/presto/pkgs/container/presto) for `linux/amd64` and
+`linux/arm64`, and runs as a non-root user. Docker Hub no longer receives new versions: pull from
+GHCR.
 
 </details>
 

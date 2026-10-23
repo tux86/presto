@@ -56,7 +56,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # Docker Hub is optional: set the DOCKERHUB_IMAGE repository variable
-      # (e.g. axforge/presto) plus the DOCKERHUB_USERNAME and DOCKERHUB_TOKEN
+      # (e.g. yourname/presto) plus the DOCKERHUB_USERNAME and DOCKERHUB_TOKEN
       # secrets. Without them the job still publishes to GHCR.
       - name: Log in to Docker Hub
         if: vars.DOCKERHUB_IMAGE != ''

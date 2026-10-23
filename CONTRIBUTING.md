@@ -87,7 +87,7 @@ The image always goes to GHCR. Docker Hub is optional and needs three repository
 
 | Setting | Kind | Example |
 |---|---|---|
-| `DOCKERHUB_IMAGE` | variable | `axforge/presto` |
+| `DOCKERHUB_IMAGE` | variable | `yourname/presto` |
 | `DOCKERHUB_USERNAME` | secret | your Docker Hub user |
 | `DOCKERHUB_TOKEN` | secret | an access token, not the password |
 

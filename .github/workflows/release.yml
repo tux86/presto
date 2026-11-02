@@ -30,7 +30,7 @@ jobs:
 
       # Node, not Bun: semantic-release checks the runtime version and refuses
       # to run under Bun's node shim, which reports an unsupported release.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 

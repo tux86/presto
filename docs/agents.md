@@ -180,10 +180,10 @@ reports. You talk about clients and months, not ids.
 | `year_summary` | days, revenue per currency, average rate and utilisation, per client and per company |
 | `export_pdf` | the client's PDF; with `saveTo`, written to disk (local server only) |
 | `create_client` · `create_mission` | onboarding |
+| `update_mission` | a new rate, new dates, or closing a mission |
 
 What the agent **cannot** do: delete anything, change a completed report without first reverting it
-to draft, or export a draft. Deleting, renaming and changing rates stay in the web UI, where you see
-what you are doing.
+to draft, or export a draft. Deleting stays in the web UI, where you see what you are doing.
 
 ## REST API
 

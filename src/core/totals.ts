@@ -22,10 +22,15 @@ export function gridWorkdayCount(grid: Day[]): number {
   return grid.filter(isWorkday).length;
 }
 
-/** Billable amount, or null when the mission has no rate. */
+/**
+ * Billable amount, or null when the mission has no rate. Rounded to the cent,
+ * half up: 16.5 × 660.25 = 10894.125 bills 10894.13.
+ */
 export function revenue(days: number, dailyRate: number | null | undefined): number | null {
   if (dailyRate == null) return null;
-  return Math.round(days * dailyRate * 100) / 100;
+  // Float multiplication lands a half cent just below .5 (16.5 × 0.29 × 100 is
+  // 478.49999999999994), which would round down. Trim that noise first.
+  return Math.round(Number((days * dailyRate * 100).toFixed(6))) / 100;
 }
 
 /** Share of the month's workdays that have been filled in, 0–100. */

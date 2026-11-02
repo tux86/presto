@@ -253,6 +253,20 @@ const TOOLS: Record<string, Tool> = {
     }),
     run: (args, api) => call(api, "POST", "/missions", args),
   }),
+
+  update_mission: tool({
+    description:
+      "Change a mission's name, daily rate, dates or active flag. A new rate applies to reports created or completed from now on; completed reports keep the rate they were sent with.",
+    input: z.object({
+      missionId: id("Mission"),
+      name: z.string().optional(),
+      dailyRate: z.number().nullable().optional().describe("In the client's currency"),
+      startDate: z.string().nullable().optional().describe("YYYY-MM-DD"),
+      endDate: z.string().nullable().optional().describe("YYYY-MM-DD"),
+      isActive: z.boolean().optional(),
+    }),
+    run: ({ missionId, ...patch }, api) => call(api, "PATCH", `/missions/${missionId}`, patch),
+  }),
 };
 
 function toolList() {

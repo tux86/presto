@@ -152,7 +152,8 @@ A year still in progress is compared against **the same months** of the previous
 full twelve: eight months of work is not a 40% collapse.
 
 If you bill in more than one currency, amounts are shown **per currency and never converted**. Presto
-does not know today's exchange rate and will not pretend to.
+does not know today's exchange rate and will not pretend to. Each report's
+amount is rounded to the cent, half up: 16.5 days at 660.25 is 10,894.13.
 
 <p align="center">
   <img src="docs/images/summary.jpg" alt="Yearly summary with days, revenue and utilisation" width="100%">

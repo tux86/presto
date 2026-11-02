@@ -178,6 +178,28 @@ describe("tools", () => {
     expect((await tool("get_report", { reportId })).json()).toMatchObject({ dailyRate: 600, amount: 900 });
   });
 
+  test("the MCP, the summary and the CSV agree on a report's amount", async () => {
+    const { reportId, missionId } = await seed();
+    await tool("update_mission", { missionId, dailyRate: 660.25 });
+    await tool("update_report", { reportId, days: { "4": 1, "5": 0.5 }, status: "completed" });
+    // The fallback path: a completed report with no snapshot of its own.
+    db.query("UPDATE report SET dailyRate = NULL WHERE id = ?").run(reportId);
+
+    const mcp = (await tool("get_report", { reportId })).json().amount;
+    const summary = await (await app.request("/api/reporting?year=2026")).json();
+    const csv = await (await app.request("/api/export/csv?year=2026")).text();
+
+    expect(mcp).toBe(990.38); // 1.5 × 660.25 = 990.375, half up
+    expect(summary.byCurrency.EUR.revenue).toBe(mcp);
+    expect(csv).toContain("990.38");
+  });
+
+  test("update_mission changes the rate", async () => {
+    const { missionId } = await seed();
+    const updated = (await tool("update_mission", { missionId, dailyRate: 660.25 })).json();
+    expect(updated.dailyRate).toBe(660.25);
+  });
+
   test("get_overview lists the year's reports with totals", async () => {
     await seed();
     const overview = (await tool("get_overview", { year: 2026 })).json();

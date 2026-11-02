@@ -64,6 +64,18 @@ describe("revenue", () => {
     expect(revenue(1.5, 333.333)).toBe(500);
   });
 
+  test("rounds a half cent up, despite float noise", () => {
+    expect(revenue(16.5, 660.25)).toBe(10894.13);
+    expect(revenue(16.5, 0.29)).toBe(4.79);
+    // Every odd-cent rate up to 2000 on a half day: days × cents is exact in
+    // integers, and half up is floor(x + 0.5).
+    const wrong = [];
+    for (let cents = 1; cents < 200_000; cents += 2) {
+      if (revenue(0.5, cents / 100) !== Math.floor(0.5 * cents + 0.5) / 100) wrong.push(cents);
+    }
+    expect(wrong).toEqual([]);
+  });
+
   test("zero days bills nothing", () => {
     expect(revenue(0, 650)).toBe(0);
   });

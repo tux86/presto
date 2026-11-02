@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/tux86/presto/compare/v2.1.2...v2.2.0) (2026-11-02)
+
+### Features
+
+* drive presto from an AI agent over MCP ([07360e9](https://github.com/tux86/presto/commit/07360e95e18d0bdbb72f0d74bbd04ac1bd7e3a2c))
+
 ## [2.1.2](https://github.com/tux86/presto/compare/v2.1.1...v2.1.2) (2026-08-31)
 
 ### Reverts

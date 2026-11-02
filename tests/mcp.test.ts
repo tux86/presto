@@ -157,6 +157,18 @@ describe("tools", () => {
     );
     expect(JSON.stringify(local)).toContain("Saved");
     expect(readFileSync(join(dir, "may.pdf")).subarray(0, 4).toString()).toBe("%PDF");
+    // A second write to the same path is refused rather than overwriting.
+    const again = await handleMcp(
+      {
+        jsonrpc: "2.0",
+        id: 2,
+        method: "tools/call",
+        params: { name: "export_pdf", arguments: { reportId, saveTo: join(dir, "may.pdf") } },
+      },
+      app.request,
+      { canWriteFiles: true },
+    );
+    expect(JSON.stringify(again)).toContain("already exists");
   });
 
   test("get_overview lists the year's reports with totals", async () => {

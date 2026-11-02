@@ -191,7 +191,7 @@ const TOOLS: Record<string, Tool> = {
     input: z.object({
       reportId: id("Report"),
       locale,
-      saveTo: z.string().optional().describe("Absolute path to write the PDF to (local server only)"),
+      saveTo: z.string().optional().describe("Absolute path of a new .pdf file, or of a directory (local server only)"),
     }),
     readOnly: true,
     run: async ({ reportId, locale, saveTo }, api, options) => {
@@ -204,7 +204,13 @@ const TOOLS: Record<string, Tool> = {
         if (!options.canWriteFiles) throw new ToolError("saveTo is only available on the local (stdio) server.");
         if (!isAbsolute(saveTo)) throw new ToolError("saveTo must be an absolute path.");
         const path = saveTo.endsWith(".pdf") ? saveTo : `${saveTo.replace(/\/$/, "")}/${filename}`;
-        writeFileSync(path, pdf);
+        // Never overwrite: an agent misled by text it read must not be able to clobber a file.
+        try {
+          writeFileSync(path, pdf, { flag: "wx" });
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code === "EEXIST") throw new ToolError(`${path} already exists.`);
+          throw err;
+        }
         return `Saved ${path}`;
       }
       return [

@@ -55,7 +55,7 @@ Tests point at `core/` and `pdf/`; the HTTP layer gets smoke tests only.
 - **`note` is printed on the client's PDF; `privateNote` never leaves the machine.** Keep them
   visually distinct in the UI, and keep the PDF test that asserts the private note is absent.
 - **MCP is hand-rolled, tools only, stateless** (`src/server/mcp.ts`, no SDK). Every tool calls
-  the REST API in-process, so business rules stay in the routes. No delete tools. `PRESTO_TOKEN`
+  the REST API in-process, so business rules stay in the routes. The MCP covers everything the UI does; `delete` is its one destructive tool. `PRESTO_TOKEN`
   guards `POST /mcp` only. User docs: `docs/agents.md`.
 
 ## Conventions

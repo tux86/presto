@@ -200,6 +200,62 @@ describe("tools", () => {
     expect(updated.dailyRate).toBe(660.25);
   });
 
+  test("delete refuses a completed report and anything in use, then works", async () => {
+    const { reportId, missionId } = await seed();
+    await tool("update_report", { reportId, status: "completed" });
+
+    expect((await tool("delete", { type: "report", id: reportId })).text).toContain("draft");
+    expect((await tool("delete", { type: "mission", id: missionId })).text).toContain("reports");
+
+    await tool("update_report", { reportId, status: "draft" });
+    expect((await tool("delete", { type: "report", id: reportId })).isError).toBe(false);
+    expect((await tool("delete", { type: "mission", id: missionId })).isError).toBe(false);
+  });
+
+  test("delete is the only destructive tool", async () => {
+    const { body } = await rpc("tools/list");
+    const destructive = body.result.tools.filter(
+      (t: { annotations: { destructiveHint: boolean } }) => t.annotations.destructiveHint,
+    );
+    expect(destructive.map((t: { name: string }) => t.name)).toEqual(["delete"]);
+  });
+
+  test("companies and clients can be managed", async () => {
+    const company = (await tool("create_company", { name: "SASU" })).json();
+    expect((await tool("update_company", { companyId: company.id, businessId: "123" })).json().businessId).toBe("123");
+
+    const client = (await tool("create_client", { name: "Acme", currency: "EUR", holidayCountry: "FR" })).json();
+    expect((await tool("update_client", { clientId: client.id, holidayCountry: "DE" })).json().holidayCountry).toBe(
+      "DE",
+    );
+  });
+
+  test("clear_report empties a draft", async () => {
+    const { reportId } = await seed();
+    await tool("fill_report", { reportId, from: "workdays" });
+    expect((await tool("clear_report", { reportId })).json().days).toEqual({});
+  });
+
+  test("exports come back as text, or saved to disk locally", async () => {
+    await seed();
+    expect((await tool("export_csv", { year: 2026 })).text).toContain("Globex");
+    expect(JSON.parse((await tool("export_data")).text).clients[0].name).toBe("Globex");
+
+    const dir = mkdtempSync(join(tmpdir(), "presto-"));
+    const local = await handleMcp(
+      {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/call",
+        params: { name: "export_csv", arguments: { year: 2026, saveTo: dir } },
+      },
+      app.request,
+      { canWriteFiles: true },
+    );
+    expect(JSON.stringify(local)).toContain("presto-2026.csv");
+    expect(readFileSync(join(dir, "presto-2026.csv"), "utf8")).toContain("Globex");
+  });
+
   test("get_overview lists the year's reports with totals", async () => {
     await seed();
     const overview = (await tool("get_overview", { year: 2026 })).json();

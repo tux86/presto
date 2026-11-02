@@ -170,20 +170,32 @@ reports. You talk about clients and months, not ids.
 
 ## Tools
 
+Everything the web UI does, the agent can do.
+
 | Tool | Does |
 |---|---|
 | `get_overview` | companies, clients, missions, and a year's reports with days and amounts |
 | `get_report` | one month, day by day: weekday, weekend, holiday name, value, note |
 | `create_report` | an empty draft for a mission and a month |
 | `fill_report` | from workdays, or from last month's weekday pattern |
+| `clear_report` | empty a draft |
 | `update_report` | change some days or notes (the others are kept), the client note, the private note, the status |
 | `year_summary` | days, revenue per currency, average rate and utilisation, per client and per company |
-| `export_pdf` | the client's PDF; with `saveTo`, written to disk (local server only) |
-| `create_client` · `create_mission` | onboarding |
-| `update_mission` | a new rate, new dates, or closing a mission |
+| `export_pdf` | the client's PDF |
+| `export_csv` | a year as a spreadsheet, for the accountant |
+| `export_data` | the whole database as JSON |
+| `create_company` · `update_company` | your legal entities |
+| `create_client` · `update_client` | clients |
+| `create_mission` · `update_mission` | missions: a new rate, new dates, or closing one |
+| `delete` | a report, mission, client or company |
 
-What the agent **cannot** do: delete anything, change a completed report without first reverting it
-to draft, or export a draft. Deleting stays in the web UI, where you see what you are doing.
+The exports take an optional `saveTo`, a file or a directory, to write to disk instead of
+returning the content. The local server only, and never over an existing file.
+
+The same rules as in the UI hold: a completed report cannot change until it is reverted to draft, a
+draft cannot be exported as a PDF, and a completed report, or a client, company or mission still in
+use, cannot be deleted. `delete` is the only tool marked destructive, so your client can make you
+confirm it every time while allowing the rest.
 
 ## REST API
 

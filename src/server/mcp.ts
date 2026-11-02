@@ -1,9 +1,9 @@
 import { writeFileSync } from "node:fs";
-import { isAbsolute } from "node:path";
+import { extname, isAbsolute } from "node:path";
 import { z } from "zod";
 import { reportGrid } from "../core/grid.ts";
 import { revenue, totalDays } from "../core/totals.ts";
-import { type Client, type Company, lookupFrom, type Mission, type Report } from "../core/types.ts";
+import { CLIENT_COLORS, type Client, type Company, lookupFrom, type Mission, type Report } from "../core/types.ts";
 import { config } from "./config.ts";
 
 /**
@@ -30,6 +30,7 @@ const INSTRUCTIONS = `Presto produces monthly activity reports (CRA) for a freel
 Model: a company (the freelancer's legal entity) bills clients; a mission belongs to one client and has a daily rate; a report is one mission for one month.
 A day is worth 0, 0.5 or 1. Weekends and public holidays (from the client's country) are computed; billing one is allowed but unusual — confirm with the user first.
 A completed report is frozen: revert it to draft before changing days or the client note. A PDF can only be exported from a completed report.
+Deleting cannot be undone: confirm with the user first. A completed report, or a client, company or mission still in use, cannot be deleted.
 "note" is printed on the PDF the client receives; "privateNote" never leaves this machine. Never put private information in "note".
 Amounts are per currency and never converted. Start with get_overview to learn the ids.`;
 
@@ -45,8 +46,37 @@ async function call<T>(api: ApiFetch, method: string, path: string, body?: unkno
     const error = (await res.json().catch(() => ({}))) as { error?: string };
     throw new ToolError(error.error ?? `Request failed (${res.status})`);
   }
-  return (await res.json()) as T;
+  return (res.status === 204 ? "Done" : await res.json()) as T;
 }
+
+/** Download an export endpoint: the bytes and the filename the server suggests. */
+async function download(api: ApiFetch, path: string) {
+  const res = await api(`/api${path}`);
+  if (!res.ok) throw new ToolError(((await res.json()) as { error: string }).error);
+  const filename = /filename="([^"]+)"/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? "export";
+  return { data: Buffer.from(await res.arrayBuffer()), filename };
+}
+
+/**
+ * Write an export to `saveTo`: a file path with the right extension, or a
+ * directory to put the server's filename in. Local server only, and never over
+ * an existing file: an agent misled by text it read must not clobber anything.
+ */
+function save(saveTo: string, file: { data: Buffer; filename: string }, options: McpOptions): string {
+  if (!options.canWriteFiles) throw new ToolError("saveTo is only available on the local (stdio) server.");
+  if (!isAbsolute(saveTo)) throw new ToolError("saveTo must be an absolute path.");
+  const ext = extname(file.filename);
+  const path = extname(saveTo) === ext ? saveTo : `${saveTo.replace(/\/$/, "")}/${file.filename}`;
+  try {
+    writeFileSync(path, file.data, { flag: "wx" });
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "EEXIST") throw new ToolError(`${path} already exists.`);
+    throw err;
+  }
+  return `Saved ${path}`;
+}
+
+const saveTo = z.string().optional().describe("Absolute path of a new file, or of a directory (local server only)");
 
 /** A report as an agent wants to read it: named, totalled, no ids to resolve. */
 function summarize(report: Report, missions: Mission[], clients: Client[]) {
@@ -77,6 +107,7 @@ interface Tool<S extends z.ZodType = z.ZodType> {
   description: string;
   input: S;
   readOnly?: boolean;
+  destructive?: boolean;
   run: (args: z.infer<S>, api: ApiFetch, options: McpOptions) => Promise<unknown>;
 }
 
@@ -149,6 +180,12 @@ const TOOLS: Record<string, Tool> = {
       call(api, "POST", `/reports/${reportId}/${from === "workdays" ? "fill" : "copy-previous"}`),
   }),
 
+  clear_report: tool({
+    description: "Empty a draft report: every day and every day note.",
+    input: z.object({ reportId: id("Report") }),
+    run: ({ reportId }, api) => call(api, "POST", `/reports/${reportId}/clear`),
+  }),
+
   update_report: tool({
     description:
       "Change a report. 'days' and 'dayNotes' are merged into what is there: only the days you name change, a value of 0 or an empty note removes one. Set status to 'completed' when the month is final, 'draft' to edit a completed one.",
@@ -189,43 +226,69 @@ const TOOLS: Record<string, Tool> = {
 
   export_pdf: tool({
     description: "The PDF the client receives, for a completed report.",
-    input: z.object({
-      reportId: id("Report"),
-      locale,
-      saveTo: z.string().optional().describe("Absolute path of a new .pdf file, or of a directory (local server only)"),
-    }),
+    input: z.object({ reportId: id("Report"), locale, saveTo }),
     readOnly: true,
     run: async ({ reportId, locale, saveTo }, api, options) => {
-      const res = await api(`/api/reports/${reportId}/pdf?locale=${locale}`);
-      if (!res.ok) throw new ToolError(((await res.json()) as { error: string }).error);
-      const pdf = Buffer.from(await res.arrayBuffer());
-      const filename = /filename="([^"]+)"/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? "report.pdf";
-
-      if (saveTo) {
-        if (!options.canWriteFiles) throw new ToolError("saveTo is only available on the local (stdio) server.");
-        if (!isAbsolute(saveTo)) throw new ToolError("saveTo must be an absolute path.");
-        const path = saveTo.endsWith(".pdf") ? saveTo : `${saveTo.replace(/\/$/, "")}/${filename}`;
-        // Never overwrite: an agent misled by text it read must not be able to clobber a file.
-        try {
-          writeFileSync(path, pdf, { flag: "wx" });
-        } catch (err) {
-          if ((err as NodeJS.ErrnoException).code === "EEXIST") throw new ToolError(`${path} already exists.`);
-          throw err;
-        }
-        return `Saved ${path}`;
-      }
+      const file = await download(api, `/reports/${reportId}/pdf?locale=${locale}`);
+      if (saveTo) return save(saveTo, file, options);
       return [
-        { type: "text", text: filename },
+        { type: "text", text: file.filename },
         {
           type: "resource",
           resource: {
             uri: `presto://reports/${reportId}/pdf`,
             mimeType: "application/pdf",
-            blob: pdf.toString("base64"),
+            blob: file.data.toString("base64"),
           },
         },
       ] satisfies Content[];
     },
+  }),
+
+  export_csv: tool({
+    description: "A year's reports as a spreadsheet for the accountant, drafts included.",
+    input: z.object({ year, locale, companyId: id("Company").optional(), saveTo }),
+    readOnly: true,
+    run: async ({ year, locale, companyId, saveTo }, api, options) => {
+      const file = await download(
+        api,
+        `/export/csv?year=${year}&locale=${locale}&company=${encodeURIComponent(companyId ?? "")}`,
+      );
+      return saveTo ? save(saveTo, file, options) : file.data.toString("utf8");
+    },
+  }),
+
+  export_data: tool({
+    description: "The whole database as JSON: a backup readable without SQLite.",
+    input: z.object({ saveTo }),
+    readOnly: true,
+    run: async ({ saveTo }, api, options) => {
+      const file = await download(api, "/export/json");
+      return saveTo ? save(saveTo, file, options) : file.data.toString("utf8");
+    },
+  }),
+
+  create_company: tool({
+    description: "Add a legal entity the freelancer bills through. Its name and business ID go on the PDF.",
+    input: z.object({
+      name: z.string(),
+      address: z.string().optional(),
+      businessId: z.string().optional().describe("SIRET, VAT number…"),
+      isDefault: z.boolean().optional().describe("Preselected for new missions"),
+    }),
+    run: (args, api) => call(api, "POST", "/companies", args),
+  }),
+
+  update_company: tool({
+    description: "Change a company's name, address, business ID, or make it the default.",
+    input: z.object({
+      companyId: id("Company"),
+      name: z.string().optional(),
+      address: z.string().nullable().optional(),
+      businessId: z.string().nullable().optional(),
+      isDefault: z.boolean().optional(),
+    }),
+    run: ({ companyId, ...patch }, api) => call(api, "PATCH", `/companies/${companyId}`, patch),
   }),
 
   create_client: tool({
@@ -235,10 +298,29 @@ const TOOLS: Record<string, Tool> = {
       currency: z.string().describe("ISO 4217, e.g. EUR"),
       holidayCountry: z.string().describe("ISO 3166-1 alpha-2, e.g. FR"),
       email: z.string().optional(),
+      phone: z.string().optional(),
       address: z.string().optional(),
       businessId: z.string().optional().describe("SIRET, VAT number…"),
+      color: z.enum(CLIENT_COLORS).optional(),
     }),
     run: (args, api) => call(api, "POST", "/clients", args),
+  }),
+
+  update_client: tool({
+    description:
+      "Change a client. A new holiday country applies to reports created from now on; existing reports keep theirs.",
+    input: z.object({
+      clientId: id("Client"),
+      name: z.string().optional(),
+      currency: z.string().optional().describe("ISO 4217, e.g. EUR"),
+      holidayCountry: z.string().optional().describe("ISO 3166-1 alpha-2, e.g. FR"),
+      email: z.string().nullable().optional(),
+      phone: z.string().nullable().optional(),
+      address: z.string().nullable().optional(),
+      businessId: z.string().nullable().optional(),
+      color: z.enum(CLIENT_COLORS).nullable().optional(),
+    }),
+    run: ({ clientId, ...patch }, api) => call(api, "PATCH", `/clients/${clientId}`, patch),
   }),
 
   create_mission: tool({
@@ -267,6 +349,15 @@ const TOOLS: Record<string, Tool> = {
     }),
     run: ({ missionId, ...patch }, api) => call(api, "PATCH", `/missions/${missionId}`, patch),
   }),
+
+  delete: tool({
+    description:
+      "Delete a report, mission, client or company, for good. Refused for a completed report (revert it to draft first) and for anything still in use (delete its reports or missions first).",
+    input: z.object({ type: z.enum(["report", "mission", "client", "company"]), id: z.string().min(1) }),
+    destructive: true,
+    run: ({ type, id }, api) =>
+      call(api, "DELETE", `/${type === "company" ? "companies" : `${type}s`}/${encodeURIComponent(id)}`),
+  }),
 };
 
 function toolList() {
@@ -276,7 +367,7 @@ function toolList() {
       name,
       description: t.description,
       inputSchema,
-      annotations: { readOnlyHint: !!t.readOnly, destructiveHint: false },
+      annotations: { readOnlyHint: !!t.readOnly, destructiveHint: !!t.destructive },
     };
   });
 }

@@ -46,8 +46,8 @@ Code and do the end of the month in a sentence:
 claude mcp add presto -- bun /path/to/presto/src/server/stdio.ts
 ```
 
-The agent goes through the same rules as the UI: completed reports stay frozen, nothing gets
-deleted, the private note never reaches the PDF. Setup for every client, local or remote, the use
+It can do everything the UI does, under the same rules: completed reports stay frozen, nothing in
+use can be deleted, the private note never reaches the PDF. Setup for every client, local or remote, the use
 cases and the REST API: **[docs/agents.md](docs/agents.md)**.
 
 ## Quick start

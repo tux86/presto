@@ -60,7 +60,8 @@ function summarize(report: Report, missions: Mission[], clients: Client[]) {
     client: client?.name,
     status: report.status,
     days,
-    amount: revenue(days, report.dailyRate),
+    // The report's snapshot, else the mission's rate: what the UI, CSV and summary use.
+    amount: revenue(days, report.dailyRate ?? mission?.dailyRate),
     currency: client?.currency,
   };
 }
@@ -118,7 +119,7 @@ const TOOLS: Record<string, Tool> = {
       return {
         ...summarize(report, [ctx.mission], [ctx.client]),
         company: ctx.company.name,
-        dailyRate: report.dailyRate,
+        dailyRate: report.dailyRate ?? ctx.mission.dailyRate,
         note: report.note,
         privateNote: report.privateNote,
         calendar: reportGrid(report, lookupFrom(ctx.holidays)).map((d) => ({

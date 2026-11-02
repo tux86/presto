@@ -171,6 +171,13 @@ describe("tools", () => {
     expect(JSON.stringify(again)).toContain("already exists");
   });
 
+  test("a report without a rate snapshot is priced at the mission's rate, like the UI", async () => {
+    const { reportId } = await seed();
+    db.query("UPDATE report SET dailyRate = NULL WHERE id = ?").run(reportId);
+    await tool("update_report", { reportId, days: { "4": 1, "5": 0.5 } });
+    expect((await tool("get_report", { reportId })).json()).toMatchObject({ dailyRate: 600, amount: 900 });
+  });
+
   test("get_overview lists the year's reports with totals", async () => {
     await seed();
     const overview = (await tool("get_overview", { year: 2026 })).json();

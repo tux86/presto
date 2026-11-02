@@ -109,9 +109,17 @@ export const reports = new Hono<Env>()
     assertEditable(report, patch);
     assertDaysInMonth(report, patch);
 
+    // A report created before its mission had a rate has no snapshot. Take one
+    // when it is completed, so the amount sent to the client cannot drift later.
+    const dailyRate =
+      patch.status === "completed" && report.dailyRate == null
+        ? (repo.getMission(c.var.db, report.missionId)?.dailyRate ?? undefined)
+        : undefined;
+
     return c.json(
       repo.updateReport(c.var.db, id, {
         ...patch,
+        dailyRate,
         days: patch.days && compactDays(patch.days),
         dayNotes: patch.dayNotes && compactNotes(patch.dayNotes),
       }),

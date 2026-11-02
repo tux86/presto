@@ -316,6 +316,7 @@ export interface ReportInput {
 
 export interface ReportPatch {
   status?: ReportStatus;
+  dailyRate?: number | null;
   days?: Record<string, DayValue>;
   dayNotes?: Record<string, string>;
   note?: string | null;
@@ -365,11 +366,12 @@ export function createReport(db: Db, input: ReportInput): Report {
 export function updateReport(db: Db, id: string, patch: ReportPatch): Report | null {
   const values: Record<string, Value> = { updatedAt: now() };
   if (patch.status !== undefined) values.status = patch.status;
+  if (patch.dailyRate !== undefined) values.dailyRate = patch.dailyRate;
   if (patch.days !== undefined) values.days = JSON.stringify(patch.days);
   if (patch.dayNotes !== undefined) values.dayNotes = JSON.stringify(patch.dayNotes);
   if (patch.note !== undefined) values.note = patch.note;
   if (patch.privateNote !== undefined) values.privateNote = patch.privateNote;
-  update(db, "report", ["status", "days", "dayNotes", "note", "privateNote", "updatedAt"], id, values);
+  update(db, "report", ["status", "dailyRate", "days", "dayNotes", "note", "privateNote", "updatedAt"], id, values);
   return getReport(db, id);
 }
 

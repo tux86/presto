@@ -539,3 +539,28 @@ describe("holiday coverage", () => {
     expect(body.holidays.FR.some((d: string) => d.startsWith("2019"))).toBe(true);
   });
 });
+
+describe("rate snapshot", () => {
+  test("a report created without a rate takes the mission's when completed", async () => {
+    const { missionId } = await seed();
+    await call("PATCH", `/missions/${missionId}`, { dailyRate: null });
+    const report = await call("POST", "/reports", { missionId, year: 2026, month: 2 });
+    expect(report.body.dailyRate).toBeNull();
+
+    await call("PATCH", `/missions/${missionId}`, { dailyRate: 660.25 });
+    const completed = await call("PATCH", `/reports/${report.body.id}`, { status: "completed" });
+    expect(completed.body.dailyRate).toBe(660.25);
+
+    // Taken once: a later rate change does not reach the completed report.
+    await call("PATCH", `/missions/${missionId}`, { dailyRate: 700 });
+    expect((await call("GET", `/reports/${report.body.id}`)).body.report.dailyRate).toBe(660.25);
+  });
+
+  test("an existing snapshot is kept", async () => {
+    const { missionId } = await seed();
+    const report = await call("POST", "/reports", { missionId, year: 2026, month: 2 });
+    await call("PATCH", `/missions/${missionId}`, { dailyRate: 700 });
+    const completed = await call("PATCH", `/reports/${report.body.id}`, { status: "completed" });
+    expect(completed.body.dailyRate).toBe(650);
+  });
+});

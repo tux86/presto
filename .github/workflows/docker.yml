@@ -100,6 +100,25 @@ jobs:
             org.opencontainers.image.description=Monthly activity reports for freelancers and consultants
             org.opencontainers.image.licenses=MIT
 
+      # Unit tests run from the source tree; only the built image proves the
+      # bundle starts and renders a PDF without node_modules. 2.2.2 and 2.3.0
+      # were published with a server that crashed on boot.
+      - name: Build for the smoke test
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: presto:smoke
+          cache-from: type=gha
+
+      # Runs with the Bun inside the image itself, so no extra action gets to
+      # run in a job that holds registry credentials.
+      - name: Smoke test the image
+        run: |
+          docker run -d --name presto-smoke -p 127.0.0.1:8080:8080 presto:smoke
+          docker run --rm --network host -v "$PWD/scripts/smoke.ts:/smoke.ts:ro" presto:smoke \
+            bun /smoke.ts http://localhost:8080 || { docker logs presto-smoke; exit 1; }
+
       - name: Build and push
         uses: docker/build-push-action@v7
         with:

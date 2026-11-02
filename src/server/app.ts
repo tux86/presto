@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { existsSync } from "node:fs";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
@@ -8,6 +9,7 @@ import type { Db } from "../db/index.ts";
 import * as repo from "../db/repo.ts";
 import { config } from "./config.ts";
 import { InUseError } from "./errors.ts";
+import { handleMcp } from "./mcp.ts";
 import { entities } from "./routes/entities.ts";
 import { reporting } from "./routes/reporting.ts";
 import { reports } from "./routes/reports.ts";
@@ -56,7 +58,14 @@ function holidayCalendars(
   return { holidays, holidayYears: [...years].sort((a, b) => a - b) };
 }
 
-export function createApp(db: Db) {
+/** Constant-time comparison, so the token cannot be guessed one byte at a time. */
+function sameToken(given: string, expected: string): boolean {
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+export function createApp(db: Db, options: { token?: string } = { token: config.token }) {
   const app = new Hono<Env>();
 
   app.use("*", async (c, next) => {
@@ -101,6 +110,29 @@ export function createApp(db: Db) {
 
   app.route("/api", api);
   app.all("/api/*", (c) => c.json({ error: "Not found" }, 404));
+
+  /**
+   * MCP over Streamable HTTP, stateless: every POST carries one JSON-RPC
+   * message and gets one JSON reply. Tools call the API above in-process.
+   */
+  app.post("/mcp", async (c) => {
+    // A browser page must not drive a local server through DNS rebinding.
+    const origin = c.req.header("Origin");
+    if (origin && URL.parse(origin)?.host !== c.req.header("Host")) {
+      return c.json({ error: "Cross-origin requests are not allowed" }, 403);
+    }
+    if (options.token && !sameToken(c.req.header("Authorization") ?? "", `Bearer ${options.token}`)) {
+      return c.json({ error: "Missing or wrong token" }, 401);
+    }
+
+    const message = await c.req.json().catch(() => undefined);
+    if (message === undefined) {
+      return c.json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }, 400);
+    }
+    const reply = await handleMcp(message, (path, init) => app.request(path, init), { canWriteFiles: false });
+    return reply ? c.json(reply) : c.body(null, 202);
+  });
+  app.all("/mcp", (c) => c.json({ error: "Use POST" }, 405));
 
   // Built UI, when there is one. In development Vite serves it instead.
   if (existsSync(UI_DIR)) {

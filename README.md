@@ -32,6 +32,24 @@ data is a single SQLite file you can copy, move and back up yourself.
 > Run it on `localhost`, or behind a reverse proxy, VPN or Tailscale that handles access control.
 > Do not put it on a public port. See [SECURITY.md](SECURITY.md).
 
+## Works with your AI agent
+
+Presto is an [MCP](https://modelcontextprotocol.io) server too. Connect Claude, Cursor, Codex or VS
+Code and do the end of the month in a sentence:
+
+> *"Fill May for Globex, I was off on the 14th. Complete it and save the PDF in French to
+> ~/Documents/CRA."*
+>
+> *"Did I bill a public holiday anywhere this year? How much did I bill per client?"*
+
+```bash
+claude mcp add presto -- bun /path/to/presto/src/server/stdio.ts
+```
+
+The agent goes through the same rules as the UI: completed reports stay frozen, nothing gets
+deleted, the private note never reaches the PDF. Setup for every client, local or remote, the use
+cases and the REST API: **[docs/agents.md](docs/agents.md)**.
+
 ## Quick start
 
 ```bash
@@ -152,6 +170,7 @@ Everything is optional. Presto runs with no configuration at all.
 | `PORT` | `3001` (`8080` in Docker) | HTTP port |
 | `DATA_DIR` | `./data` (`/data` in Docker) | where `presto.db` lives |
 | `APP_NAME` | `Presto` | name shown in the sidebar and the browser tab |
+| `PRESTO_TOKEN` | *(none)* | when set, the MCP endpoint `POST /mcp` requires `Authorization: Bearer <token>` — see [docs/agents.md](docs/agents.md#over-http) |
 
 Theme (light / dark / follow the system), language (English / French) and **privacy mode** are
 per-browser settings in the sidebar, not environment variables. Privacy mode blurs every amount —
@@ -194,11 +213,12 @@ if you need to get data out of it.
 ```bash
 bun install
 bun run dev            # API on :3001, Vite with HMR on :5173
-bun test               # 156 tests, no database or server needed
+bun test               # ~180 tests, no database or server needed
 bun run typecheck
 bun run lint:fix
 bun run seed --reset   # sample data to work against
 bun run backup         # snapshot the database
+bun run mcp            # MCP server on stdio, for a local agent
 ```
 
 ```
@@ -206,7 +226,7 @@ src/
   core/    pure logic — calendars, holidays, totals, yearly rollup, CSV
   db/      SQLite schema, migrations, queries
   pdf/     the document your client receives
-  server/  Hono routes, static file serving
+  server/  Hono routes, static file serving, the MCP server
   ui/      React app
   i18n/    English and French, shared by the UI and the PDF
 ```

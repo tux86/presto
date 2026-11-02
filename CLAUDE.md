@@ -22,6 +22,7 @@ bun run lint:fix
 bun run build        # UI only
 bun run build:server # single-file server bundle (Docker)
 bun run seed --reset # deterministic demo data for development
+bun run mcp          # MCP server on stdio (agents on this machine)
 ```
 
 ## Structure
@@ -30,7 +31,7 @@ bun run seed --reset # deterministic demo data for development
 src/core/    pure logic: dates, holidays, grid, totals, yearly rollup, CSV
 src/db/      schema + migrations + queries
 src/pdf/     the client-facing document
-src/server/  routes, config, validation
+src/server/  routes, config, validation, MCP (mcp.ts; stdio.ts entry)
 src/ui/      React app
 src/i18n/    en.ts (source of truth) + fr.ts, shared by UI and PDF
 ```
@@ -53,6 +54,9 @@ Tests point at `core/` and `pdf/`; the HTTP layer gets smoke tests only.
 - **Completed reports are frozen** except the private note and the status itself.
 - **`note` is printed on the client's PDF; `privateNote` never leaves the machine.** Keep them
   visually distinct in the UI, and keep the PDF test that asserts the private note is absent.
+- **MCP is hand-rolled, tools only, stateless** (`src/server/mcp.ts`, no SDK). Every tool calls
+  the REST API in-process, so business rules stay in the routes. No delete tools. `PRESTO_TOKEN`
+  guards `POST /mcp` only. User docs: `docs/agents.md`.
 
 ## Conventions
 

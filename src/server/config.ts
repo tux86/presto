@@ -10,6 +10,8 @@ export const config = {
   appName: process.env.APP_NAME ?? "Presto",
   version: pkg.version,
   dataDir: process.env.DATA_DIR ?? "./data",
+  /** When set, `POST /mcp` requires `Authorization: Bearer <token>`. */
+  token: process.env.PRESTO_TOKEN || undefined,
 } as const;
 
 export function databasePath(): string {

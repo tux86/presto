@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/tux86/presto/compare/v2.3.0...v2.3.1) (2026-11-02)
+
+### Bug Fixes
+
+* **docker:** ship pdfkit's standard fonts so the image starts ([360599a](https://github.com/tux86/presto/commit/360599aa56031522a0947a25db7c63ad0ce44310))
+
 ## [2.3.0](https://github.com/tux86/presto/compare/v2.2.3...v2.3.0) (2026-11-02)
 
 ### Features

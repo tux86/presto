@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/tux86/presto/compare/v2.2.0...v2.2.1) (2026-11-02)
+
+### Bug Fixes
+
+* **mcp:** never overwrite a file when saving a pdf ([c7ab746](https://github.com/tux86/presto/commit/c7ab746ad5486429a8fa865f5eccb8b7690fe07d))
+
 ## [2.2.0](https://github.com/tux86/presto/compare/v2.1.2...v2.2.0) (2026-11-02)
 
 ### Features

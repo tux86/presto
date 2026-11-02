@@ -1,6 +1,6 @@
 {
   "name": "presto",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Self-hosted activity report generator for freelancers and consultants. Track billable days, export PDF reports, drive it from an AI agent over MCP.",
   "keywords": [
     "time-tracking",

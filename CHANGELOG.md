@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/tux86/presto/compare/v2.2.1...v2.2.2) (2026-11-02)
+
+### Bug Fixes
+
+* **deps:** ship the updated dependencies ([3677548](https://github.com/tux86/presto/commit/3677548751144813607a766709cd197481f9d32a)), closes [#30](https://github.com/tux86/presto/issues/30)
+
 ## [2.2.1](https://github.com/tux86/presto/compare/v2.2.0...v2.2.1) (2026-11-02)
 
 ### Bug Fixes

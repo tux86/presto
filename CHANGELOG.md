@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/tux86/presto/compare/v2.2.3...v2.3.0) (2026-11-02)
+
+### Features
+
+* **mcp:** cover everything the UI does ([b225eec](https://github.com/tux86/presto/commit/b225eecb73b2e023a81d89c56a773216b9cb5a53))
+
 ## [2.2.3](https://github.com/tux86/presto/compare/v2.2.2...v2.2.3) (2026-11-02)
 
 ### Bug Fixes

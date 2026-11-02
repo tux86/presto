@@ -29,7 +29,7 @@ jobs:
     name: Build and publish image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Build the tag being published, not whatever main happens to be.
           ref: ${{ inputs.version && format('v{0}', inputs.version) || github.ref }}

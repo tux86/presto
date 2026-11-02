@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/tux86/presto/compare/v2.2.2...v2.2.3) (2026-11-02)
+
+### Bug Fixes
+
+* price reports without a rate snapshot at the mission's rate ([6ae619a](https://github.com/tux86/presto/commit/6ae619a87881e1c086ec5bb18eea59acee6e1d4c))
+* round half cents up reliably, and let agents change a mission ([a62e5d7](https://github.com/tux86/presto/commit/a62e5d7ea45e4b93be0df64941c46d2ffd7cabbe))
+
 ## [2.2.2](https://github.com/tux86/presto/compare/v2.2.1...v2.2.2) (2026-11-02)
 
 ### Bug Fixes
